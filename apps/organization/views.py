@@ -32,6 +32,11 @@ class CompanyListView(LoginRequiredMixin, ListView):
                 Q(industry__icontains=search) |
                 Q(city__icontains=search)
             )
+        status = self.request.GET.get('status', '')
+        if status == 'active':
+            qs = qs.filter(is_active=True)
+        elif status == 'inactive':
+            qs = qs.filter(is_active=False)
         return qs
 
 
@@ -108,7 +113,12 @@ class DepartmentListView(LoginRequiredMixin, ListView):
                 Q(code__icontains=search) |
                 Q(description__icontains=search)
             )
-        return qs
+        status = self.request.GET.get('status', '')
+        if status == 'active':
+            qs = qs.filter(is_active=True)
+        elif status == 'inactive':
+            qs = qs.filter(is_active=False)
+        return qs.select_related('parent', 'head', 'company')
 
 
 class DepartmentCreateView(LoginRequiredMixin, CreateView):
@@ -185,7 +195,15 @@ class DesignationListView(LoginRequiredMixin, ListView):
                 Q(code__icontains=search) |
                 Q(description__icontains=search)
             )
-        return qs
+        department = self.request.GET.get('department', '')
+        if department:
+            qs = qs.filter(department_id=department)
+        return qs.select_related('department')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['departments'] = Department.objects.filter(tenant=self.request.tenant, is_active=True)
+        return context
 
 
 class DesignationCreateView(LoginRequiredMixin, CreateView):
@@ -292,7 +310,15 @@ class CostCenterListView(LoginRequiredMixin, ListView):
                 Q(code__icontains=search) |
                 Q(description__icontains=search)
             )
-        return qs
+        department = self.request.GET.get('department', '')
+        if department:
+            qs = qs.filter(department_id=department)
+        return qs.select_related('department')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['departments'] = Department.objects.filter(tenant=self.request.tenant, is_active=True)
+        return context
 
 
 class CostCenterCreateView(LoginRequiredMixin, CreateView):
