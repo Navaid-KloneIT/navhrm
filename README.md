@@ -8,6 +8,7 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Database:** MySQL (MariaDB via XAMPP)
 - **Frontend:** Bootstrap 5.3, jQuery, Remix Icons, Chart.js
 - **Multi-tenancy:** Shared database with login-based tenant isolation
+- **Config:** python-decouple for environment variables
 
 ## Features
 
@@ -68,27 +69,42 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
    pip install -r requirements.txt
    ```
 
-4. **Create MySQL database**
+4. **Configure environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` and update the values for your environment:
+   ```
+   SECRET_KEY=your-secret-key-here
+   DEBUG=True
+   DB_NAME=navhrm
+   DB_USER=root
+   DB_PASSWORD=
+   DB_HOST=localhost
+   DB_PORT=3306
+   ```
+
+5. **Create MySQL database**
    ```sql
    CREATE DATABASE navhrm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
    ```
 
-5. **Run migrations**
+6. **Run migrations**
    ```bash
    python manage.py migrate
    ```
 
-6. **Seed sample data**
+7. **Seed sample data**
    ```bash
    python manage.py seed_data
    ```
 
-7. **Run the development server**
+8. **Run the development server**
    ```bash
    python manage.py runserver
    ```
 
-8. **Open in browser**
+9. **Open in browser**
    ```
    http://localhost:8000
    ```
@@ -107,45 +123,52 @@ After running `seed_data`, three tenant accounts are available:
 
 ```
 navhrm/
+├── .env                   # Environment variables (not in git)
+├── .env.example           # Environment template for new setups
 ├── apps/
-│   ├── core/           # Tenant model, middleware, base models
-│   ├── accounts/       # Auth, users, profiles, invites
-│   ├── organization/   # Company, departments, designations, org chart
-│   ├── employees/      # Employee directory, profiles, documents
-│   ├── onboarding/     # Onboarding tasks, assets, orientation
-│   └── offboarding/    # Resignations, exit interviews, clearance, F&F
-├── config/             # Django settings, URLs, WSGI
+│   ├── core/              # Tenant model, middleware, base models
+│   ├── accounts/          # Auth, users, profiles, invites
+│   ├── organization/      # Company, departments, designations, org chart
+│   ├── employees/         # Employee directory, profiles, documents
+│   ├── onboarding/        # Onboarding tasks, assets, orientation
+│   └── offboarding/       # Resignations, exit interviews, clearance, F&F
+├── config/                # Django settings, URLs, WSGI
 ├── static/
-│   ├── css/style.css   # Custom theme CSS
-│   └── js/app.js       # Theme engine & UI JavaScript
+│   ├── css/style.css      # Custom theme CSS
+│   └── js/app.js          # Theme engine & UI JavaScript
 ├── templates/
-│   ├── base.html       # Master layout
-│   ├── partials/       # Sidebar, topbar, footer, theme settings
-│   ├── auth/           # Login, register, forgot password
-│   ├── dashboard/      # Dashboard index
-│   ├── accounts/       # User management templates
-│   ├── organization/   # Organization templates
-│   ├── employees/      # Employee templates
-│   ├── onboarding/     # Onboarding templates
-│   └── offboarding/    # Offboarding templates
-├── media/              # User uploads
+│   ├── base.html          # Master layout
+│   ├── partials/          # Sidebar, topbar, footer, theme settings
+│   ├── auth/              # Login, register, forgot password
+│   ├── dashboard/         # Dashboard index
+│   ├── accounts/          # User management templates
+│   ├── organization/      # Organization templates
+│   ├── employees/         # Employee templates
+│   ├── onboarding/        # Onboarding templates
+│   └── offboarding/       # Offboarding templates
+├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
 ```
 
-## Configuration
+## Environment Variables
 
-Database settings are in `config/settings.py`. Update the `DATABASES` section if your MySQL credentials differ from defaults:
+All configuration is managed via the `.env` file using `python-decouple`. See `.env.example` for all available variables.
 
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'navhrm',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '3306',
-    }
-}
-```
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SECRET_KEY` | - | Django secret key (required) |
+| `DEBUG` | `False` | Enable debug mode |
+| `ALLOWED_HOSTS` | `*` | Comma-separated allowed hosts |
+| `DB_ENGINE` | `django.db.backends.mysql` | Database engine |
+| `DB_NAME` | `navhrm` | Database name |
+| `DB_USER` | `root` | Database username |
+| `DB_PASSWORD` | *(empty)* | Database password |
+| `DB_HOST` | `localhost` | Database host |
+| `DB_PORT` | `3306` | Database port |
+| `APP_NAME` | `NavHRM` | Application display name |
+| `TIME_ZONE` | `UTC` | Server timezone |
+| `LANGUAGE_CODE` | `en-us` | Default language |
+| `LOGIN_URL` | `/accounts/login/` | Login page URL |
+| `LOGIN_REDIRECT_URL` | `/` | Redirect after login |
+| `LOGOUT_REDIRECT_URL` | `/accounts/login/` | Redirect after logout |
