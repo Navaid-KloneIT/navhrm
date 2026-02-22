@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Letter{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Generate Letter</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'offboarding:letter_list' %}">Letters</a></li>
+            <li class="breadcrumb-item active">Generate</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Letter Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.employee.id_for_label }}" class="form-label">
+                                Employee <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.employee.html_name }}"
+                                    id="{{ form.employee.id_for_label }}"
+                                    class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                                <option value="">Select Employee</option>
+                                {% for choice in form.employee.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.employee.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="{{ form.letter_type.id_for_label }}" class="form-label">
+                                Letter Type <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.letter_type.html_name }}"
+                                    id="{{ form.letter_type.id_for_label }}"
+                                    class="form-select {% if form.letter_type.errors %}is-invalid{% endif %}">
+                                {% for value, label in form.letter_type.field.choices %}
+                                {% if value %}
+                                <option value="{{ value }}" {% if form.letter_type.value == value %}selected{% endif %}>{{ label }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            {% for error in form.letter_type.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="{{ form.letter_date.id_for_label }}" class="form-label">
+                                Letter Date <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   name="{{ form.letter_date.html_name }}"
+                                   id="{{ form.letter_date.id_for_label }}"
+                                   class="form-control {% if form.letter_date.errors %}is-invalid{% endif %}"
+                                   value="{{ form.letter_date.value|default:'' }}">
+                            {% for error in form.letter_date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.content.id_for_label }}" class="form-label">
+                                Letter Content <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="{{ form.content.html_name }}"
+                                      id="{{ form.content.id_for_label }}"
+                                      class="form-control {% if form.content.errors %}is-invalid{% endif %}"
+                                      rows="15"
+                                      placeholder="Enter or compose the letter content here...">{{ form.content.value|default:'' }}</textarea>
+                            {% for error in form.content.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">Write the full letter content. Use line breaks for paragraph spacing.</div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input type="checkbox"
+                                       name="{{ form.is_issued.html_name }}"
+                                       id="{{ form.is_issued.id_for_label }}"
+                                       class="form-check-input"
+                                       {% if form.is_issued.value %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ form.is_issued.id_for_label }}">Mark as Issued</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-file-text-line me-1"></i> Generate Letter
+                        </button>
+                        <a href="{% url 'offboarding:letter_list' %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
