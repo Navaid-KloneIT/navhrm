@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Edit Profile</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'accounts:profile' %}">Profile</a></li>
+            <li class="breadcrumb-item active">Edit</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST" enctype="multipart/form-data" action="{% url 'accounts:profile_edit' %}">
+    {% csrf_token %}
+
+    {% if user_form.non_field_errors or profile_form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in user_form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+        {% for error in profile_form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+        <!-- Personal Details -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5><i class="ri-user-3-line me-2 text-primary"></i> Personal Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- First Name -->
+                        <div class="col-md-6">
+                            <label for="{{ user_form.first_name.id_for_label }}" class="form-label">First Name</label>
+                            {{ user_form.first_name }}
+                            {% if user_form.first_name.errors %}
+                            <div class="invalid-feedback d-block">{{ user_form.first_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="col-md-6">
+                            <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                            {{ user_form.last_name }}
+                            {% if user_form.last_name.errors %}
+                            <div class="invalid-feedback d-block">{{ user_form.last_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-12">
+                            <label for="{{ user_form.email.id_for_label }}" class="form-label">Email Address</label>
+                            {{ user_form.email }}
+                            {% if user_form.email.errors %}
+                            <div class="invalid-feedback d-block">{{ user_form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="col-12">
+                            <label for="{{ user_form.phone.id_for_label }}" class="form-label">Phone</label>
+                            {{ user_form.phone }}
+                            {% if user_form.phone.errors %}
+                            <div class="invalid-feedback d-block">{{ user_form.phone.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Avatar -->
+                        <div class="col-12">
+                            <label for="{{ user_form.avatar.id_for_label }}" class="form-label">Avatar</label>
+                            {{ user_form.avatar }}
+                            {% if request.user.avatar %}
+                            <div class="mt-2">
+                                <img src="{{ request.user.avatar.url }}" alt="Current avatar" class="rounded" width="48" height="48" style="object-fit: cover;">
+                                <small class="text-muted ms-2">Current avatar</small>
+                            </div>
+                            {% endif %}
+                            {% if user_form.avatar.errors %}
+                            <div class="invalid-feedback d-block">{{ user_form.avatar.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Details -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5><i class="ri-file-user-line me-2 text-primary"></i> Profile Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- Bio -->
+                        <div class="col-12">
+                            <label for="{{ profile_form.bio.id_for_label }}" class="form-label">Bio</label>
+                            {{ profile_form.bio }}
+                            {% if profile_form.bio.errors %}
+                            <div class="invalid-feedback d-block">{{ profile_form.bio.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Date of Birth -->
+                        <div class="col-md-6">
+                            <label for="{{ profile_form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
+                            {{ profile_form.date_of_birth }}
+                            {% if profile_form.date_of_birth.errors %}
+                            <div class="invalid-feedback d-block">{{ profile_form.date_of_birth.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Zip Code -->
+                        <div class="col-md-6">
+                            <label for="{{ profile_form.zip_code.id_for_label }}" class="form-label">Zip Code</label>
+                            {{ profile_form.zip_code }}
+                            {% if profile_form.zip_code.errors %}
+                            <div class="invalid-feedback d-block">{{ profile_form.zip_code.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Address -->
+                        <div class="col-12">
+                            <label for="{{ profile_form.address.id_for_label }}" class="form-label">Address</label>
+                            {{ profile_form.address }}
+                            {% if profile_form.address.errors %}
+                            <div class="invalid-feedback d-block">{{ profile_form.address.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- City -->
+                        <div class="col-md-6">
+                            <label for="{{ profile_form.city.id_for_label }}" class="form-label">City</label>
+                            {{ profile_form.city }}
+                            {% if profile_form.city.errors %}
+                            <div class="invalid-feedback d-block">{{ profile_form.city.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- State -->
+                        <div class="col-md-6">
+                            <label for="{{ profile_form.state.id_for_label }}" class="form-label">State</label>
+                            {{ profile_form.state }}
+                            {% if profile_form.state.errors %}
+                            <div class="invalid-feedback d-block">{{ profile_form.state.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Country -->
+                        <div class="col-12">
+                            <label for="{{ profile_form.country.id_for_label }}" class="form-label">Country</label>
+                            {{ profile_form.country }}
+                            {% if profile_form.country.errors %}
+                            <div class="invalid-feedback d-block">{{ profile_form.country.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Save Changes
+                </button>
+                <a href="{% url 'accounts:profile' %}" class="btn btn-light">
+                    <i class="ri-arrow-left-line me-1"></i> Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
