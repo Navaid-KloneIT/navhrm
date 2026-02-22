@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Orientation Session{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Orientation Session</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'onboarding:list' %}">Onboarding</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'onboarding:orientation_list' %}">Orientation</a></li>
+            <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}Create{% endif %}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Session Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">
+                                Title <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="{{ form.title.html_name }}"
+                                   id="{{ form.title.id_for_label }}"
+                                   class="form-control {% if form.title.errors %}is-invalid{% endif %}"
+                                   value="{{ form.title.value|default:'' }}"
+                                   placeholder="e.g., Company Overview Presentation">
+                            {% for error in form.title.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.session_type.id_for_label }}" class="form-label">
+                                Session Type <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.session_type.html_name }}"
+                                    id="{{ form.session_type.id_for_label }}"
+                                    class="form-select {% if form.session_type.errors %}is-invalid{% endif %}">
+                                <option value="">Select Type</option>
+                                {% for value, label in form.session_type.field.choices %}
+                                {% if value %}
+                                <option value="{{ value }}" {% if form.session_type.value == value %}selected{% endif %}>{{ label }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            {% for error in form.session_type.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            <textarea name="{{ form.description.html_name }}"
+                                      id="{{ form.description.id_for_label }}"
+                                      class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Describe the session agenda...">{{ form.description.value|default:'' }}</textarea>
+                            {% for error in form.description.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.facilitator.id_for_label }}" class="form-label">Facilitator</label>
+                            <select name="{{ form.facilitator.html_name }}"
+                                    id="{{ form.facilitator.id_for_label }}"
+                                    class="form-select {% if form.facilitator.errors %}is-invalid{% endif %}">
+                                <option value="">Select Facilitator</option>
+                                {% for choice in form.facilitator.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if form.facilitator.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.facilitator.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.date.id_for_label }}" class="form-label">
+                                Date <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   name="{{ form.date.html_name }}"
+                                   id="{{ form.date.id_for_label }}"
+                                   class="form-control {% if form.date.errors %}is-invalid{% endif %}"
+                                   value="{{ form.date.value|default:'' }}">
+                            {% for error in form.date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.start_time.id_for_label }}" class="form-label">
+                                Start Time <span class="text-danger">*</span>
+                            </label>
+                            <input type="time"
+                                   name="{{ form.start_time.html_name }}"
+                                   id="{{ form.start_time.id_for_label }}"
+                                   class="form-control {% if form.start_time.errors %}is-invalid{% endif %}"
+                                   value="{{ form.start_time.value|default:'' }}">
+                            {% for error in form.start_time.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.end_time.id_for_label }}" class="form-label">
+                                End Time <span class="text-danger">*</span>
+                            </label>
+                            <input type="time"
+                                   name="{{ form.end_time.html_name }}"
+                                   id="{{ form.end_time.id_for_label }}"
+                                   class="form-control {% if form.end_time.errors %}is-invalid{% endif %}"
+                                   value="{{ form.end_time.value|default:'' }}">
+                            {% for error in form.end_time.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
+                            <input type="text"
+                                   name="{{ form.location.html_name }}"
+                                   id="{{ form.location.id_for_label }}"
+                                   class="form-control {% if form.location.errors %}is-invalid{% endif %}"
+                                   value="{{ form.location.value|default:'' }}"
+                                   placeholder="e.g., Conference Room A">
+                            {% for error in form.location.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.employees.id_for_label }}" class="form-label">Attendees</label>
+                            <select name="{{ form.employees.html_name }}"
+                                    id="{{ form.employees.id_for_label }}"
+                                    class="form-select {% if form.employees.errors %}is-invalid{% endif %}"
+                                    multiple
+                                    size="5">
+                                {% for choice in form.employees.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if choice.pk in form.employees.value %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.employees.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">Hold Ctrl/Cmd to select multiple employees.</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> {% if form.instance.pk %}Update{% else %}Create{% endif %} Session
+                        </button>
+                        <a href="{% url 'onboarding:orientation_list' %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
