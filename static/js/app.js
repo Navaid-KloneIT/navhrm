@@ -343,6 +343,8 @@
      */
     Sidebar.prototype._init = function () {
         this._sidebarEl = document.getElementById("app-sidebar") ||
+                          document.querySelector(".app-menu") ||
+                          document.querySelector(".navbar-menu") ||
                           document.querySelector(".app-sidebar") ||
                           document.querySelector(".vertical-menu");
 
@@ -382,7 +384,7 @@
     Sidebar.prototype._bindToggleButtons = function () {
         var self = this;
         var togglers = document.querySelectorAll(
-            '[data-toggle="sidebar"], .sidebar-toggle, .hamburger-icon, #sidebar-toggle'
+            '[data-toggle="sidebar"], .sidebar-toggle, .topnav-hamburger, #topnav-hamburger-icon, .hamburger-icon, #sidebar-toggle'
         );
 
         for (var i = 0; i < togglers.length; i++) {
@@ -1425,6 +1427,136 @@
     }
 
     // =========================================================================
+    // Dark Mode Toggle
+    // =========================================================================
+
+    function _bindDarkModeToggle(themeManager) {
+        var btn = document.getElementById("light-dark-mode-btn") ||
+                  document.querySelector(".light-dark-mode");
+        if (!btn) return;
+
+        function updateIcon() {
+            var isDark = themeManager.get("theme") === "dark";
+            var darkIcon = document.getElementById("theme-icon-dark");
+            var lightIcon = document.getElementById("theme-icon-light");
+            if (darkIcon) darkIcon.classList.toggle("d-none", isDark);
+            if (lightIcon) lightIcon.classList.toggle("d-none", !isDark);
+        }
+
+        btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            themeManager.toggleTheme();
+            updateIcon();
+        });
+
+        themeManager.onChange(function (key) {
+            if (key === "theme" || key === "*") updateIcon();
+        });
+
+        updateIcon();
+    }
+
+    // =========================================================================
+    // Fullscreen Toggle
+    // =========================================================================
+
+    function _bindFullscreenToggle() {
+        var btns = document.querySelectorAll('[data-toggle="fullscreen"]');
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].addEventListener("click", function (e) {
+                e.preventDefault();
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(function () {});
+                } else {
+                    document.exitFullscreen().catch(function () {});
+                }
+            });
+        }
+    }
+
+    // =========================================================================
+    // Search Box
+    // =========================================================================
+
+    function _bindSearchBox() {
+        var input = document.getElementById("search-options");
+        var dropdown = document.getElementById("search-dropdown");
+        var closeBtn = document.getElementById("search-close-options");
+        if (!input || !dropdown) return;
+
+        // Build search data from sidebar links.
+        var searchData = [];
+        var sidebarLinks = document.querySelectorAll(".app-menu .menu-link[href]");
+        for (var i = 0; i < sidebarLinks.length; i++) {
+            var href = sidebarLinks[i].getAttribute("href");
+            if (!href || href === "#" || href === "javascript:void(0);") continue;
+            var text = (sidebarLinks[i].textContent || "").trim();
+            var icon = sidebarLinks[i].querySelector("i");
+            var iconClass = icon ? icon.className : "ri-link";
+            if (text) {
+                searchData.push({ text: text, href: href, icon: iconClass });
+            }
+        }
+
+        function renderResults(query) {
+            if (!query) {
+                dropdown.classList.remove("show");
+                dropdown.innerHTML = "";
+                return;
+            }
+            var q = query.toLowerCase();
+            var matches = [];
+            for (var i = 0; i < searchData.length; i++) {
+                if (searchData[i].text.toLowerCase().indexOf(q) !== -1) {
+                    matches.push(searchData[i]);
+                }
+            }
+            if (matches.length === 0) {
+                dropdown.innerHTML = '<div class="p-3 text-center text-muted"><i class="ri-search-line d-block mb-1" style="font-size:20px;opacity:.4"></i>No results found</div>';
+            } else {
+                var html = "";
+                for (var j = 0; j < matches.length && j < 8; j++) {
+                    html += '<a href="' + matches[j].href + '" class="dropdown-item d-flex align-items-center gap-2 py-2">' +
+                            '<i class="' + matches[j].icon.split(" ")[0] + ' text-muted"></i>' +
+                            '<span>' + _escapeHtml(matches[j].text) + '</span></a>';
+                }
+                dropdown.innerHTML = html;
+            }
+            dropdown.classList.add("show");
+        }
+
+        var debounce;
+        input.addEventListener("input", function () {
+            clearTimeout(debounce);
+            var val = input.value.trim();
+            debounce = setTimeout(function () {
+                renderResults(val);
+            }, 150);
+            if (closeBtn) {
+                closeBtn.classList.toggle("d-none", !val);
+            }
+        });
+
+        input.addEventListener("focus", function () {
+            if (input.value.trim()) renderResults(input.value.trim());
+        });
+
+        if (closeBtn) {
+            closeBtn.addEventListener("click", function () {
+                input.value = "";
+                dropdown.classList.remove("show");
+                closeBtn.classList.add("d-none");
+            });
+        }
+
+        document.addEventListener("click", function (e) {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove("show");
+            }
+        });
+    }
+
+    // =========================================================================
     // Initialization
     // =========================================================================
 
@@ -1462,6 +1594,15 @@
                 input: filterInputs[i]
             });
         }
+
+        // 9. Dark mode toggle button.
+        _bindDarkModeToggle(themeManager);
+
+        // 10. Fullscreen toggle.
+        _bindFullscreenToggle();
+
+        // 11. Search box.
+        _bindSearchBox();
 
         // Expose key objects on the global NavHRM namespace.
         window.NavHRM = {
