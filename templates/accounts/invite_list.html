@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}User Invitations{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>User Invitations</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item active">Invitations</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Invitations</h5>
+                <a href="{% url 'accounts:invite_send' %}" class="btn btn-success">
+                    <i class="ri-mail-send-line me-1"></i> Send Invite
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Invited By</th>
+                                <th>Sent Date</th>
+                                <th>Expires</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invite in invites %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="ri-mail-line text-muted"></i>
+                                        <span class="fw-medium">{{ invite.email }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-primary text-primary">{{ invite.get_role_display }}</span>
+                                </td>
+                                <td>
+                                    {% if invite.status == 'pending' %}
+                                        <span class="status-badge badge-soft-warning">
+                                            <span class="status-dot bg-warning"></span>
+                                            Pending
+                                        </span>
+                                    {% elif invite.status == 'accepted' %}
+                                        <span class="status-badge badge-soft-success">
+                                            <span class="status-dot bg-success"></span>
+                                            Accepted
+                                        </span>
+                                    {% elif invite.status == 'expired' %}
+                                        <span class="status-badge badge-soft-danger">
+                                            <span class="status-dot bg-danger"></span>
+                                            Expired
+                                        </span>
+                                    {% elif invite.status == 'cancelled' %}
+                                        <span class="status-badge badge-soft-secondary">
+                                            <span class="status-dot bg-secondary"></span>
+                                            Cancelled
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ invite.invited_by.get_full_name|default:invite.invited_by.username }}</td>
+                                <td>{{ invite.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if invite.status == 'pending' %}
+                                        {{ invite.expires_at|date:"M d, Y H:i" }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if invite.status == 'pending' %}
+                                    <div class="d-flex gap-1">
+                                        <button type="button" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="Copy invite link" onclick="copyInviteLink('{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:accept_invite' invite.token %}')">
+                                            <i class="ri-file-copy-line"></i>
+                                        </button>
+                                    </div>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-mail-send-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No invitations yet</p>
+                                        <p class="mb-0" style="font-size: 13px;">Send your first invitation to get started.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Invitation list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function copyInviteLink(url) {
+        navigator.clipboard.writeText(url).then(function() {
+            // Show a brief tooltip or toast
+            var toastHtml = '<div class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">' +
+                '<div class="d-flex"><div class="toast-body"><i class="ri-check-double-line me-1"></i> Invite link copied to clipboard!</div>' +
+                '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div></div>';
+            var container = document.getElementById('django-messages');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'django-messages';
+                container.className = 'position-fixed top-0 end-0 p-3';
+                container.style.cssText = 'z-index: 1080; margin-top: 70px;';
+                document.body.appendChild(container);
+            }
+            container.innerHTML = toastHtml;
+            var toastEl = container.querySelector('.toast');
+            var toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 3000 });
+            toast.show();
+        });
+    }
+</script>
+{% endblock %}
