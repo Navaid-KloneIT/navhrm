@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views import View
@@ -249,6 +249,9 @@ class DesignationDeleteView(LoginRequiredMixin, View):
 
 class OrgChartView(LoginRequiredMixin, View):
     def get(self, request):
+        if request.GET.get('format') != 'json':
+            return render(request, 'organization/org_chart.html')
+
         departments = Department.objects.filter(
             tenant=request.tenant,
             is_active=True,
@@ -262,17 +265,12 @@ class OrgChartView(LoginRequiredMixin, View):
                 'code': dept.code,
                 'parent_id': dept.parent_id,
                 'company': dept.company.name if dept.company else None,
-                'head': None,
+                'head_name': str(dept.head) if dept.head else None,
                 'employee_count': dept.employee_count,
             }
-            if dept.head:
-                node['head'] = {
-                    'id': dept.head.id,
-                    'name': str(dept.head),
-                }
             nodes.append(node)
 
-        return JsonResponse({'departments': nodes})
+        return JsonResponse(nodes, safe=False)
 
 
 # ---------------------------------------------------------------------------
