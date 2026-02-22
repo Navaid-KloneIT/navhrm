@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>My Profile</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item active">Profile</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Profile Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-4">
+                    <div class="avatar avatar-xl">
+                        {% if request.user.avatar %}
+                            <img src="{{ request.user.avatar.url }}" alt="{{ request.user.get_full_name }}" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-soft-primary text-primary d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 28px; font-weight: 600;">
+                                {{ request.user.get_initials }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="mb-1">{{ request.user.get_full_name|default:request.user.username }}</h4>
+                        <span class="badge bg-soft-primary text-primary mb-2">{{ request.user.get_role_display }}</span>
+                        <p class="text-muted mb-0">
+                            <i class="ri-mail-line me-1"></i> {{ request.user.email }}
+                        </p>
+                    </div>
+                    <div>
+                        <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">
+                            <i class="ri-pencil-line me-1"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Personal Information -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5><i class="ri-user-3-line me-2 text-primary"></i> Personal Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Bio</label>
+                        <p class="mb-0">{{ profile.bio|default:"Not provided" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Date of Birth</label>
+                        <p class="mb-0">
+                            {% if profile.date_of_birth %}
+                                {{ profile.date_of_birth|date:"M d, Y" }}
+                            {% else %}
+                                Not provided
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-12">
+                        <label class="text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Address</label>
+                        <p class="mb-0">{{ profile.address|default:"Not provided" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">City</label>
+                        <p class="mb-0">{{ profile.city|default:"Not provided" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">State</label>
+                        <p class="mb-0">{{ profile.state|default:"Not provided" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
+                        <p class="mb-0">{{ profile.country|default:"Not provided" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Information -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5><i class="ri-shield-user-line me-2 text-primary"></i> Account Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Username</label>
+                        <p class="mb-0">{{ request.user.username }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Email</label>
+                        <p class="mb-0">{{ request.user.email }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Phone</label>
+                        <p class="mb-0">{{ request.user.phone|default:"Not provided" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Role</label>
+                        <p class="mb-0">
+                            <span class="badge bg-soft-primary text-primary">{{ request.user.get_role_display }}</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Date Joined</label>
+                        <p class="mb-0">{{ request.user.date_joined|date:"M d, Y" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Last Login</label>
+                        <p class="mb-0">
+                            {% if request.user.last_login %}
+                                {{ request.user.last_login|date:"M d, Y H:i" }}
+                            {% else %}
+                                Never
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
