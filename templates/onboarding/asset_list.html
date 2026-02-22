@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Asset Allocations{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Asset Allocations</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'onboarding:list' %}">Onboarding</a></li>
+            <li class="breadcrumb-item active">Assets</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Assets</h5>
+                <a href="{% url 'onboarding:asset_allocate' %}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> Allocate Asset
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Asset Name</th>
+                                <th>Type</th>
+                                <th>Employee</th>
+                                <th>Serial No.</th>
+                                <th>Status</th>
+                                <th>Allocated Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for asset in assets %}
+                            <tr>
+                                <td>
+                                    <span class="fw-medium">{{ asset.asset_name }}</span>
+                                    {% if asset.asset_id %}
+                                    <div class="text-muted" style="font-size: 12px;">ID: {{ asset.asset_id }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>{{ asset.get_asset_type_display }}</td>
+                                <td>{{ asset.employee }}</td>
+                                <td>{{ asset.serial_number|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-{% if asset.status == 'allocated' %}success{% elif asset.status == 'returned' %}info{% elif asset.status == 'lost' %}danger{% else %}warning{% endif %}">
+                                        {{ asset.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ asset.allocated_date|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        {% if asset.status == 'allocated' %}
+                                        <a href="{% url 'onboarding:asset_return' asset.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Return Asset">
+                                            <i class="ri-arrow-go-back-line"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-device-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No assets allocated</p>
+                                        <p class="mb-0" style="font-size: 13px;">Allocate assets to employees to track them here.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Asset list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
