@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Documents - {{ employee.full_name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <h4>Documents</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employees:directory' %}">Employees</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employees:detail' employee.pk %}">{{ employee.full_name }}</a></li>
+                    <li class="breadcrumb-item active">Documents</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'employees:detail' employee.pk %}" class="btn btn-light">
+            <i class="ri-arrow-left-line me-1"></i> Back to Profile
+        </a>
+    </div>
+</div>
+
+<!-- Upload Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="ri-upload-2-line me-2"></i>Upload Document</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" action="{% url 'employees:document_upload' employee.pk %}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if upload_form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in upload_form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <!-- Document Name -->
+                <div class="col-md-4">
+                    <label for="{{ upload_form.name.id_for_label }}" class="form-label">Document Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if upload_form.name.errors %}is-invalid{% endif %}" id="{{ upload_form.name.id_for_label }}" name="{{ upload_form.name.html_name }}" value="{{ upload_form.name.value|default_if_none:'' }}">
+                    {% if upload_form.name.errors %}<div class="invalid-feedback">{{ upload_form.name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Document Type -->
+                <div class="col-md-4">
+                    <label for="{{ upload_form.document_type.id_for_label }}" class="form-label">Type <span class="text-danger">*</span></label>
+                    <select class="form-select {% if upload_form.document_type.errors %}is-invalid{% endif %}" id="{{ upload_form.document_type.id_for_label }}" name="{{ upload_form.document_type.html_name }}">
+                        <option value="">-- Select Type --</option>
+                        <option value="id_proof" {% if upload_form.document_type.value == "id_proof" %}selected{% endif %}>ID Proof</option>
+                        <option value="address_proof" {% if upload_form.document_type.value == "address_proof" %}selected{% endif %}>Address Proof</option>
+                        <option value="education" {% if upload_form.document_type.value == "education" %}selected{% endif %}>Education Certificate</option>
+                        <option value="experience" {% if upload_form.document_type.value == "experience" %}selected{% endif %}>Experience Letter</option>
+                        <option value="contract" {% if upload_form.document_type.value == "contract" %}selected{% endif %}>Employment Contract</option>
+                        <option value="nda" {% if upload_form.document_type.value == "nda" %}selected{% endif %}>NDA</option>
+                        <option value="offer_letter" {% if upload_form.document_type.value == "offer_letter" %}selected{% endif %}>Offer Letter</option>
+                        <option value="other" {% if upload_form.document_type.value == "other" %}selected{% endif %}>Other</option>
+                    </select>
+                    {% if upload_form.document_type.errors %}<div class="invalid-feedback">{{ upload_form.document_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- File -->
+                <div class="col-md-4">
+                    <label for="{{ upload_form.file.id_for_label }}" class="form-label">File <span class="text-danger">*</span></label>
+                    <input type="file" class="form-control {% if upload_form.file.errors %}is-invalid{% endif %}" id="{{ upload_form.file.id_for_label }}" name="{{ upload_form.file.html_name }}">
+                    {% if upload_form.file.errors %}<div class="invalid-feedback">{{ upload_form.file.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Document Number -->
+                <div class="col-md-4">
+                    <label for="{{ upload_form.document_number.id_for_label }}" class="form-label">Document Number</label>
+                    <input type="text" class="form-control {% if upload_form.document_number.errors %}is-invalid{% endif %}" id="{{ upload_form.document_number.id_for_label }}" name="{{ upload_form.document_number.html_name }}" value="{{ upload_form.document_number.value|default_if_none:'' }}">
+                    {% if upload_form.document_number.errors %}<div class="invalid-feedback">{{ upload_form.document_number.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Issue Date -->
+                <div class="col-md-4">
+                    <label for="{{ upload_form.issue_date.id_for_label }}" class="form-label">Issue Date</label>
+                    <input type="date" class="form-control {% if upload_form.issue_date.errors %}is-invalid{% endif %}" id="{{ upload_form.issue_date.id_for_label }}" name="{{ upload_form.issue_date.html_name }}" value="{{ upload_form.issue_date.value|default_if_none:'' }}">
+                    {% if upload_form.issue_date.errors %}<div class="invalid-feedback">{{ upload_form.issue_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Expiry Date -->
+                <div class="col-md-4">
+                    <label for="{{ upload_form.expiry_date.id_for_label }}" class="form-label">Expiry Date</label>
+                    <input type="date" class="form-control {% if upload_form.expiry_date.errors %}is-invalid{% endif %}" id="{{ upload_form.expiry_date.id_for_label }}" name="{{ upload_form.expiry_date.html_name }}" value="{{ upload_form.expiry_date.value|default_if_none:'' }}">
+                    {% if upload_form.expiry_date.errors %}<div class="invalid-feedback">{{ upload_form.expiry_date.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-upload-2-line me-1"></i> Upload
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Documents Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Uploaded Documents</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Number</th>
+                        <th>Issue Date</th>
+                        <th>Expiry</th>
+                        <th>Verified</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                    <tr>
+                        <td class="fw-medium">
+                            <i class="ri-file-text-line me-1 text-muted"></i>
+                            {{ doc.name }}
+                        </td>
+                        <td><span class="badge bg-light text-dark">{{ doc.get_document_type_display }}</span></td>
+                        <td>{{ doc.document_number|default:"-" }}</td>
+                        <td>{{ doc.issue_date|date:"M d, Y"|default:"-" }}</td>
+                        <td>
+                            {% if doc.expiry_date %}
+                            <span class="{% if doc.expiry_date < today %}text-danger fw-medium{% endif %}">
+                                {{ doc.expiry_date|date:"M d, Y" }}
+                            </span>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if doc.is_verified %}
+                            <span class="badge bg-soft-success text-success"><i class="ri-check-line me-1"></i>Verified</span>
+                            {% else %}
+                            <span class="badge bg-soft-warning text-warning">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ doc.file.url }}" class="btn btn-sm btn-soft-primary" title="Download" target="_blank">
+                                <i class="ri-download-line"></i>
+                            </a>
+                            <form method="post" action="{% url 'employees:document_delete' doc.pk %}" class="d-inline" data-confirm-delete>
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?')">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="ri-file-text-line" style="font-size: 32px; opacity: 0.3;"></i>
+                            <p class="mb-0 mt-2">No documents uploaded yet</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
