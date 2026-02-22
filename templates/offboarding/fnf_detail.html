@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}F&F Settlement - {{ settlement.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>F&F Settlement Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'offboarding:fnf_list' %}">F&F Settlements</a></li>
+            <li class="breadcrumb-item active">{{ settlement.employee }}</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Settlement Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <h5 class="mb-1">{{ settlement.employee }}</h5>
+                        <span class="badge bg-{% if settlement.status == 'draft' %}secondary{% elif settlement.status == 'pending_approval' %}warning{% elif settlement.status == 'approved' %}info{% elif settlement.status == 'paid' %}success{% endif %} fs-6">
+                            {{ settlement.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Settlement Date</small>
+                        <div class="fw-medium">{{ settlement.settlement_date|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        {% if settlement.approved_by %}
+                        <small class="text-muted">Approved By</small>
+                        <div class="fw-medium">{{ settlement.approved_by }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Earnings Table -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-soft-success">
+                <h5 class="text-success mb-0"><i class="ri-add-circle-line me-1"></i> Earnings</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Basic Salary</td>
+                                <td class="text-end">{{ settlement.basic_salary|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>Pending Salary</td>
+                                <td class="text-end">{{ settlement.pending_salary|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>Leave Encashment</td>
+                                <td class="text-end">{{ settlement.leave_encashment|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>Bonus</td>
+                                <td class="text-end">{{ settlement.bonus|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>Gratuity</td>
+                                <td class="text-end">{{ settlement.gratuity|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>Other Earnings</td>
+                                <td class="text-end">{{ settlement.other_earnings|floatformat:2 }}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-success">
+                                <th>Total Earnings</th>
+                                <th class="text-end">{{ settlement.total_earnings|floatformat:2 }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deductions Table -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-soft-danger">
+                <h5 class="text-danger mb-0"><i class="ri-subtract-line me-1"></i> Deductions</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Notice Period Recovery</td>
+                                <td class="text-end">{{ settlement.notice_period_recovery|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>Loan Recovery</td>
+                                <td class="text-end">{{ settlement.loan_recovery|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>Tax Deduction</td>
+                                <td class="text-end">{{ settlement.tax_deduction|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>Other Deductions</td>
+                                <td class="text-end">{{ settlement.other_deductions|floatformat:2 }}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-danger">
+                                <th>Total Deductions</th>
+                                <th class="text-end">{{ settlement.total_deductions|floatformat:2 }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Net Payable Summary -->
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        {% if settlement.notes %}
+                        <small class="text-muted">Notes</small>
+                        <p class="mb-0">{{ settlement.notes }}</p>
+                        {% else %}
+                        <span class="text-muted">No additional notes.</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="p-4 bg-light rounded">
+                            <small class="text-muted d-block mb-1">Net Payable</small>
+                            <h2 class="mb-0 text-primary">{{ settlement.net_payable|floatformat:2 }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex gap-2 mb-4">
+            <a href="{% url 'offboarding:fnf_list' %}" class="btn btn-light">
+                <i class="ri-arrow-left-line me-1"></i> Back to List
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
