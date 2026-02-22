@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome Kits{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Welcome Kits</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'onboarding:list' %}">Onboarding</a></li>
+            <li class="breadcrumb-item active">Welcome Kits</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Welcome Kits</h5>
+                <a href="{% url 'onboarding:welcomekit_create' %}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> New Kit
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for kit in kits %}
+                            <tr>
+                                <td>
+                                    <span class="fw-medium">{{ kit.name }}</span>
+                                </td>
+                                <td>{{ kit.description|truncatewords:15|default:"-" }}</td>
+                                <td>
+                                    {% if kit.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'onboarding:welcomekit_create' %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Edit">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-gift-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No welcome kits found</p>
+                                        <p class="mb-0" style="font-size: 13px;">Create welcome kits to share with new employees.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
