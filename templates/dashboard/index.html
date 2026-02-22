@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Dashboard | NavHRM{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Dashboard</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item active">Dashboard</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Employees</p>
+                        <h3 class="stats-value mb-0">{{ total_employees }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-primary text-primary">
+                        <i class="ri-group-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="stats-change text-success"><i class="ri-arrow-up-line"></i> {{ new_this_month }} new</span>
+                    <span class="text-muted ms-1" style="font-size:12px;">this month</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">On Leave</p>
+                        <h3 class="stats-value mb-0">{{ on_leave }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-warning text-warning">
+                        <i class="ri-calendar-check-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Currently on leave</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Active Onboarding</p>
+                        <h3 class="stats-value mb-0">{{ active_onboarding }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-success text-success">
+                        <i class="ri-user-add-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">In progress</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Pending Resignations</p>
+                        <h3 class="stats-value mb-0">{{ pending_resignations }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-danger text-danger">
+                        <i class="ri-user-unfollow-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Awaiting review</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Department Distribution -->
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Department Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="deptChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'employees:create' %}" class="btn btn-soft-primary text-start">
+                        <i class="ri-user-add-line me-2"></i> Add New Employee
+                    </a>
+                    <a href="{% url 'organization:department_create' %}" class="btn btn-soft-info text-start">
+                        <i class="ri-building-line me-2"></i> Add Department
+                    </a>
+                    <a href="{% url 'accounts:invite_send' %}" class="btn btn-soft-success text-start">
+                        <i class="ri-mail-send-line me-2"></i> Invite User
+                    </a>
+                    <a href="{% url 'employees:directory' %}" class="btn btn-soft-warning text-start">
+                        <i class="ri-group-line me-2"></i> Employee Directory
+                    </a>
+                    <a href="{% url 'organization:org_chart' %}" class="btn btn-soft-secondary text-start">
+                        <i class="ri-organization-chart me-2"></i> Org Chart
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-0">
+    <!-- Recent Employees -->
+    <div class="col-xl-8">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Recent Employees</h5>
+                <a href="{% url 'employees:directory' %}" class="btn btn-sm btn-soft-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for emp in recent_employees %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar avatar-sm">
+                                            {% if emp.avatar %}
+                                                <img src="{{ emp.avatar.url }}" alt="">
+                                            {% else %}
+                                                {{ emp.get_initials }}
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'employees:detail' emp.pk %}" class="fw-medium">{{ emp.full_name }}</a>
+                                            <div class="text-muted" style="font-size:12px;">{{ emp.employee_id }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ emp.department|default:"-" }}</td>
+                                <td>{{ emp.designation|default:"-" }}</td>
+                                <td>
+                                    <span class="status-badge badge-soft-{% if emp.status == 'active' %}success{% elif emp.status == 'on_leave' %}warning{% else %}danger{% endif %}">
+                                        <span class="status-dot bg-{% if emp.status == 'active' %}success{% elif emp.status == 'on_leave' %}warning{% else %}danger{% endif %}"></span>
+                                        {{ emp.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ emp.date_of_joining|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">No employees yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Birthdays -->
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="ri-cake-2-line me-1 text-danger"></i> Upcoming Birthdays</h5>
+            </div>
+            <div class="card-body">
+                {% for emp in upcoming_birthdays %}
+                <div class="d-flex align-items-center gap-3 {% if not forloop.last %}mb-3 pb-3 border-bottom{% endif %}">
+                    <div class="avatar avatar-sm">
+                        {% if emp.avatar %}
+                            <img src="{{ emp.avatar.url }}" alt="">
+                        {% else %}
+                            {{ emp.get_initials }}
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0" style="font-size:14px;">{{ emp.full_name }}</h6>
+                        <span class="text-muted" style="font-size:12px;">{{ emp.date_of_birth|date:"M d" }}</span>
+                    </div>
+                    <span class="text-muted" style="font-size:20px;"><i class="ri-gift-line"></i></span>
+                </div>
+                {% empty %}
+                <div class="text-center py-3 text-muted">
+                    <i class="ri-cake-2-line" style="font-size:32px; opacity:0.3;"></i>
+                    <p class="mb-0 mt-2">No upcoming birthdays</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var labels = {{ dept_labels|safe }};
+    var data = {{ dept_data|safe }};
+
+    if (labels.length > 0) {
+        var ctx = document.getElementById('deptChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Employees',
+                    data: data,
+                    backgroundColor: 'rgba(75, 56, 179, 0.2)',
+                    borderColor: '#4b38b3',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    barPercentage: 0.6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 },
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
