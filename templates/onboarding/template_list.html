@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Onboarding Templates{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Onboarding Templates</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'onboarding:list' %}">Onboarding</a></li>
+            <li class="breadcrumb-item active">Templates</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Templates</h5>
+                <a href="{% url 'onboarding:template_create' %}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> New Template
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Tasks</th>
+                                <th>Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for template in templates %}
+                            <tr>
+                                <td>
+                                    <span class="fw-medium">{{ template.name }}</span>
+                                    {% if template.description %}
+                                    <div class="text-muted" style="font-size: 12px;">{{ template.description|truncatewords:10 }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>{{ template.department|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-soft-info text-info">{{ template.template_tasks.count }} task{{ template.template_tasks.count|pluralize }}</span>
+                                </td>
+                                <td>
+                                    {% if template.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'onboarding:template_edit' template.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Edit">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No templates found</p>
+                                        <p class="mb-0" style="font-size: 13px;">Create your first onboarding template to get started.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
