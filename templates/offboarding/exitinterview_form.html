@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Schedule Exit Interview{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Schedule Exit Interview</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'offboarding:exitinterview_list' %}">Exit Interviews</a></li>
+            <li class="breadcrumb-item active">Schedule</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Interview Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.employee.id_for_label }}" class="form-label">
+                                Employee <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.employee.html_name }}"
+                                    id="{{ form.employee.id_for_label }}"
+                                    class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                                <option value="">Select Employee</option>
+                                {% for choice in form.employee.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.employee.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.interviewer.id_for_label }}" class="form-label">Interviewer</label>
+                            <select name="{{ form.interviewer.html_name }}"
+                                    id="{{ form.interviewer.id_for_label }}"
+                                    class="form-select {% if form.interviewer.errors %}is-invalid{% endif %}">
+                                <option value="">Select Interviewer</option>
+                                {% for choice in form.interviewer.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if form.interviewer.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.interviewer.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.scheduled_date.id_for_label }}" class="form-label">
+                                Scheduled Date & Time <span class="text-danger">*</span>
+                            </label>
+                            <input type="datetime-local"
+                                   name="{{ form.scheduled_date.html_name }}"
+                                   id="{{ form.scheduled_date.id_for_label }}"
+                                   class="form-control {% if form.scheduled_date.errors %}is-invalid{% endif %}"
+                                   value="{{ form.scheduled_date.value|default:'' }}">
+                            {% for error in form.scheduled_date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-calendar-check-line me-1"></i> Schedule Interview
+                        </button>
+                        <a href="{% url 'offboarding:exitinterview_list' %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
