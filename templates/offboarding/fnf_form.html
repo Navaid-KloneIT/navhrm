@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} F&F Settlement{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{% if form.instance.pk %}Edit{% else %}Create{% endif %} F&F Settlement</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'offboarding:fnf_list' %}">F&F Settlements</a></li>
+            <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}Create{% endif %}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Basic Info -->
+        <div class="col-lg-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Settlement Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.employee.id_for_label }}" class="form-label">
+                                Employee <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.employee.html_name }}"
+                                    id="{{ form.employee.id_for_label }}"
+                                    class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                                <option value="">Select Employee</option>
+                                {% for choice in form.employee.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.employee.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="{{ form.settlement_date.id_for_label }}" class="form-label">
+                                Settlement Date <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   name="{{ form.settlement_date.html_name }}"
+                                   id="{{ form.settlement_date.id_for_label }}"
+                                   class="form-control {% if form.settlement_date.errors %}is-invalid{% endif %}"
+                                   value="{{ form.settlement_date.value|default:'' }}">
+                            {% for error in form.settlement_date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                            <select name="{{ form.status.html_name }}"
+                                    id="{{ form.status.id_for_label }}"
+                                    class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                                {% for value, label in form.status.field.choices %}
+                                <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.status.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Earnings -->
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header bg-soft-success">
+                    <h5 class="text-success mb-0"><i class="ri-add-circle-line me-1"></i> Earnings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.basic_salary.id_for_label }}" class="form-label">Basic Salary</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number"
+                                       name="{{ form.basic_salary.html_name }}"
+                                       id="{{ form.basic_salary.id_for_label }}"
+                                       class="form-control earning-field {% if form.basic_salary.errors %}is-invalid{% endif %}"
+                                       value="{{ form.basic_salary.value|default:'0' }}"
+                                       step="0.01"
+                                       min="0">
+                            </div>
+                            {% for error in form.basic_salary.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.pending_salary.id_for_label }}" class="form-label">Pending Salary</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number"
+                                       name="{{ form.pending_salary.html_name }}"
+                                       id="{{ form.pending_salary.id_for_label }}"
+                                       class="form-control earning-field {% if form.pending_salary.errors %}is-invalid{% endif %}"
+                                       value="{{ form.pending_salary.value|default:'0' }}"
+                                       step="0.01"
+                                       min="0">
+                            </div>
+                            {% for error in form.pending_salary.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.leave_encashment.id_for_label }}" class="form-label">Leave Encashment</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number"
+                                       name="{{ form.leave_encashment.html_name }}"
+                                       id="{{ form.leave_encashment.id_for_label }}"
+                                       class="form-control earning-field {% if form.leave_encashment.errors %}is-invalid{% endif %}"
+                                       value="{{ form.leave_encashment.value|default:'0' }}"
+                                       step="0.01"
+                                       min="0">
+                            </div>
+                            {% for error in form.leave_encashment.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.bonus.id_for_label }}" class="form-label">Bonus</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number"
+                                       name="{{ form.bonus.html_name }}"
+                                       id="{{ form.bonus.id_for_label }}"
+                                       class="form-control earning-field {% if form.bonus.errors %}is-invalid{% endif %}"
+                                       value="{{ form.bonus.value|default:'0' }}"
+                                       step="0.01"
+                                       min="0">
+                            </div>
+                            {% for error in form.bonus.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.gratuity.id_for_label }}" class="form-label">Gratuity</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number"
+                                       name="{{ form.gratuity.html_name }}"
+                                       id="{{ form.gratuity.id_for_label }}"
+                                       class="form-control earning-field {% if form.gratuity.errors %}is-invalid{% endif %}"
+                                       value="{{ form.gratuity.value|default:'0' }}"
+                                       step="0.01"
+                                       min="0">
+                            </div>
+                            {% for error in form.gratuity.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.other_earnings.id_for_label }}" class="form-label">Other Earnings</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number"
+                                       name="{{ form.other_earnings.html_name }}"
+                                       id="{{ form.other_earnings.id_for_label }}"
+                                       class="form-control earning-field {% if form.other_earnings.errors %}is-invalid{% endif %}"
+                                       value="{{ form.other_earnings.value|default:'0' }}"
+                                       step="0.01"
+                                       min="0">
+                            </div>
+                            {% for error in form.other_earnings.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-medium">Total Earnings</span>
+                            <span class="fw-bold text-success" id="total-earnings">$ 0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deductions -->
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header bg-soft-danger">
+                    <h5 class="text-danger mb-0"><i class="ri-subtract-line me-1"></i> Deductions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.notice_period_recovery.id_for_label }}" class="form-label">Notice Period Recovery</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number"
+                                       name="{{ form.notice_period_recovery.html_name }}"
+                                       id="{{ form.notice_period_recovery.id_for_label }}"
+                                       class="form-control deduction-field {% if form.notice_period_recovery.errors %}is-invalid{% endif %}"
+                                       value="{{ form.notice_period_recovery.value|default:'0' }}"
+                                       step="0.01"
+                                       min="0">
+                            </div>
+                            {% for error in form.notice_period_recovery.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.loan_recovery.id_for_label }}" class="form-label">Loan Recovery</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number"
+                                       name="{{ form.loan_recovery.html_name }}"
+                                       id="{{ form.loan_recovery.id_for_label }}"
+                                       class="form-control deduction-field {% if form.loan_recovery.errors %}is-invalid{% endif %}"
+                                       value="{{ form.loan_recovery.value|default:'0' }}"
+                                       step="0.01"
+                                       min="0">
+                            </div>
+                            {% for error in form.loan_recovery.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.tax_deduction.id_for_label }}" class="form-label">Tax Deduction</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number"
+                                       name="{{ form.tax_deduction.html_name }}"
+                                       id="{{ form.tax_deduction.id_for_label }}"
+                                       class="form-control deduction-field {% if form.tax_deduction.errors %}is-invalid{% endif %}"
+                                       value="{{ form.tax_deduction.value|default:'0' }}"
+                                       step="0.01"
+                                       min="0">
+                            </div>
+                            {% for error in form.tax_deduction.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.other_deductions.id_for_label }}" class="form-label">Other Deductions</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number"
+                                       name="{{ form.other_deductions.html_name }}"
+                                       id="{{ form.other_deductions.id_for_label }}"
+                                       class="form-control deduction-field {% if form.other_deductions.errors %}is-invalid{% endif %}"
+                                       value="{{ form.other_deductions.value|default:'0' }}"
+                                       step="0.01"
+                                       min="0">
+                            </div>
+                            {% for error in form.other_deductions.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-medium">Total Deductions</span>
+                            <span class="fw-bold text-danger" id="total-deductions">$ 0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Net Payable & Notes -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                            <textarea name="{{ form.notes.html_name }}"
+                                      id="{{ form.notes.id_for_label }}"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Any additional notes about this settlement...">{{ form.notes.value|default:'' }}</textarea>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block mb-1">Net Payable</small>
+                                <h2 class="mb-0 text-primary" id="net-payable">$ 0.00</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex gap-2 mb-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> {% if form.instance.pk %}Update{% else %}Create{% endif %} Settlement
+                </button>
+                <a href="{% url 'offboarding:fnf_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function calculateTotals() {
+        var totalEarnings = 0;
+        var totalDeductions = 0;
+
+        document.querySelectorAll('.earning-field').forEach(function(field) {
+            totalEarnings += parseFloat(field.value) || 0;
+        });
+
+        document.querySelectorAll('.deduction-field').forEach(function(field) {
+            totalDeductions += parseFloat(field.value) || 0;
+        });
+
+        var netPayable = totalEarnings - totalDeductions;
+
+        document.getElementById('total-earnings').textContent = '$ ' + totalEarnings.toFixed(2);
+        document.getElementById('total-deductions').textContent = '$ ' + totalDeductions.toFixed(2);
+        document.getElementById('net-payable').textContent = '$ ' + netPayable.toFixed(2);
+
+        var netEl = document.getElementById('net-payable');
+        if (netPayable < 0) {
+            netEl.classList.remove('text-primary');
+            netEl.classList.add('text-danger');
+        } else {
+            netEl.classList.remove('text-danger');
+            netEl.classList.add('text-primary');
+        }
+    }
+
+    document.querySelectorAll('.earning-field, .deduction-field').forEach(function(field) {
+        field.addEventListener('input', calculateTotals);
+    });
+
+    calculateTotals();
+});
+</script>
+{% endblock %}
