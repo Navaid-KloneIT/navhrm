@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}F&F Settlements{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Full & Final Settlements</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item active">F&F Settlements</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'offboarding:fnf_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search by employee name...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Filter by Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>Draft</option>
+                                <option value="pending_approval" {% if request.GET.status == 'pending_approval' %}selected{% endif %}>Pending Approval</option>
+                                <option value="approved" {% if request.GET.status == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="paid" {% if request.GET.status == 'paid' %}selected{% endif %}>Paid</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settlements Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Settlements</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Settlement Date</th>
+                                <th>Status</th>
+                                <th class="text-end">Total Earnings</th>
+                                <th class="text-end">Total Deductions</th>
+                                <th class="text-end">Net Payable</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for settlement in settlements %}
+                            <tr>
+                                <td>
+                                    <span class="fw-medium">{{ settlement.employee }}</span>
+                                </td>
+                                <td>{{ settlement.settlement_date|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge bg-{% if settlement.status == 'draft' %}secondary{% elif settlement.status == 'pending_approval' %}warning{% elif settlement.status == 'approved' %}info{% elif settlement.status == 'paid' %}success{% endif %}">
+                                        {{ settlement.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="text-end">{{ settlement.total_earnings|floatformat:2 }}</td>
+                                <td class="text-end">{{ settlement.total_deductions|floatformat:2 }}</td>
+                                <td class="text-end fw-medium">{{ settlement.net_payable|floatformat:2 }}</td>
+                                <td>
+                                    <a href="{% url 'offboarding:fnf_detail' settlement.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="View Details">
+                                        <i class="ri-eye-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-money-dollar-circle-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No settlements found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search or request.GET.status %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                F&F settlements will appear here when created.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="FnF list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
