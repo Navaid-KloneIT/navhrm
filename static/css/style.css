@@ -658,6 +658,7 @@ h1, h2, h3, h4, h5, h6 {
     content: '\ea6e';
     font-family: 'remixicon';
     font-size: 10px;
+    margin-top: 4px;
 }
 .breadcrumb-item a { color: var(--text-secondary); }
 .breadcrumb-item.active { color: var(--text-primary); }
