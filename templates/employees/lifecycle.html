@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Lifecycle - {{ employee.full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 40px;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 19px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    .timeline-item {
+        position: relative;
+        padding-bottom: 24px;
+    }
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    .timeline-dot {
+        position: absolute;
+        left: -28px;
+        top: 4px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 2px #d4d8dd;
+    }
+    .timeline-dot.dot-success { background: #0ab39c; box-shadow: 0 0 0 2px #0ab39c; }
+    .timeline-dot.dot-primary { background: #4b38b3; box-shadow: 0 0 0 2px #4b38b3; }
+    .timeline-dot.dot-info { background: #299cdb; box-shadow: 0 0 0 2px #299cdb; }
+    .timeline-dot.dot-warning { background: #f7b84b; box-shadow: 0 0 0 2px #f7b84b; }
+    .timeline-dot.dot-danger { background: #f06548; box-shadow: 0 0 0 2px #f06548; }
+    .timeline-dot.dot-secondary { background: #878a99; box-shadow: 0 0 0 2px #878a99; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <h4>Lifecycle Events</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employees:directory' %}">Employees</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employees:detail' employee.pk %}">{{ employee.full_name }}</a></li>
+                    <li class="breadcrumb-item active">Lifecycle</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'employees:lifecycle_add' employee.pk %}" class="btn btn-primary">
+                <i class="ri-add-line me-1"></i> Add Event
+            </a>
+            <a href="{% url 'employees:detail' employee.pk %}" class="btn btn-light">
+                <i class="ri-arrow-left-line me-1"></i> Back to Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Employee Mini Card -->
+<div class="card mb-4">
+    <div class="card-body py-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="avatar" style="width: 48px; height: 48px;">
+                {% if employee.avatar %}
+                <img src="{{ employee.avatar.url }}" alt="" class="rounded-circle" width="48" height="48" style="object-fit: cover;">
+                {% else %}
+                <span class="avatar-title rounded-circle bg-soft-primary text-primary d-inline-flex align-items-center justify-content-center" style="width:48px; height:48px; font-size:18px;">{{ employee.get_initials }}</span>
+                {% endif %}
+            </div>
+            <div>
+                <h6 class="mb-0">{{ employee.full_name }}</h6>
+                <small class="text-muted">{{ employee.employee_id }} | {{ employee.designation|default:"-" }} | {{ employee.department|default:"-" }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Timeline -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Event Timeline</h5>
+    </div>
+    <div class="card-body">
+        {% if events %}
+        <div class="timeline">
+            {% for event in events %}
+            <div class="timeline-item">
+                <div class="timeline-dot dot-{% if event.event_type == 'hired' %}success{% elif event.event_type == 'promoted' %}primary{% elif event.event_type == 'transferred' %}info{% elif event.event_type == 'salary_revision' %}warning{% elif event.event_type == 'resigned' or event.event_type == 'terminated' %}danger{% else %}secondary{% endif %}"></div>
+                <div class="card border mb-0">
+                    <div class="card-body py-3">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-{% if event.event_type == 'hired' %}success{% elif event.event_type == 'promoted' %}primary{% elif event.event_type == 'transferred' %}info{% elif event.event_type == 'salary_revision' %}warning{% elif event.event_type == 'resigned' or event.event_type == 'terminated' %}danger{% else %}secondary{% endif %}">
+                                    {{ event.get_event_type_display }}
+                                </span>
+                            </div>
+                            <small class="text-muted">
+                                <i class="ri-calendar-line me-1"></i>{{ event.event_date|date:"M d, Y" }}
+                            </small>
+                        </div>
+
+                        {% if event.description %}
+                        <p class="mb-2" style="font-size: 14px;">{{ event.description }}</p>
+                        {% endif %}
+
+                        <div class="d-flex flex-wrap gap-3" style="font-size: 13px;">
+                            {% if event.from_department or event.to_department %}
+                            <div>
+                                <span class="text-muted">Department:</span>
+                                <span class="fw-medium">{{ event.from_department|default:"N/A" }}</span>
+                                <i class="ri-arrow-right-line text-muted mx-1"></i>
+                                <span class="fw-medium">{{ event.to_department|default:"N/A" }}</span>
+                            </div>
+                            {% endif %}
+
+                            {% if event.from_designation or event.to_designation %}
+                            <div>
+                                <span class="text-muted">Designation:</span>
+                                <span class="fw-medium">{{ event.from_designation|default:"N/A" }}</span>
+                                <i class="ri-arrow-right-line text-muted mx-1"></i>
+                                <span class="fw-medium">{{ event.to_designation|default:"N/A" }}</span>
+                            </div>
+                            {% endif %}
+
+                            {% if event.old_salary or event.new_salary %}
+                            <div>
+                                <span class="text-muted">Salary:</span>
+                                <span class="fw-medium">{{ event.old_salary|default:"N/A" }}</span>
+                                <i class="ri-arrow-right-line text-muted mx-1"></i>
+                                <span class="fw-medium text-success">{{ event.new_salary|default:"N/A" }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        {% if event.processed_by %}
+                        <div class="mt-2">
+                            <small class="text-muted"><i class="ri-user-line me-1"></i>Processed by {{ event.processed_by }}</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="ri-time-line" style="font-size: 48px; opacity: 0.3;"></i>
+            <p class="mt-2 mb-0">No lifecycle events recorded yet.</p>
+            <a href="{% url 'employees:lifecycle_add' employee.pk %}" class="btn btn-sm btn-soft-primary mt-3">
+                <i class="ri-add-line me-1"></i> Add First Event
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
