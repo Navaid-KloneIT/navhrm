@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Send Invitation{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Send Invitation</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'accounts:invite_list' %}">Invitations</a></li>
+            <li class="breadcrumb-item active">Send Invite</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="ri-mail-send-line me-2 text-primary"></i> Send User Invitation</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">Send an email invitation to a new user. They will receive a link to create their account with the assigned role.</p>
+
+                <form method="POST" action="{% url 'accounts:invite_send' %}">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email Address</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">The invitation will be sent to this email address.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.role.id_for_label }}" class="form-label">Role</label>
+                        {{ form.role }}
+                        {% if form.role.errors %}
+                        <div class="invalid-feedback d-block">{{ form.role.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">The role that will be assigned to the user upon registration.</div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-send-plane-line me-1"></i> Send Invitation
+                        </button>
+                        <a href="{% url 'accounts:invite_list' %}" class="btn btn-light">
+                            <i class="ri-arrow-left-line me-1"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
