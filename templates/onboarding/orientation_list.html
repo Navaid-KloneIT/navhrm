@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Orientation Sessions{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Orientation Sessions</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'onboarding:list' %}">Onboarding</a></li>
+            <li class="breadcrumb-item active">Orientation</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Orientation Sessions</h5>
+                <a href="{% url 'onboarding:orientation_create' %}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> New Session
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Facilitator</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Location</th>
+                                <th>Attendees</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for session in sessions %}
+                            <tr>
+                                <td>
+                                    <span class="fw-medium">{{ session.title }}</span>
+                                    {% if session.description %}
+                                    <div class="text-muted" style="font-size: 12px;">{{ session.description|truncatewords:8 }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-info text-info">{{ session.get_session_type_display }}</span>
+                                </td>
+                                <td>{{ session.facilitator|default:"-" }}</td>
+                                <td>{{ session.date|date:"M d, Y" }}</td>
+                                <td>{{ session.start_time|time:"h:i A" }} - {{ session.end_time|time:"h:i A" }}</td>
+                                <td>{{ session.location|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-soft-primary text-primary">{{ session.employees.count }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-presentation-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No orientation sessions found</p>
+                                        <p class="mb-0" style="font-size: 13px;">Schedule orientation sessions for new employees.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
