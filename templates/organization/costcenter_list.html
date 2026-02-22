@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Cost Centers{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <h4>Cost Centers</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Cost Centers</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'organization:costcenter_create' %}" class="btn btn-primary">
+            <i class="ri-add-line me-1"></i> Add Cost Center
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th class="text-end">Budget</th>
+                        <th class="text-end">Spent</th>
+                        <th class="text-end">Remaining</th>
+                        <th>Utilization %</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cc in costcenters %}
+                    <tr>
+                        <td><span class="badge bg-light text-dark fw-medium">{{ cc.code }}</span></td>
+                        <td class="fw-medium">{{ cc.name }}</td>
+                        <td>{{ cc.department.name|default:"-" }}</td>
+                        <td class="text-end">{{ cc.budget|floatformat:2 }}</td>
+                        <td class="text-end">{{ cc.spent|floatformat:2 }}</td>
+                        <td class="text-end">
+                            <span class="{% if cc.remaining_budget < 0 %}text-danger fw-medium{% elif cc.remaining_budget == 0 %}text-warning{% else %}text-success{% endif %}">
+                                {{ cc.remaining_budget|floatformat:2 }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height: 6px; min-width: 60px;">
+                                    <div class="progress-bar {% if cc.utilization_percentage > 90 %}bg-danger{% elif cc.utilization_percentage > 70 %}bg-warning{% else %}bg-success{% endif %}"
+                                         role="progressbar"
+                                         style="width: {% if cc.utilization_percentage > 100 %}100{% else %}{{ cc.utilization_percentage }}{% endif %}%"
+                                         aria-valuenow="{{ cc.utilization_percentage }}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <span class="text-muted" style="font-size: 13px; min-width: 45px;">{{ cc.utilization_percentage }}%</span>
+                            </div>
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'organization:costcenter_edit' cc.pk %}" class="btn btn-sm btn-soft-warning" title="Edit">
+                                <i class="ri-pencil-line"></i>
+                            </a>
+                            <form method="post" action="{% url 'organization:costcenter_delete' cc.pk %}" class="d-inline" data-confirm-delete>
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this cost center?')">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            <i class="ri-money-dollar-circle-line" style="font-size: 32px; opacity: 0.3;"></i>
+                            <p class="mb-0 mt-2">No cost centers found</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
