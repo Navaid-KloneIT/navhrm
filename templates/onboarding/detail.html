@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Onboarding - {{ process.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Onboarding Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'onboarding:list' %}">Onboarding</a></li>
+            <li class="breadcrumb-item active">{{ process.employee }}</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Onboarding Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-1">{{ process.employee }}</h5>
+                        <p class="text-muted mb-2">
+                            Template: {{ process.template|default:"No template" }}
+                        </p>
+                        <span class="badge bg-{% if process.status == 'pending' %}warning{% elif process.status == 'in_progress' %}info{% elif process.status == 'completed' %}success{% else %}secondary{% endif %} fs-6">
+                            {{ process.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-2">
+                            <small class="text-muted">Start Date</small>
+                            <div class="fw-medium">{{ process.start_date|date:"M d, Y" }}</div>
+                        </div>
+                        <div>
+                            <small class="text-muted">Target Date</small>
+                            <div class="fw-medium">{{ process.target_completion_date|date:"M d, Y"|default:"-" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <small class="text-muted d-block mb-2">Overall Progress</small>
+                            <h3 class="mb-2">{{ process.progress_percentage }}%</h3>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-{% if process.progress_percentage == 100 %}success{% elif process.progress_percentage >= 50 %}info{% else %}warning{% endif %}"
+                                     role="progressbar"
+                                     style="width: {{ process.progress_percentage }}%"
+                                     aria-valuenow="{{ process.progress_percentage }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if process.notes %}
+                <div class="mt-3 pt-3 border-top">
+                    <small class="text-muted">Notes:</small>
+                    <p class="mb-0">{{ process.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task Checklist -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Task Checklist</h5>
+                <span class="text-muted">{{ process.tasks.count }} task{{ process.tasks.count|pluralize }}</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;"></th>
+                                <th>Task</th>
+                                <th>Assigned To</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in process.tasks.all %}
+                            <tr class="{% if task.status == 'completed' %}table-light{% endif %}">
+                                <td class="text-center">
+                                    {% if task.status == 'completed' %}
+                                    <i class="ri-checkbox-circle-fill text-success fs-5"></i>
+                                    {% elif task.status == 'skipped' %}
+                                    <i class="ri-skip-forward-fill text-secondary fs-5"></i>
+                                    {% else %}
+                                    <i class="ri-checkbox-blank-circle-line text-muted fs-5"></i>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="fw-medium {% if task.status == 'completed' %}text-decoration-line-through text-muted{% endif %}">
+                                        {{ task.title }}
+                                        {% if task.is_mandatory %}
+                                        <span class="badge bg-soft-danger text-danger ms-1" style="font-size: 10px;">Required</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if task.description %}
+                                    <small class="text-muted">{{ task.description|truncatewords:15 }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ task.assigned_to|default:"-" }}</td>
+                                <td>{{ task.due_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-{% if task.status == 'pending' %}warning{% elif task.status == 'in_progress' %}info{% elif task.status == 'completed' %}success{% else %}secondary{% endif %}">
+                                        {{ task.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'onboarding:task_update' process.pk task.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Update Task">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No tasks have been added to this onboarding process.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
