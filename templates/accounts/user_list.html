@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>User Management</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item active">Users</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search & Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'accounts:user_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search by name, email, or username...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Filter by Role</label>
+                            <select class="form-select" name="role">
+                                <option value="">All Roles</option>
+                                <option value="super_admin" {% if request.GET.role == 'super_admin' %}selected{% endif %}>Super Admin</option>
+                                <option value="tenant_admin" {% if request.GET.role == 'tenant_admin' %}selected{% endif %}>Tenant Admin</option>
+                                <option value="hr_manager" {% if request.GET.role == 'hr_manager' %}selected{% endif %}>HR Manager</option>
+                                <option value="hr_staff" {% if request.GET.role == 'hr_staff' %}selected{% endif %}>HR Staff</option>
+                                <option value="manager" {% if request.GET.role == 'manager' %}selected{% endif %}>Manager</option>
+                                <option value="employee" {% if request.GET.role == 'employee' %}selected{% endif %}>Employee</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'accounts:user_create' %}" class="btn btn-success w-100">
+                                <i class="ri-user-add-line me-1"></i> Add User
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Users Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Users</h5>
+                <span class="text-muted">{{ page_obj.paginator.count }} total user{{ page_obj.paginator.count|pluralize }}</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar avatar-sm">
+                                            {% if user.avatar %}
+                                                <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}">
+                                            {% else %}
+                                                {{ user.get_initials }}
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">{{ user.get_full_name|default:user.username }}</span>
+                                            <div class="text-muted" style="font-size: 12px;">@{{ user.username }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <span class="badge bg-soft-primary text-primary">{{ user.get_role_display }}</span>
+                                </td>
+                                <td>
+                                    {% if user.is_active %}
+                                        <span class="status-badge badge-soft-success">
+                                            <span class="status-dot bg-success"></span>
+                                            Active
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge badge-soft-danger">
+                                            <span class="status-dot bg-danger"></span>
+                                            Inactive
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.last_login %}
+                                        {{ user.last_login|date:"M d, Y H:i" }}
+                                    {% else %}
+                                        <span class="text-muted">Never</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'accounts:user_edit' user.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        <form method="POST" action="{% url 'accounts:user_deactivate' user.pk %}" class="d-inline" onsubmit="return confirm('Are you sure you want to {{ user.is_active|yesno:'deactivate,activate' }} this user?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-{{ user.is_active|yesno:'danger,success' }}" data-bs-toggle="tooltip" title="{{ user.is_active|yesno:'Deactivate,Activate' }}">
+                                                <i class="ri-{{ user.is_active|yesno:'user-unfollow-line,user-follow-line' }}"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-user-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No users found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search or request.GET.role %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Get started by adding your first user.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="User list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
