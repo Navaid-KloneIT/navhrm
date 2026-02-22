@@ -4,7 +4,7 @@
 <div class="app-menu navbar-menu">
     <!-- Brand Logo -->
     <div class="navbar-brand-box">
-        <a href="{% url 'core:dashboard' %}" class="logo logo-light">
+        <a href="{% url 'dashboard' %}" class="logo logo-light">
             <span class="logo-sm">
                 <span class="fw-bold text-white fs-5">N</span>
             </span>
@@ -12,7 +12,7 @@
                 <span class="fw-bold text-white fs-4">Nav</span><span class="fw-bold text-white-50 fs-4">HRM</span>
             </span>
         </a>
-        <a href="{% url 'core:dashboard' %}" class="logo logo-dark">
+        <a href="{% url 'dashboard' %}" class="logo logo-dark">
             <span class="logo-sm">
                 <span class="fw-bold text-primary fs-5">N</span>
             </span>
@@ -33,7 +33,7 @@
 
                 <!-- Dashboard -->
                 <li class="nav-item">
-                    <a class="nav-link menu-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'core:dashboard' %}">
+                    <a class="nav-link menu-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
                         <i class="ri-dashboard-line"></i> <span data-key="t-dashboard">Dashboard</span>
                     </a>
                 </li>
@@ -197,10 +197,10 @@
                 </p>
             </div>
             <div class="flex-shrink-0">
-                <a href="{% url 'logout' %}" class="text-muted" title="Logout" onclick="event.preventDefault(); document.getElementById('sidebar-logout-form').submit();">
+                <a href="{% url 'accounts:logout' %}" class="text-muted" title="Logout" onclick="event.preventDefault(); document.getElementById('sidebar-logout-form').submit();">
                     <i class="ri-logout-box-r-line fs-16"></i>
                 </a>
-                <form id="sidebar-logout-form" action="{% url 'logout' %}" method="POST" class="d-none">
+                <form id="sidebar-logout-form" action="{% url 'accounts:logout' %}" method="POST" class="d-none">
                     {% csrf_token %}
                 </form>
             </div>
