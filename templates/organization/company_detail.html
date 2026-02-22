@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}{{ company.name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <h4>{{ company.name }}</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'organization:company_list' %}">Companies</a></li>
+                    <li class="breadcrumb-item active">{{ company.name }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'organization:company_edit' company.pk %}" class="btn btn-soft-warning">
+                <i class="ri-pencil-line me-1"></i> Edit
+            </a>
+            <form method="post" action="{% url 'organization:company_delete' company.pk %}" class="d-inline" data-confirm-delete>
+                {% csrf_token %}
+                <button type="submit" class="btn btn-soft-danger" onclick="return confirm('Are you sure you want to delete this company?')">
+                    <i class="ri-delete-bin-line me-1"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Company Header -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex align-items-center gap-4">
+            {% if company.logo %}
+            <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="rounded" width="80" height="80" style="object-fit: cover;">
+            {% else %}
+            <div class="avatar bg-soft-primary text-primary rounded d-flex align-items-center justify-content-center" style="width:80px; height:80px; font-size:32px; font-weight:600;">
+                {{ company.name|first }}
+            </div>
+            {% endif %}
+            <div>
+                <h4 class="mb-1">{{ company.name }}</h4>
+                {% if company.legal_name %}<p class="text-muted mb-1">{{ company.legal_name }}</p>{% endif %}
+                <div class="d-flex flex-wrap gap-3 text-muted" style="font-size: 14px;">
+                    {% if company.email %}
+                    <span><i class="ri-mail-line me-1"></i> {{ company.email }}</span>
+                    {% endif %}
+                    {% if company.phone %}
+                    <span><i class="ri-phone-line me-1"></i> {{ company.phone }}</span>
+                    {% endif %}
+                    {% if company.website %}
+                    <span><i class="ri-global-line me-1"></i> <a href="{{ company.website }}" target="_blank">{{ company.website }}</a></span>
+                    {% endif %}
+                    {% if company.industry %}
+                    <span><i class="ri-building-2-line me-1"></i> {{ company.industry }}</span>
+                    {% endif %}
+                </div>
+                <div class="mt-2">
+                    {% if company.is_active %}
+                    <span class="badge bg-soft-success text-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-soft-danger text-danger">Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Company Info Card -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Company Information</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted" style="width: 40%;">Registration Number</td>
+                            <td>{{ company.registration_number|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Tax ID</td>
+                            <td>{{ company.tax_id|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Founded Date</td>
+                            <td>{{ company.founded_date|date:"M d, Y"|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Industry</td>
+                            <td>{{ company.industry|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Address</td>
+                            <td>
+                                {% if company.address_line1 %}{{ company.address_line1 }}<br>{% endif %}
+                                {% if company.address_line2 %}{{ company.address_line2 }}<br>{% endif %}
+                                {% if company.city %}{{ company.city }}, {% endif %}
+                                {% if company.state %}{{ company.state }}{% endif %}
+                                {% if company.zip_code %} {{ company.zip_code }}{% endif %}
+                                {% if company.country %}<br>{{ company.country }}{% endif %}
+                                {% if not company.address_line1 and not company.city %}-{% endif %}
+                            </td>
+                        </tr>
+                        {% if company.description %}
+                        <tr>
+                            <td class="text-muted">Description</td>
+                            <td>{{ company.description }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Locations Card -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Locations</h5>
+                <span class="badge bg-primary">{{ company.locations.count }}</span>
+            </div>
+            <div class="card-body">
+                {% for location in company.locations.all %}
+                <div class="{% if not forloop.last %}mb-3 pb-3 border-bottom{% endif %}">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div>
+                            <h6 class="mb-1">
+                                {{ location.name }}
+                                {% if location.is_headquarters %}
+                                <span class="badge bg-soft-primary text-primary ms-1">HQ</span>
+                                {% endif %}
+                            </h6>
+                            <p class="text-muted mb-0" style="font-size: 13px;">
+                                {% if location.address_line1 %}{{ location.address_line1 }}{% endif %}
+                                {% if location.city %}, {{ location.city }}{% endif %}
+                                {% if location.state %}, {{ location.state }}{% endif %}
+                                {% if location.country %}, {{ location.country }}{% endif %}
+                            </p>
+                            {% if location.phone %}
+                            <small class="text-muted"><i class="ri-phone-line me-1"></i>{{ location.phone }}</small>
+                            {% endif %}
+                        </div>
+                        {% if location.is_active %}
+                        <span class="badge bg-soft-success text-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-soft-danger text-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-4 text-muted">
+                    <i class="ri-map-pin-line" style="font-size: 32px; opacity: 0.3;"></i>
+                    <p class="mb-0 mt-2">No locations added yet</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
