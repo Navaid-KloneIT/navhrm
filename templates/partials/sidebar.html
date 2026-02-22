@@ -1,0 +1,212 @@
+{% load static %}
+
+<!-- Sidebar -->
+<div class="app-menu navbar-menu">
+    <!-- Brand Logo -->
+    <div class="navbar-brand-box">
+        <a href="{% url 'core:dashboard' %}" class="logo logo-light">
+            <span class="logo-sm">
+                <span class="fw-bold text-white fs-5">N</span>
+            </span>
+            <span class="logo-lg">
+                <span class="fw-bold text-white fs-4">Nav</span><span class="fw-bold text-white-50 fs-4">HRM</span>
+            </span>
+        </a>
+        <a href="{% url 'core:dashboard' %}" class="logo logo-dark">
+            <span class="logo-sm">
+                <span class="fw-bold text-primary fs-5">N</span>
+            </span>
+            <span class="logo-lg">
+                <span class="fw-bold text-primary fs-4">Nav</span><span class="fw-bold text-dark fs-4">HRM</span>
+            </span>
+        </a>
+        <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">
+            <i class="ri-record-circle-line"></i>
+        </button>
+    </div>
+
+    <div id="scrollbar">
+        <div class="container-fluid">
+            <div id="two-column-menu"></div>
+
+            <ul class="navbar-nav" id="navbar-nav">
+
+                <!-- Dashboard -->
+                <li class="nav-item">
+                    <a class="nav-link menu-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'core:dashboard' %}">
+                        <i class="ri-dashboard-line"></i> <span data-key="t-dashboard">Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- ===== CORE HR Section ===== -->
+                <li class="menu-title"><span data-key="t-core-hr">CORE HR</span></li>
+
+                <!-- Employees -->
+                <li class="nav-item">
+                    <a class="nav-link menu-link {% if request.resolver_match.app_name == 'employees' %}active{% endif %}" href="#sidebarEmployees" data-bs-toggle="collapse" role="button"
+                       aria-expanded="{% if request.resolver_match.app_name == 'employees' %}true{% else %}false{% endif %}" aria-controls="sidebarEmployees">
+                        <i class="ri-group-line"></i> <span data-key="t-employees">Employees</span>
+                    </a>
+                    <div class="collapse menu-dropdown {% if request.resolver_match.app_name == 'employees' %}show{% endif %}" id="sidebarEmployees">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{% url 'employees:directory' %}" class="nav-link {% if request.resolver_match.url_name == 'directory' %}active{% endif %}" data-key="t-directory">Directory</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'employees:create' %}" class="nav-link {% if request.resolver_match.url_name == 'create' and request.resolver_match.app_name == 'employees' %}active{% endif %}" data-key="t-add-employee">Add Employee</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Organization -->
+                <li class="nav-item">
+                    <a class="nav-link menu-link {% if request.resolver_match.app_name == 'organization' %}active{% endif %}" href="#sidebarOrganization" data-bs-toggle="collapse" role="button"
+                       aria-expanded="{% if request.resolver_match.app_name == 'organization' %}true{% else %}false{% endif %}" aria-controls="sidebarOrganization">
+                        <i class="ri-building-line"></i> <span data-key="t-organization">Organization</span>
+                    </a>
+                    <div class="collapse menu-dropdown {% if request.resolver_match.app_name == 'organization' %}show{% endif %}" id="sidebarOrganization">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{% url 'organization:company_list' %}" class="nav-link {% if request.resolver_match.url_name == 'company_list' %}active{% endif %}" data-key="t-companies">Companies</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'organization:department_list' %}" class="nav-link {% if request.resolver_match.url_name == 'department_list' %}active{% endif %}" data-key="t-departments">Departments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'organization:designation_list' %}" class="nav-link {% if request.resolver_match.url_name == 'designation_list' %}active{% endif %}" data-key="t-designations">Designations</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'organization:org_chart' %}" class="nav-link {% if request.resolver_match.url_name == 'org_chart' %}active{% endif %}" data-key="t-org-chart">Org Chart</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'organization:costcenter_list' %}" class="nav-link {% if request.resolver_match.url_name == 'costcenter_list' %}active{% endif %}" data-key="t-cost-centers">Cost Centers</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Onboarding -->
+                <li class="nav-item">
+                    <a class="nav-link menu-link {% if request.resolver_match.app_name == 'onboarding' %}active{% endif %}" href="#sidebarOnboarding" data-bs-toggle="collapse" role="button"
+                       aria-expanded="{% if request.resolver_match.app_name == 'onboarding' %}true{% else %}false{% endif %}" aria-controls="sidebarOnboarding">
+                        <i class="ri-user-add-line"></i> <span data-key="t-onboarding">Onboarding</span>
+                    </a>
+                    <div class="collapse menu-dropdown {% if request.resolver_match.app_name == 'onboarding' %}show{% endif %}" id="sidebarOnboarding">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{% url 'onboarding:list' %}" class="nav-link {% if request.resolver_match.url_name == 'list' and request.resolver_match.app_name == 'onboarding' %}active{% endif %}" data-key="t-onboarding-list">Onboarding List</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'onboarding:template_list' %}" class="nav-link {% if request.resolver_match.url_name == 'template_list' %}active{% endif %}" data-key="t-templates">Templates</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'onboarding:asset_list' %}" class="nav-link {% if request.resolver_match.url_name == 'asset_list' %}active{% endif %}" data-key="t-assets">Assets</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'onboarding:orientation_list' %}" class="nav-link {% if request.resolver_match.url_name == 'orientation_list' %}active{% endif %}" data-key="t-orientation">Orientation</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'onboarding:welcomekit_list' %}" class="nav-link {% if request.resolver_match.url_name == 'welcomekit_list' %}active{% endif %}" data-key="t-welcome-kits">Welcome Kits</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Offboarding -->
+                <li class="nav-item">
+                    <a class="nav-link menu-link {% if request.resolver_match.app_name == 'offboarding' %}active{% endif %}" href="#sidebarOffboarding" data-bs-toggle="collapse" role="button"
+                       aria-expanded="{% if request.resolver_match.app_name == 'offboarding' %}true{% else %}false{% endif %}" aria-controls="sidebarOffboarding">
+                        <i class="ri-user-unfollow-line"></i> <span data-key="t-offboarding">Offboarding</span>
+                    </a>
+                    <div class="collapse menu-dropdown {% if request.resolver_match.app_name == 'offboarding' %}show{% endif %}" id="sidebarOffboarding">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{% url 'offboarding:resignation_list' %}" class="nav-link {% if request.resolver_match.url_name == 'resignation_list' %}active{% endif %}" data-key="t-resignations">Resignations</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'offboarding:exitinterview_list' %}" class="nav-link {% if request.resolver_match.url_name == 'exitinterview_list' %}active{% endif %}" data-key="t-exit-interviews">Exit Interviews</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'offboarding:clearance_list' %}" class="nav-link {% if request.resolver_match.url_name == 'clearance_list' %}active{% endif %}" data-key="t-clearance">Clearance</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'offboarding:fnf_list' %}" class="nav-link {% if request.resolver_match.url_name == 'fnf_list' %}active{% endif %}" data-key="t-fnf-settlements">F&amp;F Settlements</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'offboarding:letter_list' %}" class="nav-link {% if request.resolver_match.url_name == 'letter_list' %}active{% endif %}" data-key="t-experience-letters">Experience Letters</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- ===== ADMINISTRATION Section ===== -->
+                <li class="menu-title"><span data-key="t-administration">ADMINISTRATION</span></li>
+
+                <!-- Users -->
+                <li class="nav-item">
+                    <a class="nav-link menu-link {% if request.resolver_match.app_name == 'accounts' and request.resolver_match.url_name in 'user_list,user_invite' %}active{% endif %}" href="#sidebarUsers" data-bs-toggle="collapse" role="button"
+                       aria-expanded="{% if request.resolver_match.app_name == 'accounts' %}true{% else %}false{% endif %}" aria-controls="sidebarUsers">
+                        <i class="ri-user-settings-line"></i> <span data-key="t-users">Users</span>
+                    </a>
+                    <div class="collapse menu-dropdown {% if request.resolver_match.app_name == 'accounts' %}show{% endif %}" id="sidebarUsers">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="javascript:void(0);" class="nav-link" data-key="t-user-list">User List</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="javascript:void(0);" class="nav-link" data-key="t-invite-users">Invite Users</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Settings -->
+                <li class="nav-item">
+                    <a class="nav-link menu-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}" href="javascript:void(0);">
+                        <i class="ri-settings-3-line"></i> <span data-key="t-settings">Settings</span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+
+    <!-- Sidebar User Profile (bottom) -->
+    <div class="sidebar-profile pt-2 pb-3 px-3 border-top">
+        <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-size: 14px;">
+                    {% if user.first_name %}
+                        {{ user.first_name|first|upper }}
+                    {% else %}
+                        <i class="ri-user-3-line"></i>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="flex-grow-1 ms-2 sidebar-profile-text">
+                <h6 class="mb-0 fs-13 fw-semibold">
+                    {% if user.get_full_name %}
+                        {{ user.get_full_name|truncatewords:3 }}
+                    {% else %}
+                        {{ user.username|default:"User" }}
+                    {% endif %}
+                </h6>
+                <p class="mb-0 fs-11 text-muted">
+                    {% if user.is_superuser %}Administrator{% else %}User{% endif %}
+                </p>
+            </div>
+            <div class="flex-shrink-0">
+                <a href="{% url 'logout' %}" class="text-muted" title="Logout" onclick="event.preventDefault(); document.getElementById('sidebar-logout-form').submit();">
+                    <i class="ri-logout-box-r-line fs-16"></i>
+                </a>
+                <form id="sidebar-logout-form" action="{% url 'logout' %}" method="POST" class="d-none">
+                    {% csrf_token %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sidebar Backdrop (for mobile) -->
+<div class="vertical-overlay"></div>
