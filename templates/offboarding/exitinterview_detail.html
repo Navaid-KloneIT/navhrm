@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Exit Interview - {{ interview.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Exit Interview Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'offboarding:exitinterview_list' %}">Exit Interviews</a></li>
+            <li class="breadcrumb-item active">{{ interview.employee }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Interview Info -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Interview Information</h5>
+                <span class="badge bg-{% if interview.status == 'scheduled' %}info{% elif interview.status == 'completed' %}success{% else %}secondary{% endif %} fs-6">
+                    {{ interview.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Employee</small>
+                        <div class="fw-medium">{{ interview.employee }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Interviewer</small>
+                        <div class="fw-medium">{{ interview.interviewer|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Scheduled Date</small>
+                        <div class="fw-medium">{{ interview.scheduled_date|date:"M d, Y h:i A" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Summary -->
+        {% if interview.status == 'completed' %}
+        <div class="card">
+            <div class="card-header">
+                <h5>Feedback Summary</h5>
+            </div>
+            <div class="card-body">
+                {% if interview.overall_experience %}
+                <div class="mb-4">
+                    <small class="text-muted d-block mb-2">Overall Experience Rating</small>
+                    <div class="d-flex align-items-center gap-1">
+                        {% for i in "12345" %}
+                        <i class="ri-star-{% if forloop.counter <= interview.overall_experience %}fill text-warning{% else %}line text-muted{% endif %} fs-4"></i>
+                        {% endfor %}
+                        <span class="ms-2 fw-medium">{{ interview.overall_experience }}/5</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if interview.reason_for_leaving %}
+                <div class="mb-4">
+                    <small class="text-muted">Reason for Leaving</small>
+                    <p class="mt-1">{{ interview.reason_for_leaving }}</p>
+                </div>
+                {% endif %}
+
+                {% if interview.what_liked %}
+                <div class="mb-4">
+                    <small class="text-muted">What did you like most?</small>
+                    <p class="mt-1">{{ interview.what_liked }}</p>
+                </div>
+                {% endif %}
+
+                {% if interview.what_disliked %}
+                <div class="mb-4">
+                    <small class="text-muted">What could be improved?</small>
+                    <p class="mt-1">{{ interview.what_disliked }}</p>
+                </div>
+                {% endif %}
+
+                {% if interview.would_recommend is not None %}
+                <div class="mb-4">
+                    <small class="text-muted">Would recommend the company?</small>
+                    <div class="mt-1">
+                        {% if interview.would_recommend %}
+                        <span class="badge bg-success">Yes</span>
+                        {% else %}
+                        <span class="badge bg-danger">No</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if interview.additional_feedback %}
+                <div>
+                    <small class="text-muted">Additional Feedback</small>
+                    <p class="mt-1 mb-0">{{ interview.additional_feedback }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if interview.status == 'scheduled' %}
+                    <a href="{% url 'offboarding:exitinterview_feedback' interview.pk %}" class="btn btn-success">
+                        <i class="ri-feedback-line me-1"></i> Record Feedback
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'offboarding:exitinterview_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
