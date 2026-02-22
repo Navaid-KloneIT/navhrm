@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Exit Interview Feedback - {{ interview.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Exit Interview Feedback</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'offboarding:exitinterview_list' %}">Exit Interviews</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'offboarding:exitinterview_detail' interview.pk %}">{{ interview.employee }}</a></li>
+            <li class="breadcrumb-item active">Feedback</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Record Feedback for {{ interview.employee }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.overall_experience.id_for_label }}" class="form-label">
+                                Overall Experience Rating <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.overall_experience.html_name }}"
+                                    id="{{ form.overall_experience.id_for_label }}"
+                                    class="form-select {% if form.overall_experience.errors %}is-invalid{% endif %}">
+                                <option value="">Select Rating</option>
+                                <option value="1" {% if form.overall_experience.value|stringformat:"s" == "1" %}selected{% endif %}>1 - Very Poor</option>
+                                <option value="2" {% if form.overall_experience.value|stringformat:"s" == "2" %}selected{% endif %}>2 - Poor</option>
+                                <option value="3" {% if form.overall_experience.value|stringformat:"s" == "3" %}selected{% endif %}>3 - Average</option>
+                                <option value="4" {% if form.overall_experience.value|stringformat:"s" == "4" %}selected{% endif %}>4 - Good</option>
+                                <option value="5" {% if form.overall_experience.value|stringformat:"s" == "5" %}selected{% endif %}>5 - Excellent</option>
+                            </select>
+                            {% for error in form.overall_experience.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.would_recommend.id_for_label }}" class="form-label">
+                                Would Recommend Company?
+                            </label>
+                            <select name="{{ form.would_recommend.html_name }}"
+                                    id="{{ form.would_recommend.id_for_label }}"
+                                    class="form-select {% if form.would_recommend.errors %}is-invalid{% endif %}">
+                                <option value="">Select</option>
+                                <option value="True" {% if form.would_recommend.value|stringformat:"s" == "True" %}selected{% endif %}>Yes</option>
+                                <option value="False" {% if form.would_recommend.value|stringformat:"s" == "False" %}selected{% endif %}>No</option>
+                            </select>
+                            {% for error in form.would_recommend.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.reason_for_leaving.id_for_label }}" class="form-label">
+                                Reason for Leaving
+                            </label>
+                            <textarea name="{{ form.reason_for_leaving.html_name }}"
+                                      id="{{ form.reason_for_leaving.id_for_label }}"
+                                      class="form-control {% if form.reason_for_leaving.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Primary reason for leaving the organization...">{{ form.reason_for_leaving.value|default:'' }}</textarea>
+                            {% for error in form.reason_for_leaving.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.what_liked.id_for_label }}" class="form-label">
+                                What did you like most?
+                            </label>
+                            <textarea name="{{ form.what_liked.html_name }}"
+                                      id="{{ form.what_liked.id_for_label }}"
+                                      class="form-control {% if form.what_liked.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="What aspects of the company/role were most enjoyable...">{{ form.what_liked.value|default:'' }}</textarea>
+                            {% for error in form.what_liked.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.what_disliked.id_for_label }}" class="form-label">
+                                What could be improved?
+                            </label>
+                            <textarea name="{{ form.what_disliked.html_name }}"
+                                      id="{{ form.what_disliked.id_for_label }}"
+                                      class="form-control {% if form.what_disliked.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Areas where the company could do better...">{{ form.what_disliked.value|default:'' }}</textarea>
+                            {% for error in form.what_disliked.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.additional_feedback.id_for_label }}" class="form-label">
+                                Additional Feedback
+                            </label>
+                            <textarea name="{{ form.additional_feedback.html_name }}"
+                                      id="{{ form.additional_feedback.id_for_label }}"
+                                      class="form-control {% if form.additional_feedback.errors %}is-invalid{% endif %}"
+                                      rows="4"
+                                      placeholder="Any other comments or suggestions...">{{ form.additional_feedback.value|default:'' }}</textarea>
+                            {% for error in form.additional_feedback.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="ri-save-line me-1"></i> Save Feedback
+                        </button>
+                        <a href="{% url 'offboarding:exitinterview_detail' interview.pk %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
