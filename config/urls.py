@@ -12,6 +12,7 @@ urlpatterns = [
     path('employees/', include('apps.employees.urls')),
     path('onboarding/', include('apps.onboarding.urls')),
     path('offboarding/', include('apps.offboarding.urls')),
+    path('recruitment/', include('apps.recruitment.urls')),
 ]
 
 if settings.DEBUG:
