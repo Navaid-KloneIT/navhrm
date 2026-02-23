@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Job Requisitions{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Job Requisitions</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Job Requisitions</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'recruitment:job_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search jobs...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Department</label>
+                            <select class="form-select" name="department">
+                                <option value="">All Departments</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.pk }}" {% if request.GET.department == dept.pk|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'recruitment:job_create' %}" class="btn btn-primary w-100">
+                                <i class="ri-add-line me-1"></i> Create Requisition
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Jobs Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Job Requisitions</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Code</th>
+                                <th>Department</th>
+                                <th>Type</th>
+                                <th>Positions</th>
+                                <th>Applications</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in jobs %}
+                            <tr>
+                                <td class="fw-medium">
+                                    <a href="{% url 'recruitment:job_detail' job.pk %}">{{ job.title }}</a>
+                                </td>
+                                <td><span class="badge bg-light text-dark">{{ job.code|default:"-" }}</span></td>
+                                <td>{{ job.department.name|default:"-" }}</td>
+                                <td>{{ job.get_employment_type_display }}</td>
+                                <td>{{ job.filled_positions }}/{{ job.positions }}</td>
+                                <td><span class="badge bg-soft-info text-info">{{ job.app_count }}</span></td>
+                                <td>
+                                    {% if job.priority == 'urgent' %}
+                                    <span class="badge bg-soft-danger text-danger">Urgent</span>
+                                    {% elif job.priority == 'high' %}
+                                    <span class="badge bg-soft-warning text-warning">High</span>
+                                    {% elif job.priority == 'medium' %}
+                                    <span class="badge bg-soft-info text-info">Medium</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if job.status == 'published' %}
+                                    <span class="badge bg-soft-success text-success">Published</span>
+                                    {% elif job.status == 'draft' %}
+                                    <span class="badge bg-soft-secondary text-secondary">Draft</span>
+                                    {% elif job.status == 'approved' %}
+                                    <span class="badge bg-soft-primary text-primary">Approved</span>
+                                    {% elif job.status == 'pending_approval' %}
+                                    <span class="badge bg-soft-warning text-warning">Pending</span>
+                                    {% elif job.status == 'closed' %}
+                                    <span class="badge bg-soft-dark text-dark">Closed</span>
+                                    {% elif job.status == 'on_hold' %}
+                                    <span class="badge bg-soft-info text-info">On Hold</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-danger text-danger">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'recruitment:job_detail' job.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="View">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                        <a href="{% url 'recruitment:job_edit' job.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'recruitment:job_delete' job.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this job requisition?')">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-briefcase-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No job requisitions found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search or request.GET.status or request.GET.department %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Job requisitions will appear here when created.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Job list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
