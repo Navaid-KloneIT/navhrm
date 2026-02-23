@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Interview - {{ interview.application.candidate.full_name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <h4>Interview Details</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'recruitment:interview_list' %}">Interviews</a></li>
+                    <li class="breadcrumb-item active">{{ interview.round_name }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'recruitment:interview_edit' interview.pk %}" class="btn btn-warning">
+                <i class="ri-pencil-line me-1"></i> Edit
+            </a>
+            <a href="{% url 'recruitment:feedback_create' interview.pk %}" class="btn btn-primary">
+                <i class="ri-chat-3-line me-1"></i> Add Feedback
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Interview Info -->
+        <div class="card">
+            <div class="card-header"><h5>Interview Information</h5></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Candidate</p>
+                        <p class="fw-medium">
+                            <a href="{% url 'recruitment:candidate_detail' interview.application.candidate.pk %}">{{ interview.application.candidate.full_name }}</a>
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Job</p>
+                        <p class="fw-medium">
+                            <a href="{% url 'recruitment:job_detail' interview.application.job.pk %}">{{ interview.application.job.title }}</a>
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Round</p>
+                        <p class="fw-medium">{{ interview.round_name }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Mode</p>
+                        <p><span class="badge bg-soft-info text-info">{{ interview.get_mode_display }}</span></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Date & Time</p>
+                        <p class="fw-medium">{{ interview.scheduled_date|date:"M d, Y" }} at {{ interview.scheduled_time|time:"h:i A" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Duration</p>
+                        <p class="fw-medium">{{ interview.duration_minutes }} minutes</p>
+                    </div>
+                    {% if interview.location %}
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Location</p>
+                        <p class="fw-medium">{{ interview.location }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Status</p>
+                        <p>
+                            {% if interview.status == 'completed' %}
+                            <span class="badge bg-soft-success text-success">Completed</span>
+                            {% elif interview.status == 'scheduled' %}
+                            <span class="badge bg-soft-primary text-primary">Scheduled</span>
+                            {% elif interview.status == 'cancelled' %}
+                            <span class="badge bg-soft-danger text-danger">Cancelled</span>
+                            {% else %}
+                            <span class="badge bg-soft-secondary text-secondary">{{ interview.get_status_display }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Result</p>
+                        <p>
+                            {% if interview.result == 'pass' %}
+                            <span class="badge bg-soft-success text-success">Pass</span>
+                            {% elif interview.result == 'fail' %}
+                            <span class="badge bg-soft-danger text-danger">Fail</span>
+                            {% elif interview.result == 'on_hold' %}
+                            <span class="badge bg-soft-warning text-warning">On Hold</span>
+                            {% else %}
+                            <span class="badge bg-soft-secondary text-secondary">Pending</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                {% if interview.notes %}
+                <h6 class="mt-3">Notes</h6>
+                <p>{{ interview.notes|linebreaks }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Feedback -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Interview Feedback ({{ feedbacks|length }})</h5>
+                <a href="{% url 'recruitment:feedback_create' interview.pk %}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> Add Feedback
+                </a>
+            </div>
+            <div class="card-body">
+                {% for fb in feedbacks %}
+                <div class="border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="mb-0">{{ fb.interviewer }}</h6>
+                        <div>
+                            {% if fb.recommendation == 'strong_hire' %}
+                            <span class="badge bg-soft-success text-success">Strong Hire</span>
+                            {% elif fb.recommendation == 'hire' %}
+                            <span class="badge bg-soft-success text-success">Hire</span>
+                            {% elif fb.recommendation == 'no_hire' %}
+                            <span class="badge bg-soft-danger text-danger">No Hire</span>
+                            {% else %}
+                            <span class="badge bg-soft-danger text-danger">Strong No Hire</span>
+                            {% endif %}
+                            <a href="{% url 'recruitment:feedback_edit' interview.pk fb.pk %}" class="btn btn-sm btn-soft-warning ms-1"><i class="ri-pencil-line"></i></a>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        {% if fb.technical_rating %}
+                        <div class="col-md-3">
+                            <small class="text-muted">Technical</small>
+                            <div class="text-warning">
+                                {% for i in "12345" %}{% if forloop.counter <= fb.technical_rating %}<i class="ri-star-fill"></i>{% else %}<i class="ri-star-line"></i>{% endif %}{% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if fb.communication_rating %}
+                        <div class="col-md-3">
+                            <small class="text-muted">Communication</small>
+                            <div class="text-warning">
+                                {% for i in "12345" %}{% if forloop.counter <= fb.communication_rating %}<i class="ri-star-fill"></i>{% else %}<i class="ri-star-line"></i>{% endif %}{% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if fb.cultural_fit_rating %}
+                        <div class="col-md-3">
+                            <small class="text-muted">Cultural Fit</small>
+                            <div class="text-warning">
+                                {% for i in "12345" %}{% if forloop.counter <= fb.cultural_fit_rating %}<i class="ri-star-fill"></i>{% else %}<i class="ri-star-line"></i>{% endif %}{% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if fb.overall_rating %}
+                        <div class="col-md-3">
+                            <small class="text-muted">Overall</small>
+                            <div class="text-warning">
+                                {% for i in "12345" %}{% if forloop.counter <= fb.overall_rating %}<i class="ri-star-fill"></i>{% else %}<i class="ri-star-line"></i>{% endif %}{% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if fb.strengths %}<p class="mb-1"><strong>Strengths:</strong> {{ fb.strengths }}</p>{% endif %}
+                    {% if fb.weaknesses %}<p class="mb-1"><strong>Weaknesses:</strong> {{ fb.weaknesses }}</p>{% endif %}
+                    {% if fb.comments %}<p class="mb-0"><strong>Comments:</strong> {{ fb.comments }}</p>{% endif %}
+                </div>
+                {% empty %}
+                <div class="text-center py-4 text-muted">
+                    <i class="ri-chat-3-line" style="font-size: 36px; opacity: 0.3;"></i>
+                    <p class="mt-2 mb-0">No feedback submitted yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Interviewers -->
+        <div class="card">
+            <div class="card-header"><h5>Interviewers</h5></div>
+            <div class="card-body">
+                {% for emp in interview.interviewers.all %}
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="avatar-title rounded-circle bg-soft-primary text-primary" style="width:32px; height:32px; font-size:12px;">{{ emp.get_initials }}</span>
+                    <span>{{ emp.full_name }}</span>
+                </div>
+                {% empty %}
+                <p class="text-muted mb-0">No interviewers assigned.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
