@@ -1255,6 +1255,47 @@ body.sidebar-open .vertical-overlay {
     box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.08);
 }
 
+/* Topbar Header Items */
+.header-item {
+    display: flex;
+    align-items: center;
+}
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-topbar {
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+}
+.btn-topbar:hover {
+    color: var(--text-primary);
+    background: rgba(var(--primary-rgb), 0.08);
+}
+
+/* Notification & User Dropdowns */
+.dropdown-menu-lg {
+    min-width: 320px;
+}
+.dropdown-head {
+    padding: 0;
+}
+.dropdown-head .bg-primary {
+    border-radius: 0.375rem 0.375rem 0 0;
+}
+.topbar-badge {
+    top: 4px;
+    right: 4px;
+}
+.topbar-user .dropdown-menu {
+    min-width: 180px;
+}
+
 /* Toast customization */
 .toast-container {
     z-index: 10000;
