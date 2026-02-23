@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Application - {{ application.candidate.full_name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <h4>Application Details</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'recruitment:application_list' %}">Applications</a></li>
+                    <li class="breadcrumb-item active">{{ application.candidate.full_name }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'recruitment:application_edit' application.pk %}" class="btn btn-warning">
+                <i class="ri-pencil-line me-1"></i> Update Status
+            </a>
+            <a href="{% url 'recruitment:interview_create' %}" class="btn btn-primary">
+                <i class="ri-calendar-line me-1"></i> Schedule Interview
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Application Info -->
+        <div class="card">
+            <div class="card-header"><h5>Application Information</h5></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Candidate</p>
+                        <p class="fw-medium"><a href="{% url 'recruitment:candidate_detail' application.candidate.pk %}">{{ application.candidate.full_name }}</a></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Job</p>
+                        <p class="fw-medium"><a href="{% url 'recruitment:job_detail' application.job.pk %}">{{ application.job.title }}</a></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Applied Date</p>
+                        <p class="fw-medium">{{ application.applied_date|date:"M d, Y" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Source</p>
+                        <p><span class="badge bg-soft-info text-info">{{ application.get_source_display }}</span></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Status</p>
+                        <p>
+                            {% if application.status == 'hired' %}
+                            <span class="badge bg-soft-success text-success">Hired</span>
+                            {% elif application.status == 'rejected' %}
+                            <span class="badge bg-soft-danger text-danger">Rejected</span>
+                            {% elif application.status == 'interview' %}
+                            <span class="badge bg-soft-primary text-primary">Interview</span>
+                            {% elif application.status == 'shortlisted' %}
+                            <span class="badge bg-soft-info text-info">Shortlisted</span>
+                            {% elif application.status == 'offered' %}
+                            <span class="badge bg-soft-warning text-warning">Offered</span>
+                            {% else %}
+                            <span class="badge bg-soft-secondary text-secondary">{{ application.get_status_display }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Rating</p>
+                        <p>
+                            {% if application.rating %}
+                            <span class="text-warning">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= application.rating %}
+                                    <i class="ri-star-fill"></i>
+                                    {% else %}
+                                    <i class="ri-star-line"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                            {% else %}-{% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                {% if application.cover_letter %}
+                <h6 class="mt-3">Cover Letter</h6>
+                <p>{{ application.cover_letter|linebreaks }}</p>
+                {% endif %}
+
+                {% if application.resume %}
+                <div class="mt-3">
+                    <a href="{{ application.resume.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="ri-file-line me-1"></i> View Resume
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if application.notes %}
+                <h6 class="mt-3">Notes</h6>
+                <p>{{ application.notes|linebreaks }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Interviews -->
+        <div class="card">
+            <div class="card-header"><h5>Interviews ({{ interviews|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Round</th>
+                                <th>Date & Time</th>
+                                <th>Mode</th>
+                                <th>Status</th>
+                                <th>Result</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for interview in interviews %}
+                            <tr>
+                                <td class="fw-medium">{{ interview.round_name }}</td>
+                                <td>{{ interview.scheduled_date|date:"M d, Y" }} {{ interview.scheduled_time|time:"h:i A" }}</td>
+                                <td>{{ interview.get_mode_display }}</td>
+                                <td>
+                                    {% if interview.status == 'completed' %}
+                                    <span class="badge bg-soft-success text-success">Completed</span>
+                                    {% elif interview.status == 'scheduled' %}
+                                    <span class="badge bg-soft-primary text-primary">Scheduled</span>
+                                    {% elif interview.status == 'cancelled' %}
+                                    <span class="badge bg-soft-danger text-danger">Cancelled</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ interview.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if interview.result == 'pass' %}
+                                    <span class="badge bg-soft-success text-success">Pass</span>
+                                    {% elif interview.result == 'fail' %}
+                                    <span class="badge bg-soft-danger text-danger">Fail</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-warning text-warning">{{ interview.get_result_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'recruitment:interview_detail' interview.pk %}" class="btn btn-sm btn-soft-info">
+                                        <i class="ri-eye-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">No interviews scheduled.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Offers -->
+        <div class="card">
+            <div class="card-header"><h5>Offers ({{ offers|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Designation</th>
+                                <th>Salary</th>
+                                <th>Joining Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for offer in offers %}
+                            <tr>
+                                <td class="fw-medium">{{ offer.offered_designation }}</td>
+                                <td>{{ offer.salary_currency }} {{ offer.offered_salary|intcomma }}</td>
+                                <td>{{ offer.joining_date|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if offer.status == 'accepted' %}
+                                    <span class="badge bg-soft-success text-success">Accepted</span>
+                                    {% elif offer.status == 'rejected' %}
+                                    <span class="badge bg-soft-danger text-danger">Rejected</span>
+                                    {% elif offer.status == 'sent' %}
+                                    <span class="badge bg-soft-primary text-primary">Sent</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ offer.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'recruitment:offer_detail' offer.pk %}" class="btn btn-sm btn-soft-info">
+                                        <i class="ri-eye-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">No offers yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Candidate Quick Info -->
+        <div class="card">
+            <div class="card-header"><h5>Candidate</h5></div>
+            <div class="card-body text-center">
+                <div class="avatar-title rounded-circle bg-soft-primary text-primary mx-auto mb-3" style="width:60px; height:60px; font-size:22px; line-height:60px;">{{ application.candidate.initials }}</div>
+                <h6>{{ application.candidate.full_name }}</h6>
+                <p class="text-muted mb-1">{{ application.candidate.email }}</p>
+                {% if application.candidate.phone %}<p class="text-muted mb-0">{{ application.candidate.phone }}</p>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
