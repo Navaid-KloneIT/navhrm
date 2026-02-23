@@ -4,22 +4,20 @@
 
 {% block content %}
 <div class="page-title-box">
-    <div class="d-flex align-items-center justify-content-between">
-        <div>
-            <h4>Documents</h4>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'employees:directory' %}">Employees</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'employees:detail' employee.pk %}">{{ employee.full_name }}</a></li>
-                    <li class="breadcrumb-item active">Documents</li>
-                </ol>
-            </nav>
-        </div>
-        <a href="{% url 'employees:detail' employee.pk %}" class="btn btn-light">
-            <i class="ri-arrow-left-line me-1"></i> Back to Profile
-        </a>
+    <div>
+        <h4>Documents</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'employees:directory' %}">Employees</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'employees:detail' employee.pk %}">{{ employee.full_name }}</a></li>
+                <li class="breadcrumb-item active">Documents</li>
+            </ol>
+        </nav>
     </div>
+    <a href="{% url 'employees:detail' employee.pk %}" class="btn btn-light">
+        <i class="ri-arrow-left-line me-1"></i> Back to Profile
+    </a>
 </div>
 
 <!-- Upload Form -->
