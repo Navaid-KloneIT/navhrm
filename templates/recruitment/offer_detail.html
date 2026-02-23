@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Offer - {{ offer.application.candidate.full_name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <h4>Offer Details</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'recruitment:offer_list' %}">Offers</a></li>
+                    <li class="breadcrumb-item active">{{ offer.application.candidate.full_name }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'recruitment:offer_edit' offer.pk %}" class="btn btn-warning">
+                <i class="ri-pencil-line me-1"></i> Edit
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header"><h5>Offer Information</h5></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Candidate</p>
+                        <p class="fw-medium">
+                            <a href="{% url 'recruitment:candidate_detail' offer.application.candidate.pk %}">{{ offer.application.candidate.full_name }}</a>
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Job</p>
+                        <p class="fw-medium">
+                            <a href="{% url 'recruitment:job_detail' offer.application.job.pk %}">{{ offer.application.job.title }}</a>
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Offered Designation</p>
+                        <p class="fw-medium">{{ offer.offered_designation }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Department</p>
+                        <p class="fw-medium">{{ offer.offered_department.name|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Offered Salary</p>
+                        <p class="fw-medium">{{ offer.salary_currency }} {{ offer.offered_salary|intcomma }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Probation Period</p>
+                        <p class="fw-medium">{{ offer.probation_months }} months</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Joining Date</p>
+                        <p class="fw-medium">{{ offer.joining_date|date:"M d, Y" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Offer Date</p>
+                        <p class="fw-medium">{{ offer.offer_date|date:"M d, Y" }}</p>
+                    </div>
+                    {% if offer.expiry_date %}
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted">Expiry Date</p>
+                        <p class="fw-medium">{{ offer.expiry_date|date:"M d, Y" }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if offer.benefits %}
+                <h6 class="mt-3">Benefits</h6>
+                <p>{{ offer.benefits|linebreaks }}</p>
+                {% endif %}
+
+                {% if offer.terms_conditions %}
+                <h6 class="mt-3">Terms & Conditions</h6>
+                <p>{{ offer.terms_conditions|linebreaks }}</p>
+                {% endif %}
+
+                {% if offer.remarks %}
+                <h6 class="mt-3">Remarks</h6>
+                <p>{{ offer.remarks|linebreaks }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5>Status</h5></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="text-muted">Status:</span>
+                    {% if offer.status == 'accepted' %}
+                    <span class="badge bg-soft-success text-success">Accepted</span>
+                    {% elif offer.status == 'rejected' %}
+                    <span class="badge bg-soft-danger text-danger">Rejected</span>
+                    {% elif offer.status == 'sent' %}
+                    <span class="badge bg-soft-primary text-primary">Sent</span>
+                    {% elif offer.status == 'approved' %}
+                    <span class="badge bg-soft-info text-info">Approved</span>
+                    {% elif offer.status == 'draft' %}
+                    <span class="badge bg-soft-secondary text-secondary">Draft</span>
+                    {% elif offer.status == 'pending_approval' %}
+                    <span class="badge bg-soft-warning text-warning">Pending Approval</span>
+                    {% else %}
+                    <span class="badge bg-soft-secondary text-secondary">{{ offer.get_status_display }}</span>
+                    {% endif %}
+                </div>
+                {% if offer.approved_by %}
+                <div class="mb-3">
+                    <span class="text-muted">Approved By:</span>
+                    <span>{{ offer.approved_by }}</span>
+                </div>
+                {% endif %}
+                {% if offer.approved_date %}
+                <div class="mb-3">
+                    <span class="text-muted">Approved Date:</span>
+                    <span>{{ offer.approved_date|date:"M d, Y" }}</span>
+                </div>
+                {% endif %}
+                {% if offer.candidate_response_date %}
+                <div class="mb-3">
+                    <span class="text-muted">Response Date:</span>
+                    <span>{{ offer.candidate_response_date|date:"M d, Y" }}</span>
+                </div>
+                {% endif %}
+                <div class="mb-0">
+                    <span class="text-muted">Created:</span>
+                    <span>{{ offer.created_at|date:"M d, Y" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
