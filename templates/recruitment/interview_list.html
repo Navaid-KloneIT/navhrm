@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Interviews{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Interviews</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Interviews</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'recruitment:interview_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search candidate or round...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'recruitment:interview_create' %}" class="btn btn-primary w-100">
+                                <i class="ri-add-line me-1"></i> Schedule Interview
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Interviews Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Interviews</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Job</th>
+                                <th>Round</th>
+                                <th>Date & Time</th>
+                                <th>Mode</th>
+                                <th>Status</th>
+                                <th>Result</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for interview in interviews %}
+                            <tr>
+                                <td class="fw-medium">
+                                    <a href="{% url 'recruitment:candidate_detail' interview.application.candidate.pk %}">{{ interview.application.candidate.full_name }}</a>
+                                </td>
+                                <td>{{ interview.application.job.title|truncatewords:5 }}</td>
+                                <td>{{ interview.round_name }}</td>
+                                <td>{{ interview.scheduled_date|date:"M d, Y" }} {{ interview.scheduled_time|time:"h:i A" }}</td>
+                                <td><span class="badge bg-soft-info text-info">{{ interview.get_mode_display }}</span></td>
+                                <td>
+                                    {% if interview.status == 'completed' %}
+                                    <span class="badge bg-soft-success text-success">Completed</span>
+                                    {% elif interview.status == 'scheduled' %}
+                                    <span class="badge bg-soft-primary text-primary">Scheduled</span>
+                                    {% elif interview.status == 'cancelled' %}
+                                    <span class="badge bg-soft-danger text-danger">Cancelled</span>
+                                    {% elif interview.status == 'no_show' %}
+                                    <span class="badge bg-soft-dark text-dark">No Show</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-warning text-warning">{{ interview.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if interview.result == 'pass' %}
+                                    <span class="badge bg-soft-success text-success">Pass</span>
+                                    {% elif interview.result == 'fail' %}
+                                    <span class="badge bg-soft-danger text-danger">Fail</span>
+                                    {% elif interview.result == 'on_hold' %}
+                                    <span class="badge bg-soft-warning text-warning">On Hold</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'recruitment:interview_detail' interview.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="View">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                        <a href="{% url 'recruitment:interview_edit' interview.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'recruitment:interview_delete' interview.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure?')">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-calendar-check-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No interviews found</p>
+                                        <p class="mb-0" style="font-size: 13px;">Interviews will appear here when scheduled.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav>
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
