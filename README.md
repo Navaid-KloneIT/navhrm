@@ -18,6 +18,15 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Employee Onboarding** - Templates, task checklists, asset allocation, orientation, welcome kits
 - **Employee Offboarding** - Resignations, exit interviews, clearance process, F&F settlements, experience letters
 
+### Recruitment Module
+- **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
+- **Job Templates** - Pre-defined job description templates for quick requisition creation
+- **Candidate Management** - Talent pool, candidate profiles, resume uploads, skills tracking, source tracking
+- **Applications** - Link candidates to jobs, status pipeline (applied → screening → shortlisted → interview → offered → hired)
+- **Interview Process** - Schedule interviews (in-person/phone/video), assign interviewers, multi-criteria feedback with star ratings
+- **Offer Management** - Create offers with salary, joining date, probation, benefits, approval workflow, status tracking
+- **Public Career Page** - Standalone public-facing career page for external candidates to browse jobs and submit applications without login
+
 ### Dashboard & Theme System
 - Multiple layout modes (vertical, horizontal, detached sidebar)
 - Light/Dark theme toggle
@@ -131,7 +140,8 @@ navhrm/
 │   ├── organization/      # Company, departments, designations, org chart
 │   ├── employees/         # Employee directory, profiles, documents
 │   ├── onboarding/        # Onboarding tasks, assets, orientation
-│   └── offboarding/       # Resignations, exit interviews, clearance, F&F
+│   ├── offboarding/       # Resignations, exit interviews, clearance, F&F
+│   └── recruitment/       # Job requisitions, candidates, interviews, offers
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS
@@ -145,7 +155,8 @@ navhrm/
 │   ├── organization/      # Organization templates
 │   ├── employees/         # Employee templates
 │   ├── onboarding/        # Onboarding templates
-│   └── offboarding/       # Offboarding templates
+│   ├── offboarding/       # Offboarding templates
+│   └── recruitment/       # Recruitment templates + public career page
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
