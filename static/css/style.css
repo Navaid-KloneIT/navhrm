@@ -856,7 +856,8 @@ h1, h2, h3, h4, h5, h6 {
 .avatar-xl { width: 64px; height: 64px; font-size: 24px; }
 .avatar-xxl { width: 96px; height: 96px; font-size: 36px; }
 
-.avatar {
+.avatar,
+.avatar-title {
     display: inline-flex;
     align-items: center;
     justify-content: center;
