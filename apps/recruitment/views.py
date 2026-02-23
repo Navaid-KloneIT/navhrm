@@ -257,6 +257,8 @@ class CandidateDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['applications'] = self.object.applications.select_related('job').all()
+        if self.object.skills:
+            context['skills_list'] = [s.strip() for s in self.object.skills.split(',') if s.strip()]
         return context
 
 
