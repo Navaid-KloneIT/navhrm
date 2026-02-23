@@ -116,7 +116,7 @@
         var key;
         for (key in DATA_ATTRS) {
             if (DATA_ATTRS.hasOwnProperty(key)) {
-                document.body.setAttribute(DATA_ATTRS[key], this._settings[key]);
+                document.documentElement.setAttribute(DATA_ATTRS[key], this._settings[key]);
             }
         }
 
@@ -138,7 +138,7 @@
         this._settings[key] = value;
 
         if (DATA_ATTRS[key]) {
-            document.body.setAttribute(DATA_ATTRS[key], value);
+            document.documentElement.setAttribute(DATA_ATTRS[key], value);
         }
 
         if (key === "direction") {
@@ -509,7 +509,7 @@
         this._sidebarEl.addEventListener("mouseenter", function () {
             if (self._tm.get("sidebarSize") === "small" && !self._isMobile()) {
                 self._hoverExpanded = true;
-                document.body.setAttribute("data-sidebar-size", "hover");
+                document.documentElement.setAttribute("data-sidebar-size", "hover");
                 document.body.classList.add("sidebar-hover-active");
             }
         });
@@ -517,7 +517,7 @@
         this._sidebarEl.addEventListener("mouseleave", function () {
             if (self._hoverExpanded) {
                 self._hoverExpanded = false;
-                document.body.setAttribute("data-sidebar-size", "small");
+                document.documentElement.setAttribute("data-sidebar-size", "small");
                 document.body.classList.remove("sidebar-hover-active");
             }
         });

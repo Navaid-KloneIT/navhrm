@@ -172,34 +172,7 @@
                 });
             }
 
-            // Light/Dark mode quick toggle
-            var themeToggleBtn = document.getElementById('light-dark-mode-btn');
-            if (themeToggleBtn) {
-                themeToggleBtn.addEventListener('click', function() {
-                    var html = document.documentElement;
-                    var currentTheme = html.getAttribute('data-theme');
-                    var darkIcon = document.getElementById('theme-icon-dark');
-                    var lightIcon = document.getElementById('theme-icon-light');
-
-                    if (currentTheme === 'dark') {
-                        if (typeof ThemeManager !== 'undefined' && ThemeManager.setAttribute) {
-                            ThemeManager.setAttribute('data-theme', 'light');
-                        } else {
-                            html.setAttribute('data-theme', 'light');
-                        }
-                        darkIcon.classList.remove('d-none');
-                        lightIcon.classList.add('d-none');
-                    } else {
-                        if (typeof ThemeManager !== 'undefined' && ThemeManager.setAttribute) {
-                            ThemeManager.setAttribute('data-theme', 'dark');
-                        } else {
-                            html.setAttribute('data-theme', 'dark');
-                        }
-                        darkIcon.classList.add('d-none');
-                        lightIcon.classList.remove('d-none');
-                    }
-                });
-            }
+            // Light/Dark mode toggle is handled by app.js _bindDarkModeToggle
         });
 
         // Back to top scroll function
