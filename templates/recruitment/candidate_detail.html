@@ -65,12 +65,12 @@
             </div>
         </div>
 
-        {% if candidate.skills %}
+        {% if skills_list %}
         <div class="card">
             <div class="card-header"><h5>Skills</h5></div>
             <div class="card-body">
-                {% for skill in candidate.skills.split:',' %}
-                <span class="badge bg-soft-primary text-primary me-1 mb-1">{{ skill|trim }}</span>
+                {% for skill in skills_list %}
+                <span class="badge bg-soft-primary text-primary me-1 mb-1">{{ skill }}</span>
                 {% endfor %}
             </div>
         </div>
