@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <h4>{{ title }}</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'recruitment:interview_list' %}">Interviews</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'recruitment:interview_detail' interview.pk %}">{{ interview.round_name }}</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>{{ interview.application.candidate.full_name }} - {{ interview.round_name }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <h6 class="mb-3">Ratings (1-5)</h6>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="{{ form.technical_rating.id_for_label }}" class="form-label">Technical</label>
+                            <input type="number" class="form-control {% if form.technical_rating.errors %}is-invalid{% endif %}" id="{{ form.technical_rating.id_for_label }}" name="{{ form.technical_rating.html_name }}" value="{{ form.technical_rating.value|default_if_none:'' }}" min="1" max="5">
+                            {% if form.technical_rating.errors %}<div class="invalid-feedback">{{ form.technical_rating.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <label for="{{ form.communication_rating.id_for_label }}" class="form-label">Communication</label>
+                            <input type="number" class="form-control {% if form.communication_rating.errors %}is-invalid{% endif %}" id="{{ form.communication_rating.id_for_label }}" name="{{ form.communication_rating.html_name }}" value="{{ form.communication_rating.value|default_if_none:'' }}" min="1" max="5">
+                            {% if form.communication_rating.errors %}<div class="invalid-feedback">{{ form.communication_rating.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <label for="{{ form.cultural_fit_rating.id_for_label }}" class="form-label">Cultural Fit</label>
+                            <input type="number" class="form-control {% if form.cultural_fit_rating.errors %}is-invalid{% endif %}" id="{{ form.cultural_fit_rating.id_for_label }}" name="{{ form.cultural_fit_rating.html_name }}" value="{{ form.cultural_fit_rating.value|default_if_none:'' }}" min="1" max="5">
+                            {% if form.cultural_fit_rating.errors %}<div class="invalid-feedback">{{ form.cultural_fit_rating.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <label for="{{ form.overall_rating.id_for_label }}" class="form-label">Overall</label>
+                            <input type="number" class="form-control {% if form.overall_rating.errors %}is-invalid{% endif %}" id="{{ form.overall_rating.id_for_label }}" name="{{ form.overall_rating.html_name }}" value="{{ form.overall_rating.value|default_if_none:'' }}" min="1" max="5">
+                            {% if form.overall_rating.errors %}<div class="invalid-feedback">{{ form.overall_rating.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4 mb-3">Assessment</h6>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="{{ form.strengths.id_for_label }}" class="form-label">Strengths</label>
+                            <textarea class="form-control {% if form.strengths.errors %}is-invalid{% endif %}" id="{{ form.strengths.id_for_label }}" name="{{ form.strengths.html_name }}" rows="3">{{ form.strengths.value|default_if_none:'' }}</textarea>
+                            {% if form.strengths.errors %}<div class="invalid-feedback">{{ form.strengths.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label for="{{ form.weaknesses.id_for_label }}" class="form-label">Weaknesses</label>
+                            <textarea class="form-control {% if form.weaknesses.errors %}is-invalid{% endif %}" id="{{ form.weaknesses.id_for_label }}" name="{{ form.weaknesses.html_name }}" rows="3">{{ form.weaknesses.value|default_if_none:'' }}</textarea>
+                            {% if form.weaknesses.errors %}<div class="invalid-feedback">{{ form.weaknesses.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label for="{{ form.comments.id_for_label }}" class="form-label">Comments</label>
+                            <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %}" id="{{ form.comments.id_for_label }}" name="{{ form.comments.html_name }}" rows="3">{{ form.comments.value|default_if_none:'' }}</textarea>
+                            {% if form.comments.errors %}<div class="invalid-feedback">{{ form.comments.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.recommendation.id_for_label }}" class="form-label">Recommendation</label>
+                            <select class="form-select {% if form.recommendation.errors %}is-invalid{% endif %}" id="{{ form.recommendation.id_for_label }}" name="{{ form.recommendation.html_name }}">
+                                {% for value, label in form.recommendation.field.choices %}
+                                <option value="{{ value }}" {% if form.recommendation.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.recommendation.errors %}<div class="invalid-feedback">{{ form.recommendation.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Submit Feedback
+                        </button>
+                        <a href="{% url 'recruitment:interview_detail' interview.pk %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
