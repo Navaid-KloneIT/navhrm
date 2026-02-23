@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'apps.employees',
     'apps.onboarding',
     'apps.offboarding',
+    'apps.recruitment',
 ]
 
 MIDDLEWARE = [
