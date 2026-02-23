@@ -1,0 +1,103 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ job.title }} - Careers</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .career-hero { background: linear-gradient(135deg, #4b38b3, #6c5ce7); color: #fff; padding: 40px 0; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="career-hero">
+        <div class="container">
+            <a href="{% url 'recruitment:career_page' %}" class="text-white text-decoration-none mb-3 d-inline-block"><i class="ri-arrow-left-line me-1"></i> Back to Jobs</a>
+            <h1>{{ job.title }}</h1>
+            <div class="d-flex flex-wrap gap-3 mt-3">
+                {% if job.department %}<span><i class="ri-building-line me-1"></i>{{ job.department.name }}</span>{% endif %}
+                {% if job.location %}<span><i class="ri-map-pin-line me-1"></i>{{ job.location }}</span>{% endif %}
+                <span><i class="ri-briefcase-line me-1"></i>{{ job.get_employment_type_display }}</span>
+                {% if job.experience_min or job.experience_max %}
+                <span><i class="ri-time-line me-1"></i>{{ job.experience_min }}{% if job.experience_max %}-{{ job.experience_max }}{% endif %} years</span>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <div class="container my-4">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        {% if job.description %}
+                        <h5>Job Description</h5>
+                        <div class="mb-4">{{ job.description|linebreaks }}</div>
+                        {% endif %}
+
+                        {% if job.requirements %}
+                        <h5>Requirements</h5>
+                        <div class="mb-4">{{ job.requirements|linebreaks }}</div>
+                        {% endif %}
+
+                        {% if job.responsibilities %}
+                        <h5>Responsibilities</h5>
+                        <div class="mb-4">{{ job.responsibilities|linebreaks }}</div>
+                        {% endif %}
+
+                        {% if job.benefits %}
+                        <h5>Benefits</h5>
+                        <div class="mb-4">{{ job.benefits|linebreaks }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5>Job Summary</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="ri-briefcase-line me-2 text-primary"></i><strong>Type:</strong> {{ job.get_employment_type_display }}</li>
+                            {% if job.department %}<li class="mb-2"><i class="ri-building-line me-2 text-primary"></i><strong>Department:</strong> {{ job.department.name }}</li>{% endif %}
+                            {% if job.location %}<li class="mb-2"><i class="ri-map-pin-line me-2 text-primary"></i><strong>Location:</strong> {{ job.location }}</li>{% endif %}
+                            {% if job.experience_min or job.experience_max %}
+                            <li class="mb-2"><i class="ri-time-line me-2 text-primary"></i><strong>Experience:</strong> {{ job.experience_min }}{% if job.experience_max %}-{{ job.experience_max }}{% endif %} years</li>
+                            {% endif %}
+                            {% if job.salary_min or job.salary_max %}
+                            <li class="mb-2"><i class="ri-money-dollar-circle-line me-2 text-primary"></i><strong>Salary:</strong>
+                                {% if job.salary_min %}{{ job.salary_min|intcomma }}{% endif %}
+                                {% if job.salary_min and job.salary_max %} - {% endif %}
+                                {% if job.salary_max %}{{ job.salary_max|intcomma }}{% endif %}
+                            </li>
+                            {% endif %}
+                            <li class="mb-2"><i class="ri-team-line me-2 text-primary"></i><strong>Positions:</strong> {{ job.positions }}</li>
+                            {% if job.publish_date %}<li class="mb-2"><i class="ri-calendar-line me-2 text-primary"></i><strong>Posted:</strong> {{ job.publish_date|date:"M d, Y" }}</li>{% endif %}
+                            {% if job.closing_date %}<li class="mb-0"><i class="ri-calendar-close-line me-2 text-primary"></i><strong>Closing:</strong> {{ job.closing_date|date:"M d, Y" }}</li>{% endif %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="d-grid mt-3">
+                    <a href="{% url 'recruitment:career_apply' job.pk %}" class="btn btn-primary btn-lg">
+                        <i class="ri-send-plane-line me-1"></i> Apply Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; {{ current_year|default:"2026" }} {{ app_name|default:"NavHRM" }}. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
