@@ -157,6 +157,49 @@
                 </ul>
             </li>
 
+            <li class="menu-title">Recruitment</li>
+
+            <!-- Recruitment -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'recruitment' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-briefcase-4-line"></i>
+                    <span class="menu-text">Recruitment</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'recruitment' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'recruitment:job_list' %}" class="menu-link {% if request.resolver_match.url_name == 'job_list' %}active{% endif %}">
+                            <span class="menu-text">Job Requisitions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'recruitment:template_list' %}" class="menu-link {% if request.resolver_match.url_name == 'template_list' and request.resolver_match.app_name == 'recruitment' %}active{% endif %}">
+                            <span class="menu-text">Job Templates</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'recruitment:candidate_list' %}" class="menu-link {% if request.resolver_match.url_name == 'candidate_list' %}active{% endif %}">
+                            <span class="menu-text">Candidates</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'recruitment:application_list' %}" class="menu-link {% if request.resolver_match.url_name == 'application_list' %}active{% endif %}">
+                            <span class="menu-text">Applications</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'recruitment:interview_list' %}" class="menu-link {% if request.resolver_match.url_name == 'interview_list' %}active{% endif %}">
+                            <span class="menu-text">Interviews</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'recruitment:offer_list' %}" class="menu-link {% if request.resolver_match.url_name == 'offer_list' %}active{% endif %}">
+                            <span class="menu-text">Offers</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title">Administration</li>
 
             <!-- Users -->
