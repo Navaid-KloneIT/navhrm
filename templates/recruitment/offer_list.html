@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Offers{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Offers</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Offers</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'recruitment:offer_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search candidate or designation...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'recruitment:offer_create' %}" class="btn btn-primary w-100">
+                                <i class="ri-add-line me-1"></i> Create Offer
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Offers Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Offers</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Job</th>
+                                <th>Designation</th>
+                                <th>Salary</th>
+                                <th>Joining Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for offer in offers %}
+                            <tr>
+                                <td class="fw-medium">
+                                    <a href="{% url 'recruitment:candidate_detail' offer.application.candidate.pk %}">{{ offer.application.candidate.full_name }}</a>
+                                </td>
+                                <td>{{ offer.application.job.title|truncatewords:5 }}</td>
+                                <td>{{ offer.offered_designation }}</td>
+                                <td>{{ offer.salary_currency }} {{ offer.offered_salary|intcomma }}</td>
+                                <td>{{ offer.joining_date|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if offer.status == 'accepted' %}
+                                    <span class="badge bg-soft-success text-success">Accepted</span>
+                                    {% elif offer.status == 'rejected' %}
+                                    <span class="badge bg-soft-danger text-danger">Rejected</span>
+                                    {% elif offer.status == 'sent' %}
+                                    <span class="badge bg-soft-primary text-primary">Sent</span>
+                                    {% elif offer.status == 'approved' %}
+                                    <span class="badge bg-soft-info text-info">Approved</span>
+                                    {% elif offer.status == 'draft' %}
+                                    <span class="badge bg-soft-secondary text-secondary">Draft</span>
+                                    {% elif offer.status == 'pending_approval' %}
+                                    <span class="badge bg-soft-warning text-warning">Pending</span>
+                                    {% elif offer.status == 'expired' %}
+                                    <span class="badge bg-soft-dark text-dark">Expired</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ offer.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'recruitment:offer_detail' offer.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="View">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                        <a href="{% url 'recruitment:offer_edit' offer.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'recruitment:offer_delete' offer.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure?')">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-mail-send-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No offers found</p>
+                                        <p class="mb-0" style="font-size: 13px;">Offers will appear here when created.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav>
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
