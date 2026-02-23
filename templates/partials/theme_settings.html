@@ -1,5 +1,5 @@
 <!-- Theme Settings Offcanvas -->
-<div class="offcanvas offcanvas-end border-0" tabindex="-1" id="theme-settings-offcanvas" aria-labelledby="theme-settings-label">
+<div class="offcanvas offcanvas-end border-0 theme-customizer" tabindex="-1" id="theme-settings-offcanvas" aria-labelledby="theme-settings-label">
     <div class="offcanvas-header bg-primary bg-pattern p-3">
         <h5 class="offcanvas-title text-white" id="theme-settings-label">
             <i class="ri-settings-3-line me-1 align-middle"></i> Theme Settings
@@ -16,7 +16,7 @@
                 <div class="row gy-2 mb-4">
                     <div class="col-4">
                         <div class="form-check card-radio">
-                            <input id="customizer-layout01" name="data-layout" type="radio" value="vertical" class="form-check-input" checked>
+                            <input id="customizer-layout01" name="setting-layout" type="radio" value="vertical" class="form-check-input" checked>
                             <label class="form-check-label p-0" for="customizer-layout01">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -40,7 +40,7 @@
                     </div>
                     <div class="col-4">
                         <div class="form-check card-radio">
-                            <input id="customizer-layout02" name="data-layout" type="radio" value="horizontal" class="form-check-input">
+                            <input id="customizer-layout02" name="setting-layout" type="radio" value="horizontal" class="form-check-input">
                             <label class="form-check-label p-0" for="customizer-layout02">
                                 <span class="d-flex h-100 flex-column gap-1">
                                     <span class="bg-light d-flex p-1 gap-1 align-items-center">
@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-4">
                         <div class="form-check card-radio">
-                            <input id="customizer-layout03" name="data-layout" type="radio" value="detached" class="form-check-input">
+                            <input id="customizer-layout03" name="setting-layout" type="radio" value="detached" class="form-check-input">
                             <label class="form-check-label p-0" for="customizer-layout03">
                                 <span class="d-flex h-100 flex-column">
                                     <span class="bg-light d-flex p-1 gap-1 align-items-center" style="height: 30px;">
@@ -85,7 +85,7 @@
                 <div class="row gy-2 mb-4">
                     <div class="col-4">
                         <div class="form-check card-radio">
-                            <input id="customizer-theme01" name="data-theme" type="radio" value="light" class="form-check-input" checked>
+                            <input id="customizer-theme01" name="setting-theme" type="radio" value="light" class="form-check-input" checked>
                             <label class="form-check-label p-0" for="customizer-theme01">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -108,7 +108,7 @@
                     </div>
                     <div class="col-4">
                         <div class="form-check card-radio">
-                            <input id="customizer-theme02" name="data-theme" type="radio" value="dark" class="form-check-input">
+                            <input id="customizer-theme02" name="setting-theme" type="radio" value="dark" class="form-check-input">
                             <label class="form-check-label p-0" for="customizer-theme02">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -136,7 +136,7 @@
                 <div class="row gy-2 mb-4">
                     <div class="col-4">
                         <div class="form-check card-radio">
-                            <input id="customizer-topbar01" name="data-topbar" type="radio" value="light" class="form-check-input" checked>
+                            <input id="customizer-topbar01" name="setting-topbar-color" type="radio" value="light" class="form-check-input" checked>
                             <label class="form-check-label p-0" for="customizer-topbar01">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -159,7 +159,7 @@
                     </div>
                     <div class="col-4">
                         <div class="form-check card-radio">
-                            <input id="customizer-topbar02" name="data-topbar" type="radio" value="dark" class="form-check-input">
+                            <input id="customizer-topbar02" name="setting-topbar-color" type="radio" value="dark" class="form-check-input">
                             <label class="form-check-label p-0" for="customizer-topbar02">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -187,7 +187,7 @@
                 <div class="row gy-2 mb-4">
                     <div class="col-4">
                         <div class="form-check card-radio">
-                            <input id="customizer-sidebar01" name="data-sidebar" type="radio" value="light" class="form-check-input" checked>
+                            <input id="customizer-sidebar01" name="setting-sidebar-color" type="radio" value="light" class="form-check-input" checked>
                             <label class="form-check-label p-0" for="customizer-sidebar01">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -210,7 +210,7 @@
                     </div>
                     <div class="col-4">
                         <div class="form-check card-radio">
-                            <input id="customizer-sidebar02" name="data-sidebar" type="radio" value="dark" class="form-check-input">
+                            <input id="customizer-sidebar02" name="setting-sidebar-color" type="radio" value="dark" class="form-check-input" checked>
                             <label class="form-check-label p-0" for="customizer-sidebar02">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -233,7 +233,7 @@
                     </div>
                     <div class="col-4">
                         <div class="form-check card-radio">
-                            <input id="customizer-sidebar03" name="data-sidebar" type="radio" value="gradient" class="form-check-input">
+                            <input id="customizer-sidebar03" name="setting-sidebar-color" type="radio" value="colored" class="form-check-input">
                             <label class="form-check-label p-0" for="customizer-sidebar03">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -261,7 +261,7 @@
                 <div class="row gy-2 mb-4">
                     <div class="col-6">
                         <div class="form-check card-radio">
-                            <input id="customizer-size01" name="data-sidebar-size" type="radio" value="default" class="form-check-input" checked>
+                            <input id="customizer-size01" name="setting-sidebar-size" type="radio" value="default" class="form-check-input" checked>
                             <label class="form-check-label p-0" for="customizer-size01">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -284,7 +284,7 @@
                     </div>
                     <div class="col-6">
                         <div class="form-check card-radio">
-                            <input id="customizer-size02" name="data-sidebar-size" type="radio" value="compact" class="form-check-input">
+                            <input id="customizer-size02" name="setting-sidebar-size" type="radio" value="compact" class="form-check-input">
                             <label class="form-check-label p-0" for="customizer-size02">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -307,7 +307,7 @@
                     </div>
                     <div class="col-6">
                         <div class="form-check card-radio">
-                            <input id="customizer-size03" name="data-sidebar-size" type="radio" value="sm" class="form-check-input">
+                            <input id="customizer-size03" name="setting-sidebar-size" type="radio" value="small" class="form-check-input">
                             <label class="form-check-label p-0" for="customizer-size03">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -330,7 +330,7 @@
                     </div>
                     <div class="col-6">
                         <div class="form-check card-radio">
-                            <input id="customizer-size04" name="data-sidebar-size" type="radio" value="sm-hover" class="form-check-input">
+                            <input id="customizer-size04" name="setting-sidebar-size" type="radio" value="hover" class="form-check-input">
                             <label class="form-check-label p-0" for="customizer-size04">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -358,7 +358,7 @@
                 <div class="row gy-2 mb-4">
                     <div class="col-6">
                         <div class="form-check card-radio">
-                            <input id="customizer-width01" name="data-layout-width" type="radio" value="fluid" class="form-check-input" checked>
+                            <input id="customizer-width01" name="setting-layout-width" type="radio" value="fluid" class="form-check-input" checked>
                             <label class="form-check-label p-0" for="customizer-width01">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -381,7 +381,7 @@
                     </div>
                     <div class="col-6">
                         <div class="form-check card-radio">
-                            <input id="customizer-width02" name="data-layout-width" type="radio" value="boxed" class="form-check-input">
+                            <input id="customizer-width02" name="setting-layout-width" type="radio" value="boxed" class="form-check-input">
                             <label class="form-check-label p-0" for="customizer-width02">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -409,7 +409,7 @@
                 <div class="row gy-2 mb-4">
                     <div class="col-6">
                         <div class="form-check card-radio">
-                            <input id="customizer-position01" name="data-layout-position" type="radio" value="fixed" class="form-check-input" checked>
+                            <input id="customizer-position01" name="setting-layout-position" type="radio" value="fixed" class="form-check-input" checked>
                             <label class="form-check-label p-0" for="customizer-position01">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -432,7 +432,7 @@
                     </div>
                     <div class="col-6">
                         <div class="form-check card-radio">
-                            <input id="customizer-position02" name="data-layout-position" type="radio" value="scrollable" class="form-check-input">
+                            <input id="customizer-position02" name="setting-layout-position" type="radio" value="scrollable" class="form-check-input">
                             <label class="form-check-label p-0" for="customizer-position02">
                                 <span class="d-flex gap-1 h-100">
                                     <span class="flex-shrink-0">
@@ -463,43 +463,10 @@
     <div class="offcanvas-footer border-top p-3 text-center">
         <div class="row">
             <div class="col-12">
-                <button type="button" class="btn btn-primary w-100" id="reset-layout" onclick="ThemeManager.resetDefaults();">
+                <button type="button" class="btn btn-primary w-100 customizer-reset" id="customizer-reset">
                     <i class="ri-refresh-line align-middle me-1"></i> Reset to Defaults
                 </button>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    // Bind theme settings radio buttons to ThemeManager
-    document.addEventListener('DOMContentLoaded', function() {
-        // Listen for radio button changes in theme settings
-        var themeRadios = document.querySelectorAll('#theme-settings-offcanvas input[type="radio"]');
-        themeRadios.forEach(function(radio) {
-            radio.addEventListener('change', function() {
-                var attrName = this.getAttribute('name');
-                var attrValue = this.value;
-                if (typeof ThemeManager !== 'undefined' && ThemeManager.setAttribute) {
-                    ThemeManager.setAttribute(attrName, attrValue);
-                } else {
-                    document.documentElement.setAttribute(attrName, attrValue);
-                }
-            });
-        });
-
-        // Sync radio buttons with current body attributes on open
-        var offcanvasEl = document.getElementById('theme-settings-offcanvas');
-        if (offcanvasEl) {
-            offcanvasEl.addEventListener('show.bs.offcanvas', function() {
-                themeRadios.forEach(function(radio) {
-                    var attrName = radio.getAttribute('name');
-                    var currentValue = document.documentElement.getAttribute(attrName);
-                    if (currentValue === radio.value) {
-                        radio.checked = true;
-                    }
-                });
-            });
-        }
-    });
-</script>
