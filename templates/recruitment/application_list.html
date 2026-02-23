@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Applications{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Applications</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Applications</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'recruitment:application_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search candidate or job...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Job</label>
+                            <select class="form-select" name="job">
+                                <option value="">All Jobs</option>
+                                {% for j in jobs %}
+                                <option value="{{ j.pk }}" {% if request.GET.job == j.pk|stringformat:"s" %}selected{% endif %}>{{ j.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'recruitment:application_list' %}" class="btn btn-light w-100">Clear</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Applications Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Applications</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Job</th>
+                                <th>Applied Date</th>
+                                <th>Source</th>
+                                <th>Rating</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                            <tr>
+                                <td class="fw-medium">
+                                    <a href="{% url 'recruitment:candidate_detail' app.candidate.pk %}">{{ app.candidate.full_name }}</a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'recruitment:job_detail' app.job.pk %}">{{ app.job.title }}</a>
+                                </td>
+                                <td>{{ app.applied_date|date:"M d, Y" }}</td>
+                                <td><span class="badge bg-soft-info text-info">{{ app.get_source_display }}</span></td>
+                                <td>
+                                    {% if app.rating %}
+                                    <span class="text-warning">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= app.rating %}
+                                            <i class="ri-star-fill"></i>
+                                            {% else %}
+                                            <i class="ri-star-line"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                    {% else %}-{% endif %}
+                                </td>
+                                <td>
+                                    {% if app.status == 'hired' %}
+                                    <span class="badge bg-soft-success text-success">Hired</span>
+                                    {% elif app.status == 'rejected' %}
+                                    <span class="badge bg-soft-danger text-danger">Rejected</span>
+                                    {% elif app.status == 'interview' %}
+                                    <span class="badge bg-soft-primary text-primary">Interview</span>
+                                    {% elif app.status == 'shortlisted' %}
+                                    <span class="badge bg-soft-info text-info">Shortlisted</span>
+                                    {% elif app.status == 'offered' %}
+                                    <span class="badge bg-soft-warning text-warning">Offered</span>
+                                    {% elif app.status == 'withdrawn' %}
+                                    <span class="badge bg-soft-dark text-dark">Withdrawn</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ app.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'recruitment:application_detail' app.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="View">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                        <a href="{% url 'recruitment:application_edit' app.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Update Status">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'recruitment:application_delete' app.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure?')">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No applications found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search or request.GET.status or request.GET.job %}
+                                                Try adjusting your filters.
+                                            {% else %}
+                                                Applications will appear here when candidates apply.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Application list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.job %}&job={{ request.GET.job }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.job %}&job={{ request.GET.job }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.job %}&job={{ request.GET.job }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
