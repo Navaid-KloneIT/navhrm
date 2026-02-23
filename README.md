@@ -27,17 +27,6 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Offer Management** - Create offers with salary, joining date, probation, benefits, approval workflow, status tracking
 - **Public Career Page** - Standalone public-facing career page for external candidates to browse jobs and submit applications without login
 
-### Dashboard & Theme System
-- Multiple layout modes (vertical, horizontal, detached sidebar)
-- Light/Dark theme toggle
-- Sidebar variants (light, dark, colored)
-- Sidebar sizes (default, compact, small icon, hover)
-- Topbar color options
-- Boxed/fluid width, fixed/scrollable position
-- RTL/LTR support
-- Preloader toggle
-- Theme preferences saved to localStorage
-
 ### Authentication & User Management
 - Login, registration, forgot password
 - Role-based access (super admin, tenant admin, HR manager, HR staff, manager, employee)
