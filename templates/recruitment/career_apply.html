@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply - {{ job.title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .career-hero { background: linear-gradient(135deg, #4b38b3, #6c5ce7); color: #fff; padding: 40px 0; }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="career-hero">
+        <div class="container">
+            <a href="{% url 'recruitment:career_detail' job.pk %}" class="text-white text-decoration-none mb-3 d-inline-block"><i class="ri-arrow-left-line me-1"></i> Back to Job</a>
+            <h1>Apply for {{ job.title }}</h1>
+            {% if job.department %}
+            <p class="mb-0"><i class="ri-building-line me-1"></i>{{ job.department.name }}{% if job.location %} | <i class="ri-map-pin-line me-1"></i>{{ job.location }}{% endif %}</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <div class="container my-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Messages -->
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="mb-4">Application Form</h5>
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <p class="mb-0">Please correct the errors below.</p>
+                            </div>
+                            {% endif %}
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="id_first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" id="id_first_name" name="first_name" value="{{ form.first_name.value|default_if_none:'' }}" required>
+                                    {% if form.first_name.errors %}<div class="invalid-feedback">{{ form.first_name.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" id="id_last_name" name="last_name" value="{{ form.last_name.value|default_if_none:'' }}" required>
+                                    {% if form.last_name.errors %}<div class="invalid-feedback">{{ form.last_name.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_email" class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" id="id_email" name="email" value="{{ form.email.value|default_if_none:'' }}" required>
+                                    {% if form.email.errors %}<div class="invalid-feedback">{{ form.email.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_phone" class="form-label">Phone</label>
+                                    <input type="text" class="form-control {% if form.phone.errors %}is-invalid{% endif %}" id="id_phone" name="phone" value="{{ form.phone.value|default_if_none:'' }}">
+                                    {% if form.phone.errors %}<div class="invalid-feedback">{{ form.phone.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_current_company" class="form-label">Current Company</label>
+                                    <input type="text" class="form-control {% if form.current_company.errors %}is-invalid{% endif %}" id="id_current_company" name="current_company" value="{{ form.current_company.value|default_if_none:'' }}">
+                                    {% if form.current_company.errors %}<div class="invalid-feedback">{{ form.current_company.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="id_experience_years" class="form-label">Experience (years)</label>
+                                    <input type="number" class="form-control {% if form.experience_years.errors %}is-invalid{% endif %}" id="id_experience_years" name="experience_years" value="{{ form.experience_years.value|default_if_none:'' }}" step="0.5" min="0">
+                                    {% if form.experience_years.errors %}<div class="invalid-feedback">{{ form.experience_years.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="id_expected_salary" class="form-label">Expected Salary</label>
+                                    <input type="number" class="form-control {% if form.expected_salary.errors %}is-invalid{% endif %}" id="id_expected_salary" name="expected_salary" value="{{ form.expected_salary.value|default_if_none:'' }}">
+                                    {% if form.expected_salary.errors %}<div class="invalid-feedback">{{ form.expected_salary.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_linkedin_url" class="form-label">LinkedIn URL</label>
+                                    <input type="url" class="form-control {% if form.linkedin_url.errors %}is-invalid{% endif %}" id="id_linkedin_url" name="linkedin_url" value="{{ form.linkedin_url.value|default_if_none:'' }}" placeholder="https://linkedin.com/in/...">
+                                    {% if form.linkedin_url.errors %}<div class="invalid-feedback">{{ form.linkedin_url.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_resume" class="form-label">Resume</label>
+                                    <input type="file" class="form-control {% if form.resume.errors %}is-invalid{% endif %}" id="id_resume" name="resume">
+                                    {% if form.resume.errors %}<div class="invalid-feedback">{{ form.resume.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-12">
+                                    <label for="id_cover_letter" class="form-label">Cover Letter</label>
+                                    <textarea class="form-control {% if form.cover_letter.errors %}is-invalid{% endif %}" id="id_cover_letter" name="cover_letter" rows="5">{{ form.cover_letter.value|default_if_none:'' }}</textarea>
+                                    {% if form.cover_letter.errors %}<div class="invalid-feedback">{{ form.cover_letter.errors.0 }}</div>{% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="ri-send-plane-line me-1"></i> Submit Application
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; {{ current_year|default:"2026" }} {{ app_name|default:"NavHRM" }}. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
