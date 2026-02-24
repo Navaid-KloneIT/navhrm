@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:shift_list' %}">Shifts</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Shift Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                Name <span class="text-danger">*</span>
+                            </label>
+                            {{ form.name }}
+                            {% for error in form.name.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.code.id_for_label }}" class="form-label">
+                                Code
+                            </label>
+                            {{ form.code }}
+                            {% for error in form.code.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.start_time.id_for_label }}" class="form-label">
+                                Start Time <span class="text-danger">*</span>
+                            </label>
+                            {{ form.start_time }}
+                            {% for error in form.start_time.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.end_time.id_for_label }}" class="form-label">
+                                End Time <span class="text-danger">*</span>
+                            </label>
+                            {{ form.end_time }}
+                            {% for error in form.end_time.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.grace_period_minutes.id_for_label }}" class="form-label">
+                                Grace Period (minutes)
+                            </label>
+                            {{ form.grace_period_minutes }}
+                            {% for error in form.grace_period_minutes.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.half_day_threshold_hours.id_for_label }}" class="form-label">
+                                Half Day Threshold (hrs)
+                            </label>
+                            {{ form.half_day_threshold_hours }}
+                            {% for error in form.half_day_threshold_hours.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.full_day_threshold_hours.id_for_label }}" class="form-label">
+                                Full Day Threshold (hrs)
+                            </label>
+                            {{ form.full_day_threshold_hours }}
+                            {% for error in form.full_day_threshold_hours.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                Description
+                            </label>
+                            {{ form.description }}
+                            {% for error in form.description.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                {{ form.is_night_shift }}
+                                <label class="form-check-label" for="{{ form.is_night_shift.id_for_label }}">
+                                    Night Shift
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save
+                        </button>
+                        <a href="{% url 'attendance:shift_list' %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
