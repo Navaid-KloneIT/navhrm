@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load attendance_tags %}
+
+{% block title %}Leave Calendar - {{ month_name }} {{ year }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Leave Calendar</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item active">Leave Calendar</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Month Navigation -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{% url 'attendance:leave_calendar' %}?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-light">
+                        <i class="ri-arrow-left-s-line me-1"></i> Previous
+                    </a>
+                    <h4 class="mb-0">{{ month_name }} {{ year }}</h4>
+                    <a href="{% url 'attendance:leave_calendar' %}?year={{ next_year }}&month={{ next_month }}" class="btn btn-light">
+                        Next <i class="ri-arrow-right-s-line ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Calendar Grid -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0">
+                        <thead>
+                            <tr class="text-center">
+                                <th class="bg-light" style="width: 14.28%;">Monday</th>
+                                <th class="bg-light" style="width: 14.28%;">Tuesday</th>
+                                <th class="bg-light" style="width: 14.28%;">Wednesday</th>
+                                <th class="bg-light" style="width: 14.28%;">Thursday</th>
+                                <th class="bg-light" style="width: 14.28%;">Friday</th>
+                                <th class="bg-light text-muted" style="width: 14.28%;">Saturday</th>
+                                <th class="bg-light text-muted" style="width: 14.28%;">Sunday</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for week in calendar_data %}
+                            <tr>
+                                {% for day in week %}
+                                <td class="p-1 align-top" style="min-height: 100px; height: 100px; {% if not day.day %}background-color: #f8f9fa;{% endif %}{% if day.is_today %}background-color: #fff8e1;{% endif %}">
+                                    {% if day.day %}
+                                    <div class="d-flex justify-content-between mb-1 px-1">
+                                        <small class="fw-medium {% if day.is_weekend %}text-muted{% endif %}{% if day.is_today %} text-primary{% endif %}">
+                                            {{ day.day }}
+                                        </small>
+                                    </div>
+                                    {% for entry in day.leaves %}
+                                    <div class="px-1 mb-1 rounded-1 text-truncate" style="background-color: {{ entry.color }}20; border-left: 3px solid {{ entry.color }}; font-size: 11px; padding: 2px 4px;">
+                                        <span class="fw-medium">{{ entry.employee_name }}</span>
+                                        <br>
+                                        <small class="text-muted">{{ entry.leave_type_name }}</small>
+                                    </div>
+                                    {% endfor %}
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Legend -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Legend</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-3">
+                    {% for lt in leave_types %}
+                    <div class="d-flex align-items-center">
+                        <span class="d-inline-block rounded-circle me-2" style="width: 12px; height: 12px; background-color: {{ lt.color_code }};"></span>
+                        <small>{{ lt.name }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
