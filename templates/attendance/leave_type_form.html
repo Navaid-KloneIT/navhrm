@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:leave_type_list' %}">Leave Types</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Leave Type Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="{{ form.name.html_name }}"
+                                   id="{{ form.name.id_for_label }}"
+                                   class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                                   value="{{ form.name.value|default:'' }}"
+                                   placeholder="e.g., Sick Leave">
+                            {% for error in form.name.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="{{ form.code.id_for_label }}" class="form-label">
+                                Code <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="{{ form.code.html_name }}"
+                                   id="{{ form.code.id_for_label }}"
+                                   class="form-control {% if form.code.errors %}is-invalid{% endif %}"
+                                   value="{{ form.code.value|default:'' }}"
+                                   placeholder="e.g., SL">
+                            {% for error in form.code.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">
+                                Category <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.category.html_name }}"
+                                    id="{{ form.category.id_for_label }}"
+                                    class="form-select {% if form.category.errors %}is-invalid{% endif %}">
+                                <option value="">Select Category</option>
+                                {% for value, label in form.category.field.choices %}
+                                {% if value %}
+                                <option value="{{ value }}" {% if form.category.value == value %}selected{% endif %}>{{ label }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            {% for error in form.category.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.max_days_per_year.id_for_label }}" class="form-label">
+                                Max Days Per Year <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.max_days_per_year.html_name }}"
+                                   id="{{ form.max_days_per_year.id_for_label }}"
+                                   class="form-control {% if form.max_days_per_year.errors %}is-invalid{% endif %}"
+                                   value="{{ form.max_days_per_year.value|default:'' }}"
+                                   step="0.5" min="0">
+                            {% for error in form.max_days_per_year.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.max_consecutive_days.id_for_label }}" class="form-label">
+                                Max Consecutive Days
+                            </label>
+                            <input type="number"
+                                   name="{{ form.max_consecutive_days.html_name }}"
+                                   id="{{ form.max_consecutive_days.id_for_label }}"
+                                   class="form-control {% if form.max_consecutive_days.errors %}is-invalid{% endif %}"
+                                   value="{{ form.max_consecutive_days.value|default:'' }}"
+                                   min="0"
+                                   placeholder="Blank = no limit">
+                            {% for error in form.max_consecutive_days.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <small class="text-muted">Leave blank for no limit</small>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.document_after_days.id_for_label }}" class="form-label">
+                                Document After Days
+                            </label>
+                            <input type="number"
+                                   name="{{ form.document_after_days.html_name }}"
+                                   id="{{ form.document_after_days.id_for_label }}"
+                                   class="form-control {% if form.document_after_days.errors %}is-invalid{% endif %}"
+                                   value="{{ form.document_after_days.value|default:'0' }}"
+                                   min="0">
+                            {% for error in form.document_after_days.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <small class="text-muted">0 = always require document</small>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="{{ form.color_code.id_for_label }}" class="form-label">
+                                Color Code
+                            </label>
+                            <input type="color"
+                                   name="{{ form.color_code.html_name }}"
+                                   id="{{ form.color_code.id_for_label }}"
+                                   class="form-control form-control-color {% if form.color_code.errors %}is-invalid{% endif %}"
+                                   value="{{ form.color_code.value|default:'#3b82f6' }}">
+                            {% for error in form.color_code.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            <textarea name="{{ form.description.html_name }}"
+                                      id="{{ form.description.id_for_label }}"
+                                      class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Optional description for this leave type...">{{ form.description.value|default:'' }}</textarea>
+                            {% for error in form.description.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox"
+                                               name="{{ form.is_paid.html_name }}"
+                                               id="{{ form.is_paid.id_for_label }}"
+                                               class="form-check-input"
+                                               {% if form.is_paid.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="{{ form.is_paid.id_for_label }}">Paid Leave</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox"
+                                               name="{{ form.requires_approval.html_name }}"
+                                               id="{{ form.requires_approval.id_for_label }}"
+                                               class="form-check-input"
+                                               {% if form.requires_approval.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="{{ form.requires_approval.id_for_label }}">Requires Approval</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox"
+                                               name="{{ form.requires_document.html_name }}"
+                                               id="{{ form.requires_document.id_for_label }}"
+                                               class="form-check-input"
+                                               {% if form.requires_document.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="{{ form.requires_document.id_for_label }}">Requires Document</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox"
+                                               name="{{ form.is_active.html_name }}"
+                                               id="{{ form.is_active.id_for_label }}"
+                                               class="form-check-input"
+                                               {% if form.is_active.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Active</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Leave Type
+                        </button>
+                        <a href="{% url 'attendance:leave_type_list' %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
