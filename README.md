@@ -101,6 +101,8 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 7. **Seed sample data**
    ```bash
    python manage.py seed_data
+   python manage.py seed_recruitment
+   python manage.py seed_attendance
    ```
 
 8. **Run the development server**
