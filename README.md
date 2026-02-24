@@ -18,6 +18,12 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Employee Onboarding** - Templates, task checklists, asset allocation, orientation, welcome kits
 - **Employee Offboarding** - Resignations, exit interviews, clearance process, F&F settlements, experience letters
 
+### Attendance & Leave Module
+- **Attendance Management** - Web check-in/out, attendance records, monthly calendar view, attendance regularization, shift management & assignment
+- **Leave Management** - Leave types (sick, casual, earned, unpaid, comp-off), leave policies (accrual, carry-forward, encashment), leave balances, leave applications with approval workflow, team leave calendar
+- **Time Tracking** - Projects & tasks, weekly timesheets with approval workflow, time entries against projects, overtime requests & approval, billable hours tracking
+- **Holiday Management** - National/regional/company holidays, holiday calendar, floating/optional holidays, location-based holiday policies
+
 ### Recruitment Module
 - **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
 - **Job Templates** - Pre-defined job description templates for quick requisition creation
@@ -130,7 +136,8 @@ navhrm/
 │   ├── employees/         # Employee directory, profiles, documents
 │   ├── onboarding/        # Onboarding tasks, assets, orientation
 │   ├── offboarding/       # Resignations, exit interviews, clearance, F&F
-│   └── recruitment/       # Job requisitions, candidates, interviews, offers
+│   ├── recruitment/       # Job requisitions, candidates, interviews, offers
+│   └── attendance/        # Attendance, leave, time tracking, holidays
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS
@@ -145,7 +152,8 @@ navhrm/
 │   ├── employees/         # Employee templates
 │   ├── onboarding/        # Onboarding templates
 │   ├── offboarding/       # Offboarding templates
-│   └── recruitment/       # Recruitment templates + public career page
+│   ├── recruitment/       # Recruitment templates + public career page
+│   └── attendance/        # Attendance & leave module templates
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
