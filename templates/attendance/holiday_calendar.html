@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load attendance_tags %}
+
+{% block title %}Holiday Calendar - {{ month_name }} {{ year }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Holiday Calendar</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:holiday_list' %}">Holidays</a></li>
+            <li class="breadcrumb-item active">Calendar</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <!-- Month Navigation -->
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <a href="{% url 'attendance:holiday_calendar' %}?month={{ prev_month }}&year={{ prev_year }}" class="btn btn-sm btn-light">
+                    <i class="ri-arrow-left-s-line"></i> Previous
+                </a>
+                <h5 class="mb-0">{{ month_name }} {{ year }}</h5>
+                <a href="{% url 'attendance:holiday_calendar' %}?month={{ next_month }}&year={{ next_year }}" class="btn btn-sm btn-light">
+                    Next <i class="ri-arrow-right-s-line"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0">
+                        <thead>
+                            <tr class="text-center">
+                                <th style="width: 14.28%;">Mon</th>
+                                <th style="width: 14.28%;">Tue</th>
+                                <th style="width: 14.28%;">Wed</th>
+                                <th style="width: 14.28%;">Thu</th>
+                                <th style="width: 14.28%;">Fri</th>
+                                <th style="width: 14.28%;" class="text-muted">Sat</th>
+                                <th style="width: 14.28%;" class="text-muted">Sun</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% comment %}
+                            Calendar rendering: first_weekday is 0=Mon..6=Sun.
+                            We iterate weeks. Each week is a row.
+                            Empty cells before the first day and after the last day.
+                            {% endcomment %}
+                            <tr>
+                            {% for day_info in calendar_days %}
+                                {% if day_info.new_row and not forloop.first %}
+                            </tr>
+                            <tr>
+                                {% endif %}
+                                {% if day_info.day == 0 %}
+                                <td class="bg-light" style="min-height: 80px; height: 80px;">&nbsp;</td>
+                                {% else %}
+                                <td style="min-height: 80px; height: 80px; vertical-align: top; {% if day_info.is_weekend %}background-color: #f8f9fa;{% endif %}">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="{% if day_info.is_today %}badge bg-primary rounded-circle{% endif %}" style="{% if day_info.is_today %}width: 24px; height: 24px; line-height: 16px; text-align: center;{% endif %}">{{ day_info.day }}</span>
+                                    </div>
+                                    {% if day_info.holidays %}
+                                    {% for h in day_info.holidays %}
+                                    <div class="mt-1">
+                                        <span class="badge bg-{% if h.holiday_type == 'national' %}danger{% elif h.holiday_type == 'regional' %}warning{% elif h.holiday_type == 'company' %}primary{% else %}info{% endif %} text-wrap" style="font-size: 11px;">
+                                            {{ h.name }}
+                                        </span>
+                                    </div>
+                                    {% endfor %}
+                                    {% endif %}
+                                </td>
+                                {% endif %}
+                            {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex gap-3 flex-wrap">
+                    <span><span class="badge bg-danger">&nbsp;</span> National</span>
+                    <span><span class="badge bg-warning">&nbsp;</span> Regional</span>
+                    <span><span class="badge bg-primary">&nbsp;</span> Company</span>
+                    <span><span class="badge bg-info">&nbsp;</span> Restricted/Optional</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
