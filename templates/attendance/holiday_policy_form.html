@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:holiday_policy_list' %}">Holiday Policies</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Holiday Policy Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                Policy Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="{{ form.name.html_name }}"
+                                   id="{{ form.name.id_for_label }}"
+                                   class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                                   value="{{ form.name.value|default:'' }}"
+                                   placeholder="e.g., India Office Holiday Policy 2026">
+                            {% for error in form.name.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.year.id_for_label }}" class="form-label">
+                                Year <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.year.html_name }}"
+                                   id="{{ form.year.id_for_label }}"
+                                   class="form-control {% if form.year.errors %}is-invalid{% endif %}"
+                                   value="{{ form.year.value|default:'' }}"
+                                   min="2020" max="2099">
+                            {% for error in form.year.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            <textarea name="{{ form.description.html_name }}"
+                                      id="{{ form.description.id_for_label }}"
+                                      class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Policy description...">{{ form.description.value|default:'' }}</textarea>
+                            {% for error in form.description.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
+                            <select name="{{ form.location.html_name }}"
+                                    id="{{ form.location.id_for_label }}"
+                                    class="form-select {% if form.location.errors %}is-invalid{% endif %}">
+                                <option value="">All Locations</option>
+                                {% for choice in form.location.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if form.location.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.location.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.department.id_for_label }}" class="form-label">Department</label>
+                            <select name="{{ form.department.html_name }}"
+                                    id="{{ form.department.id_for_label }}"
+                                    class="form-select {% if form.department.errors %}is-invalid{% endif %}">
+                                <option value="">All Departments</option>
+                                {% for choice in form.department.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if form.department.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.department.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.applicable_employment_types.id_for_label }}" class="form-label">
+                                Applicable Employment Types
+                            </label>
+                            <input type="text"
+                                   name="{{ form.applicable_employment_types.html_name }}"
+                                   id="{{ form.applicable_employment_types.id_for_label }}"
+                                   class="form-control {% if form.applicable_employment_types.errors %}is-invalid{% endif %}"
+                                   value="{{ form.applicable_employment_types.value|default:'' }}"
+                                   placeholder="e.g., full_time,part_time,contract">
+                            {% for error in form.applicable_employment_types.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <small class="text-muted">Comma-separated values. Leave blank for all types.</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.max_floating_holidays.id_for_label }}" class="form-label">
+                                Max Floating Holidays <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.max_floating_holidays.html_name }}"
+                                   id="{{ form.max_floating_holidays.id_for_label }}"
+                                   class="form-control {% if form.max_floating_holidays.errors %}is-invalid{% endif %}"
+                                   value="{{ form.max_floating_holidays.value|default:'2' }}"
+                                   min="0">
+                            {% for error in form.max_floating_holidays.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <small class="text-muted">Number of floating holidays employees can select per year.</small>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.holidays.id_for_label }}" class="form-label">Holidays</label>
+                            <select name="{{ form.holidays.html_name }}"
+                                    id="{{ form.holidays.id_for_label }}"
+                                    class="form-select {% if form.holidays.errors %}is-invalid{% endif %}"
+                                    multiple
+                                    size="8">
+                                {% for choice in form.holidays.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if choice.pk|stringformat:"s" in form.holidays.value %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.holidays.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <small class="text-muted">Hold Ctrl/Cmd to select multiple holidays for this policy.</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox"
+                                       name="{{ form.is_active.html_name }}"
+                                       id="{{ form.is_active.id_for_label }}"
+                                       {% if form.is_active.value %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Active</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Policy
+                        </button>
+                        <a href="{% url 'attendance:holiday_policy_list' %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
