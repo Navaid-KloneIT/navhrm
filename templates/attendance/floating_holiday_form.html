@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Select Floating Holiday{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Select Floating Holiday</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:floating_holiday_list' %}">Floating Holidays</a></li>
+            <li class="breadcrumb-item active">Select</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Floating Holiday Selection</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="{{ form.holiday.id_for_label }}" class="form-label">
+                                Holiday <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.holiday.html_name }}"
+                                    id="{{ form.holiday.id_for_label }}"
+                                    class="form-select {% if form.holiday.errors %}is-invalid{% endif %}">
+                                <option value="">Select a Floating Holiday</option>
+                                {% for choice in form.holiday.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if form.holiday.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.holiday.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <small class="text-muted">Choose from available restricted/optional holidays.</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.selected_date.id_for_label }}" class="form-label">
+                                Selected Date <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   name="{{ form.selected_date.html_name }}"
+                                   id="{{ form.selected_date.id_for_label }}"
+                                   class="form-control {% if form.selected_date.errors %}is-invalid{% endif %}"
+                                   value="{{ form.selected_date.value|default:'' }}">
+                            {% for error in form.selected_date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <small class="text-muted">The date you wish to take this floating holiday.</small>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                            <textarea name="{{ form.notes.html_name }}"
+                                      id="{{ form.notes.id_for_label }}"
+                                      class="form-control {% if form.notes.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Any additional notes...">{{ form.notes.value|default:'' }}</textarea>
+                            {% for error in form.notes.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-check-line me-1"></i> Select Holiday
+                        </button>
+                        <a href="{% url 'attendance:floating_holiday_list' %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
