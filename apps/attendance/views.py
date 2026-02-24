@@ -802,7 +802,7 @@ class LeaveApplicationDetailView(LoginRequiredMixin, View):
         )
         approval_form = LeaveApprovalForm()
         return render(request, 'attendance/leave_detail.html', {
-            'application': application,
+            'leave': application,
             'approval_form': approval_form,
         })
 
