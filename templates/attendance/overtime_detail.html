@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% load attendance_tags %}
+
+{% block title %}Overtime Request - {{ overtime.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Overtime Request Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:overtime_list' %}">Overtime</a></li>
+            <li class="breadcrumb-item active">{{ overtime.employee }} - {{ overtime.date|date:"M d, Y" }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Detail Card -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Overtime Information</h5>
+                <span class="badge bg-{{ overtime.status|leave_status_color }} fs-6">
+                    {{ overtime.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Employee</small>
+                        <div class="fw-medium">{{ overtime.employee }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Date</small>
+                        <div class="fw-medium">{{ overtime.date|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">OT Type</small>
+                        <div class="fw-medium">{{ overtime.get_ot_type_display }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Project</small>
+                        <div class="fw-medium">{{ overtime.project.name|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Planned Hours</small>
+                        <div class="fw-medium">{{ overtime.planned_hours }}h</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Actual Hours</small>
+                        <div class="fw-medium">{{ overtime.actual_hours }}h</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Generate Comp-Off</small>
+                        <div class="fw-medium">
+                            {% if overtime.generate_comp_off %}
+                            <span class="badge bg-success">Yes</span>
+                            {% else %}
+                            <span class="badge bg-secondary">No</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Created At</small>
+                        <div class="fw-medium">{{ overtime.created_at|date:"M d, Y H:i" }}</div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Reason</small>
+                    <p class="mt-1 mb-0">{{ overtime.reason }}</p>
+                </div>
+
+                {% if overtime.approved_by %}
+                <div class="mt-4 pt-3 border-top">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">{% if overtime.status == 'approved' %}Approved{% else %}Reviewed{% endif %} By</small>
+                            <div class="fw-medium">{{ overtime.approved_by }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">{% if overtime.status == 'approved' %}Approved{% else %}Reviewed{% endif %} At</small>
+                            <div class="fw-medium">{{ overtime.approved_at|date:"M d, Y H:i"|default:"-" }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if overtime.rejection_reason %}
+                <div class="mt-3 pt-3 border-top">
+                    <small class="text-muted">Rejection Reason</small>
+                    <p class="mt-1 mb-0 text-danger">{{ overtime.rejection_reason }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Approval Form (if pending and user can approve) -->
+        {% if overtime.status == 'pending' and can_approve %}
+        <div class="card">
+            <div class="card-header">
+                <h5>Review Overtime Request</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'attendance:overtime_approve' overtime.pk %}" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="id_status" class="form-label">
+                                Decision <span class="text-danger">*</span>
+                            </label>
+                            <select name="status" id="id_status" class="form-select" required>
+                                <option value="">Select Decision</option>
+                                <option value="approved">Approve</option>
+                                <option value="rejected">Reject</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="id_actual_hours" class="form-label">Actual Hours</label>
+                            <input type="number" name="actual_hours" id="id_actual_hours"
+                                   class="form-control" step="0.25" min="0" max="24"
+                                   value="{{ overtime.planned_hours }}"
+                                   placeholder="Enter actual overtime hours">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="id_rejection_reason" class="form-label">Rejection Reason</label>
+                            <textarea name="rejection_reason" id="id_rejection_reason"
+                                      class="form-control" rows="3"
+                                      placeholder="Required if rejecting..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-check-line me-1"></i> Submit Review
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Actions Sidebar -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'attendance:overtime_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to Overtime List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
