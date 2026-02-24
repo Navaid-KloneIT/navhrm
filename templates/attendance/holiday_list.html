@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load attendance_tags %}
+
+{% block title %}Holidays{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Holidays</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item active">Holidays</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'attendance:holiday_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Year</label>
+                            <input type="number" class="form-control" name="year"
+                                   value="{{ request.GET.year|default:current_year }}"
+                                   min="2020" max="2099">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Holiday Type</label>
+                            <select class="form-select" name="holiday_type">
+                                <option value="">All Types</option>
+                                <option value="national" {% if request.GET.holiday_type == 'national' %}selected{% endif %}>National Holiday</option>
+                                <option value="regional" {% if request.GET.holiday_type == 'regional' %}selected{% endif %}>Regional Holiday</option>
+                                <option value="company" {% if request.GET.holiday_type == 'company' %}selected{% endif %}>Company Holiday</option>
+                                <option value="restricted" {% if request.GET.holiday_type == 'restricted' %}selected{% endif %}>Restricted/Optional</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'attendance:holiday_calendar' %}" class="btn btn-outline-primary w-100">
+                                <i class="ri-calendar-2-line me-1"></i> Calendar
+                            </a>
+                        </div>
+                        <div class="col-md-3 ms-auto">
+                            <a href="{% url 'attendance:holiday_create' %}" class="btn btn-primary w-100">
+                                <i class="ri-add-line me-1"></i> Create Holiday
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Holidays Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Holidays</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Location</th>
+                                <th>Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for holiday in holidays %}
+                            <tr>
+                                <td><span class="fw-medium">{{ holiday.name }}</span></td>
+                                <td>{{ holiday.date|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge bg-{% if holiday.holiday_type == 'national' %}danger{% elif holiday.holiday_type == 'regional' %}warning{% elif holiday.holiday_type == 'company' %}primary{% else %}info{% endif %}">
+                                        {{ holiday.get_holiday_type_display }}
+                                    </span>
+                                </td>
+                                <td>{{ holiday.location|default:"All Locations" }}</td>
+                                <td>
+                                    {% if holiday.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'attendance:holiday_edit' holiday.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-calendar-event-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No holidays found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.year or request.GET.holiday_type %}
+                                                Try adjusting your filter criteria.
+                                            {% else %}
+                                                Add holidays to get started.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav><ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.year %}&year={{ request.GET.year }}{% endif %}{% if request.GET.holiday_type %}&holiday_type={{ request.GET.holiday_type }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.year %}&year={{ request.GET.year }}{% endif %}{% if request.GET.holiday_type %}&holiday_type={{ request.GET.holiday_type }}{% endif %}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.year %}&year={{ request.GET.year }}{% endif %}{% if request.GET.holiday_type %}&holiday_type={{ request.GET.holiday_type }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>
+                    {% endif %}
+                </ul></nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
