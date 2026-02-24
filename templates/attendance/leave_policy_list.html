@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Leave Policies{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Leave Policies</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item active">Leave Policies</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Policies Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">All Leave Policies</h5>
+                <a href="{% url 'attendance:leave_policy_create' %}" class="btn btn-primary btn-sm">
+                    <i class="ri-add-line me-1"></i> Create Leave Policy
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Leave Type</th>
+                                <th>Accrual Frequency</th>
+                                <th>Accrual Amount</th>
+                                <th>Carry Forward</th>
+                                <th>Encashment</th>
+                                <th>Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for policy in object_list %}
+                            <tr>
+                                <td><span class="fw-medium">{{ policy.name }}</span></td>
+                                <td>{{ policy.leave_type.name }}</td>
+                                <td>{{ policy.get_accrual_frequency_display }}</td>
+                                <td>{{ policy.accrual_amount }} days</td>
+                                <td>
+                                    {% if policy.allow_carry_forward %}
+                                    <span class="badge bg-soft-success text-success">Yes</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if policy.allow_encashment %}
+                                    <span class="badge bg-soft-success text-success">Yes</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if policy.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'attendance:leave_policy_edit' policy.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No leave policies found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            Create a leave policy to define accrual and carry-forward rules.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Leave policy list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
