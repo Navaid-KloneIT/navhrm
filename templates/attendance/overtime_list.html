@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load attendance_tags %}
+
+{% block title %}Overtime Requests{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Overtime Requests</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item active">Overtime</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'attendance:overtime_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Filter by Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="approved" {% if request.GET.status == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="rejected" {% if request.GET.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                                <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-3 ms-auto">
+                            <a href="{% url 'attendance:overtime_create' %}" class="btn btn-primary w-100">
+                                <i class="ri-add-line me-1"></i> Create Overtime Request
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overtime Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Overtime Requests</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Planned Hours</th>
+                                <th>Actual Hours</th>
+                                <th>Status</th>
+                                <th>Project</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ot in overtime_requests %}
+                            <tr>
+                                <td><span class="fw-medium">{{ ot.employee }}</span></td>
+                                <td>{{ ot.date|date:"M d, Y" }}</td>
+                                <td>{{ ot.get_ot_type_display }}</td>
+                                <td>{{ ot.planned_hours }}h</td>
+                                <td>{{ ot.actual_hours }}h</td>
+                                <td>
+                                    <span class="badge bg-{{ ot.status|leave_status_color }}">
+                                        {{ ot.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ ot.project.name|default:"-" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'attendance:overtime_detail' ot.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="View Details">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-time-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No overtime requests found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.status %}
+                                                Try adjusting your filter criteria.
+                                            {% else %}
+                                                Overtime requests will appear here when created.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav><ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>
+                    {% endif %}
+                </ul></nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
