@@ -414,14 +414,14 @@ class ShiftListView(LoginRequiredMixin, ListView):
 
 class ShiftCreateView(LoginRequiredMixin, View):
     def get(self, request):
-        form = ShiftForm(tenant=request.tenant)
+        form = ShiftForm()
         return render(request, 'attendance/shift_form.html', {
             'form': form,
             'title': 'Create Shift',
         })
 
     def post(self, request):
-        form = ShiftForm(request.POST, tenant=request.tenant)
+        form = ShiftForm(request.POST)
         if form.is_valid():
             shift = form.save(commit=False)
             shift.tenant = request.tenant
@@ -437,7 +437,7 @@ class ShiftCreateView(LoginRequiredMixin, View):
 class ShiftUpdateView(LoginRequiredMixin, View):
     def get(self, request, pk):
         shift = get_object_or_404(Shift.all_objects, pk=pk, tenant=request.tenant)
-        form = ShiftForm(instance=shift, tenant=request.tenant)
+        form = ShiftForm(instance=shift)
         return render(request, 'attendance/shift_form.html', {
             'form': form,
             'shift': shift,
@@ -446,7 +446,7 @@ class ShiftUpdateView(LoginRequiredMixin, View):
 
     def post(self, request, pk):
         shift = get_object_or_404(Shift.all_objects, pk=pk, tenant=request.tenant)
-        form = ShiftForm(request.POST, instance=shift, tenant=request.tenant)
+        form = ShiftForm(request.POST, instance=shift)
         if form.is_valid():
             form.save()
             messages.success(request, f'Shift "{shift.name}" updated successfully.')
@@ -548,14 +548,14 @@ class LeaveTypeListView(LoginRequiredMixin, ListView):
 
 class LeaveTypeCreateView(LoginRequiredMixin, View):
     def get(self, request):
-        form = LeaveTypeForm(tenant=request.tenant)
+        form = LeaveTypeForm()
         return render(request, 'attendance/leave_type_form.html', {
             'form': form,
             'title': 'Create Leave Type',
         })
 
     def post(self, request):
-        form = LeaveTypeForm(request.POST, tenant=request.tenant)
+        form = LeaveTypeForm(request.POST)
         if form.is_valid():
             leave_type = form.save(commit=False)
             leave_type.tenant = request.tenant
@@ -573,7 +573,7 @@ class LeaveTypeUpdateView(LoginRequiredMixin, View):
         leave_type = get_object_or_404(
             LeaveType.all_objects, pk=pk, tenant=request.tenant
         )
-        form = LeaveTypeForm(instance=leave_type, tenant=request.tenant)
+        form = LeaveTypeForm(instance=leave_type)
         return render(request, 'attendance/leave_type_form.html', {
             'form': form,
             'leave_type': leave_type,
@@ -584,7 +584,7 @@ class LeaveTypeUpdateView(LoginRequiredMixin, View):
         leave_type = get_object_or_404(
             LeaveType.all_objects, pk=pk, tenant=request.tenant
         )
-        form = LeaveTypeForm(request.POST, instance=leave_type, tenant=request.tenant)
+        form = LeaveTypeForm(request.POST, instance=leave_type)
         if form.is_valid():
             form.save()
             messages.success(request, f'Leave type "{leave_type.name}" updated successfully.')
