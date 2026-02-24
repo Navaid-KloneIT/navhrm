@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Check In / Check Out{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Check In / Check Out</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item active">Punch</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        {% if not employee %}
+        <!-- No Employee Record -->
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="text-warning mb-3">
+                    <i class="ri-error-warning-line" style="font-size: 64px;"></i>
+                </div>
+                <h5>No Employee Record Found</h5>
+                <p class="text-muted">No employee record is linked to your account. Please contact your administrator.</p>
+                <a href="{% url 'attendance:dashboard' %}" class="btn btn-primary">
+                    <i class="ri-arrow-left-line me-1"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-header text-center">
+                <h5 class="mb-0">Today's Attendance</h5>
+            </div>
+            <div class="card-body text-center py-4">
+                <!-- Today's Date -->
+                <div class="mb-4">
+                    <h3 class="text-primary mb-1">{{ today|date:"l" }}</h3>
+                    <p class="text-muted fs-5 mb-0">{{ today|date:"F d, Y" }}</p>
+                </div>
+
+                {% if attendance and attendance.check_in and attendance.check_out %}
+                <!-- Already Checked Out -->
+                <div class="mb-4">
+                    <div class="d-inline-block bg-soft-success text-success rounded-circle p-3 mb-3" style="width: 80px; height: 80px; line-height: 56px;">
+                        <i class="ri-check-double-line" style="font-size: 36px;"></i>
+                    </div>
+                    <h5 class="text-success">Day Complete</h5>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="border rounded p-3">
+                            <small class="text-muted d-block">Check In</small>
+                            <span class="fw-medium fs-5">{{ attendance.check_in|date:"h:i A" }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="border rounded p-3">
+                            <small class="text-muted d-block">Check Out</small>
+                            <span class="fw-medium fs-5">{{ attendance.check_out|date:"h:i A" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border rounded p-3 mb-3">
+                    <small class="text-muted d-block">Total Hours</small>
+                    <span class="fw-medium fs-4 text-primary">{{ attendance.total_hours }} hrs</span>
+                </div>
+
+                {% elif attendance and attendance.check_in %}
+                <!-- Checked In, Not Checked Out -->
+                <div class="mb-4">
+                    <div class="d-inline-block bg-soft-info text-info rounded-circle p-3 mb-3" style="width: 80px; height: 80px; line-height: 56px;">
+                        <i class="ri-time-line" style="font-size: 36px;"></i>
+                    </div>
+                    <h5 class="text-info">Currently Working</h5>
+                </div>
+
+                <div class="border rounded p-3 mb-4">
+                    <small class="text-muted d-block">Checked In At</small>
+                    <span class="fw-medium fs-4">{{ attendance.check_in|date:"h:i A" }}</span>
+                </div>
+
+                <form method="POST" action="{% url 'attendance:punch' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="check_out">
+                    <button type="submit" class="btn btn-danger btn-lg px-5">
+                        <i class="ri-logout-box-line me-2"></i> Check Out
+                    </button>
+                </form>
+
+                {% else %}
+                <!-- Not Checked In -->
+                <div class="mb-4">
+                    <div class="d-inline-block bg-soft-secondary text-secondary rounded-circle p-3 mb-3" style="width: 80px; height: 80px; line-height: 56px;">
+                        <i class="ri-fingerprint-line" style="font-size: 36px;"></i>
+                    </div>
+                    <h5 class="text-muted">Not Checked In</h5>
+                    <p class="text-muted">Tap the button below to mark your attendance.</p>
+                </div>
+
+                <form method="POST" action="{% url 'attendance:punch' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="check_in">
+                    <button type="submit" class="btn btn-success btn-lg px-5">
+                        <i class="ri-login-box-line me-2"></i> Check In
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
