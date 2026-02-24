@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+{% load attendance_tags %}
+
+{% block title %}Timesheet - {{ timesheet.employee }} - Week of {{ timesheet.week_start_date|date:"M d, Y" }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Timesheet Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:timesheet_list' %}">Timesheets</a></li>
+            <li class="breadcrumb-item active">Week of {{ timesheet.week_start_date|date:"M d, Y" }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Timesheet Info Card -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Timesheet Information</h5>
+                <span class="badge bg-{{ timesheet.status|timesheet_status_color }} fs-6">
+                    {{ timesheet.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Employee</small>
+                        <div class="fw-medium">{{ timesheet.employee }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Week</small>
+                        <div class="fw-medium">{{ timesheet.week_start_date|date:"M d, Y" }} - {{ timesheet.week_end_date|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Total Hours</small>
+                        <div class="fw-medium">{{ timesheet.total_hours }} hrs</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Billable Hours</small>
+                        <div class="fw-medium">{{ timesheet.billable_hours }} hrs</div>
+                    </div>
+                </div>
+
+                {% if timesheet.notes %}
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Notes</small>
+                    <p class="mt-1 mb-0">{{ timesheet.notes }}</p>
+                </div>
+                {% endif %}
+
+                {% if timesheet.submitted_at %}
+                <div class="mt-3 pt-3 border-top">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">Submitted At</small>
+                            <div class="fw-medium">{{ timesheet.submitted_at|date:"M d, Y H:i" }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if timesheet.approved_by %}
+                <div class="mt-3 pt-3 border-top">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">Approved By</small>
+                            <div class="fw-medium">{{ timesheet.approved_by }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">Approved At</small>
+                            <div class="fw-medium">{{ timesheet.approved_at|date:"M d, Y H:i"|default:"-" }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if timesheet.rejection_reason %}
+                <div class="mt-3 pt-3 border-top">
+                    <small class="text-muted">Rejection Reason</small>
+                    <p class="mt-1 mb-0 text-danger">{{ timesheet.rejection_reason }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Card -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if timesheet.status == 'draft' %}
+                    <form method="POST" action="{% url 'attendance:timesheet_submit' timesheet.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info w-100" onclick="return confirm('Submit this timesheet for approval?')">
+                            <i class="ri-send-plane-line me-1"></i> Submit for Approval
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    {% if timesheet.status == 'submitted' and can_approve %}
+                    <a href="{% url 'attendance:timesheet_approve' timesheet.pk %}" class="btn btn-success">
+                        <i class="ri-check-double-line me-1"></i> Approve / Reject
+                    </a>
+                    {% endif %}
+
+                    <a href="{% url 'attendance:timesheet_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to Timesheets
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Time Entries Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Time Entries</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Project</th>
+                                <th>Task</th>
+                                <th>Hours</th>
+                                <th>Description</th>
+                                <th>Billable</th>
+                                {% if timesheet.status == 'draft' %}
+                                <th>Actions</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in timesheet.entries.all %}
+                            <tr>
+                                <td>{{ entry.date|date:"D, M d" }}</td>
+                                <td>{{ entry.project.name }}</td>
+                                <td>{{ entry.task.name|default:"-" }}</td>
+                                <td><span class="fw-medium">{{ entry.hours }}h</span></td>
+                                <td>{{ entry.description|default:"-"|truncatewords:10 }}</td>
+                                <td>
+                                    {% if entry.is_billable %}
+                                    <span class="badge bg-success">Billable</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Non-billable</span>
+                                    {% endif %}
+                                </td>
+                                {% if timesheet.status == 'draft' %}
+                                <td>
+                                    <form method="POST" action="{% url 'attendance:time_entry_delete' timesheet.pk entry.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete Entry" onclick="return confirm('Delete this time entry?')">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="{% if timesheet.status == 'draft' %}7{% else %}6{% endif %}" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="ri-time-line" style="font-size: 36px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-0">No time entries yet. Add your first entry below.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Time Entry Form (if draft) -->
+{% if timesheet.status == 'draft' %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Add Time Entry</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'attendance:time_entry_create' timesheet.pk %}" novalidate>
+                    {% csrf_token %}
+
+                    {% if entry_form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in entry_form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label for="{{ entry_form.project.id_for_label }}" class="form-label">
+                                Project <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ entry_form.project.html_name }}"
+                                    id="{{ entry_form.project.id_for_label }}"
+                                    class="form-select {% if entry_form.project.errors %}is-invalid{% endif %}">
+                                <option value="">Select Project</option>
+                                {% for choice in entry_form.project.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if entry_form.project.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in entry_form.project.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="{{ entry_form.task.id_for_label }}" class="form-label">Task</label>
+                            <select name="{{ entry_form.task.html_name }}"
+                                    id="{{ entry_form.task.id_for_label }}"
+                                    class="form-select {% if entry_form.task.errors %}is-invalid{% endif %}">
+                                <option value="">Select Task</option>
+                                {% for choice in entry_form.task.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if entry_form.task.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in entry_form.task.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="{{ entry_form.date.id_for_label }}" class="form-label">
+                                Date <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   name="{{ entry_form.date.html_name }}"
+                                   id="{{ entry_form.date.id_for_label }}"
+                                   class="form-control {% if entry_form.date.errors %}is-invalid{% endif %}"
+                                   value="{{ entry_form.date.value|default:'' }}">
+                            {% for error in entry_form.date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-1">
+                            <label for="{{ entry_form.hours.id_for_label }}" class="form-label">
+                                Hours <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ entry_form.hours.html_name }}"
+                                   id="{{ entry_form.hours.id_for_label }}"
+                                   class="form-control {% if entry_form.hours.errors %}is-invalid{% endif %}"
+                                   value="{{ entry_form.hours.value|default:'' }}"
+                                   step="0.25" min="0.25" max="24">
+                            {% for error in entry_form.hours.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="{{ entry_form.description.id_for_label }}" class="form-label">Description</label>
+                            <input type="text"
+                                   name="{{ entry_form.description.html_name }}"
+                                   id="{{ entry_form.description.id_for_label }}"
+                                   class="form-control {% if entry_form.description.errors %}is-invalid{% endif %}"
+                                   value="{{ entry_form.description.value|default:'' }}"
+                                   placeholder="What did you work on?">
+                            {% for error in entry_form.description.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-1">
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox"
+                                       name="{{ entry_form.is_billable.html_name }}"
+                                       id="{{ entry_form.is_billable.id_for_label }}"
+                                       {% if entry_form.is_billable.value %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ entry_form.is_billable.id_for_label }}">Billable</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-add-line"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
