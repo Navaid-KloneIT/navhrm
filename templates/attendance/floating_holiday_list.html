@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load attendance_tags %}
+
+{% block title %}Floating Holidays{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Floating Holidays</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item active">Floating Holidays</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-end">
+            <a href="{% url 'attendance:floating_holiday_select' %}" class="btn btn-primary">
+                <i class="ri-add-line me-1"></i> Select Floating Holiday
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Holidays Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>My Floating Holidays</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Holiday Name</th>
+                                <th>Holiday Date</th>
+                                <th>Status</th>
+                                <th>Selected Date</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fh in floating_holidays %}
+                            <tr>
+                                <td><span class="fw-medium">{{ fh.holiday.name }}</span></td>
+                                <td>{{ fh.holiday.date|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge bg-{{ fh.status|leave_status_color }}">
+                                        {{ fh.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ fh.selected_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>{{ fh.notes|default:"-"|truncatewords:10 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-calendar-check-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No floating holidays selected</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            You can select floating holidays from the available restricted/optional holidays.
+                                        </p>
+                                        <a href="{% url 'attendance:floating_holiday_select' %}" class="btn btn-sm btn-primary mt-3">
+                                            <i class="ri-add-line me-1"></i> Select a Floating Holiday
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav><ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="ri-arrow-left-s-line"></i></a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="ri-arrow-right-s-line"></i></a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>
+                    {% endif %}
+                </ul></nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
