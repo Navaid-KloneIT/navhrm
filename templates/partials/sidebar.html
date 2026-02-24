@@ -157,6 +157,147 @@
                 </ul>
             </li>
 
+            <li class="menu-title">Attendance & Leave</li>
+
+            <!-- Attendance -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'attendance' and 'attendance' in request.resolver_match.url_name or request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name == 'attendance' or request.resolver_match.url_name == 'punch' or 'regularization' in request.resolver_match.url_name or 'shift' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-fingerprint-line"></i>
+                    <span class="menu-text">Attendance</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'attendance' and 'attendance' in request.resolver_match.url_name or request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name == 'attendance' or request.resolver_match.url_name == 'punch' or 'regularization' in request.resolver_match.url_name or 'shift' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name == 'attendance' %}active{% endif %}">
+                            <span class="menu-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:punch' %}" class="menu-link {% if request.resolver_match.url_name == 'punch' %}active{% endif %}">
+                            <span class="menu-text">Check In/Out</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:attendance_list' %}" class="menu-link {% if request.resolver_match.url_name == 'attendance_list' %}active{% endif %}">
+                            <span class="menu-text">Records</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:attendance_calendar' %}" class="menu-link {% if request.resolver_match.url_name == 'attendance_calendar' %}active{% endif %}">
+                            <span class="menu-text">Calendar</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:regularization_list' %}" class="menu-link {% if request.resolver_match.url_name == 'regularization_list' %}active{% endif %}">
+                            <span class="menu-text">Regularization</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:shift_list' %}" class="menu-link {% if request.resolver_match.url_name == 'shift_list' %}active{% endif %}">
+                            <span class="menu-text">Shifts</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Leave -->
+            <li class="nav-item has-submenu {% if 'leave' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-calendar-check-line"></i>
+                    <span class="menu-text">Leave</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if 'leave' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:leave_list' %}" class="menu-link {% if request.resolver_match.url_name == 'leave_list' %}active{% endif %}">
+                            <span class="menu-text">Applications</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:leave_apply' %}" class="menu-link {% if request.resolver_match.url_name == 'leave_apply' %}active{% endif %}">
+                            <span class="menu-text">Apply Leave</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:leave_balance_list' %}" class="menu-link {% if request.resolver_match.url_name == 'leave_balance_list' %}active{% endif %}">
+                            <span class="menu-text">Balances</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:leave_calendar' %}" class="menu-link {% if request.resolver_match.url_name == 'leave_calendar' %}active{% endif %}">
+                            <span class="menu-text">Team Calendar</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:leave_type_list' %}" class="menu-link {% if request.resolver_match.url_name == 'leave_type_list' %}active{% endif %}">
+                            <span class="menu-text">Leave Types</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:leave_policy_list' %}" class="menu-link {% if request.resolver_match.url_name == 'leave_policy_list' %}active{% endif %}">
+                            <span class="menu-text">Policies</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Time Tracking -->
+            <li class="nav-item has-submenu {% if 'timesheet' in request.resolver_match.url_name or 'project' in request.resolver_match.url_name or 'overtime' in request.resolver_match.url_name or 'time_entry' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-time-line"></i>
+                    <span class="menu-text">Time Tracking</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if 'timesheet' in request.resolver_match.url_name or 'project' in request.resolver_match.url_name or 'overtime' in request.resolver_match.url_name or 'time_entry' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:timesheet_list' %}" class="menu-link {% if request.resolver_match.url_name == 'timesheet_list' %}active{% endif %}">
+                            <span class="menu-text">Timesheets</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:project_list' %}" class="menu-link {% if request.resolver_match.url_name == 'project_list' %}active{% endif %}">
+                            <span class="menu-text">Projects</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:overtime_list' %}" class="menu-link {% if request.resolver_match.url_name == 'overtime_list' %}active{% endif %}">
+                            <span class="menu-text">Overtime</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Holidays -->
+            <li class="nav-item has-submenu {% if 'holiday' in request.resolver_match.url_name or 'floating' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-sun-line"></i>
+                    <span class="menu-text">Holidays</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if 'holiday' in request.resolver_match.url_name or 'floating' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:holiday_list' %}" class="menu-link {% if request.resolver_match.url_name == 'holiday_list' %}active{% endif %}">
+                            <span class="menu-text">Holiday List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:holiday_calendar' %}" class="menu-link {% if request.resolver_match.url_name == 'holiday_calendar' %}active{% endif %}">
+                            <span class="menu-text">Calendar</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:floating_holiday_list' %}" class="menu-link {% if request.resolver_match.url_name == 'floating_holiday_list' %}active{% endif %}">
+                            <span class="menu-text">Floating Holidays</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'attendance:holiday_policy_list' %}" class="menu-link {% if request.resolver_match.url_name == 'holiday_policy_list' %}active{% endif %}">
+                            <span class="menu-text">Policies</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title">Recruitment</li>
 
             <!-- Recruitment -->
