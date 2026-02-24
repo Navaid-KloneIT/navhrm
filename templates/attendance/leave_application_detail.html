@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% load attendance_tags %}
+
+{% block title %}Leave Application - {{ leave.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Leave Application Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:leave_list' %}">Leave Applications</a></li>
+            <li class="breadcrumb-item active">{{ leave.employee }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Leave Info Card -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Leave Information</h5>
+                <span class="badge bg-{{ leave.status|leave_status_color }} fs-6">
+                    {{ leave.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Employee</small>
+                        <div class="fw-medium">{{ leave.employee }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Leave Type</small>
+                        <div class="fw-medium">
+                            <span class="d-inline-block rounded-circle me-1" style="width: 10px; height: 10px; background-color: {{ leave.leave_type.color_code }};"></span>
+                            {{ leave.leave_type.name }}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">From Date</small>
+                        <div class="fw-medium">{{ leave.from_date|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">From Day Type</small>
+                        <div class="fw-medium">{{ leave.get_from_day_type_display }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">To Date</small>
+                        <div class="fw-medium">{{ leave.to_date|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">To Day Type</small>
+                        <div class="fw-medium">{{ leave.get_to_day_type_display }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Total Days</small>
+                        <div class="fw-medium fs-5">{{ leave.total_days }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Applied On</small>
+                        <div class="fw-medium">{{ leave.created_at|date:"M d, Y h:i A" }}</div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Reason</small>
+                    <p class="mt-1">{{ leave.reason }}</p>
+                </div>
+
+                {% if leave.document %}
+                <div class="mt-3 pt-3 border-top">
+                    <small class="text-muted">Supporting Document</small>
+                    <div class="mt-1">
+                        <a href="{{ leave.document.url }}" class="btn btn-sm btn-soft-primary" target="_blank">
+                            <i class="ri-download-2-line me-1"></i> Download Document
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if leave.approved_by %}
+                <div class="mt-4 pt-3 border-top">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">{% if leave.status == 'approved' %}Approved{% else %}Reviewed{% endif %} By</small>
+                            <div class="fw-medium">{{ leave.approved_by }}</div>
+                        </div>
+                        {% if leave.approved_at %}
+                        <div class="col-md-6">
+                            <small class="text-muted">{% if leave.status == 'approved' %}Approved{% else %}Reviewed{% endif %} At</small>
+                            <div class="fw-medium">{{ leave.approved_at|date:"M d, Y h:i A" }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if leave.status == 'rejected' and leave.rejection_reason %}
+                <div class="mt-3 pt-3 border-top">
+                    <small class="text-muted text-danger">Rejection Reason</small>
+                    <p class="mt-1 mb-0 text-danger">{{ leave.rejection_reason }}</p>
+                </div>
+                {% endif %}
+
+                {% if leave.status == 'cancelled' and leave.cancellation_reason %}
+                <div class="mt-3 pt-3 border-top">
+                    <small class="text-muted">Cancellation Reason</small>
+                    <p class="mt-1 mb-0">{{ leave.cancellation_reason }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Approval Form (for pending leaves) -->
+        {% if leave.status == 'pending' and approval_form %}
+        <div class="card">
+            <div class="card-header">
+                <h5>Approve / Reject Leave</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'attendance:leave_approve' leave.pk %}" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ approval_form.status.id_for_label }}" class="form-label">
+                                Decision <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ approval_form.status.html_name }}"
+                                    id="{{ approval_form.status.id_for_label }}"
+                                    class="form-select {% if approval_form.status.errors %}is-invalid{% endif %}">
+                                <option value="">Select Decision</option>
+                                <option value="approved">Approve</option>
+                                <option value="rejected">Reject</option>
+                            </select>
+                            {% for error in approval_form.status.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ approval_form.rejection_reason.id_for_label }}" class="form-label">
+                                Rejection Reason
+                            </label>
+                            <textarea name="{{ approval_form.rejection_reason.html_name }}"
+                                      id="{{ approval_form.rejection_reason.id_for_label }}"
+                                      class="form-control {% if approval_form.rejection_reason.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Required if rejecting the leave application...">{{ approval_form.rejection_reason.value|default:'' }}</textarea>
+                            {% for error in approval_form.rejection_reason.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-check-double-line me-1"></i> Submit Decision
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Cancel Leave Form (for pending or approved leaves) -->
+        {% if leave.status == 'pending' or leave.status == 'approved' %}
+        <div class="card border-warning">
+            <div class="card-header bg-soft-warning">
+                <h5 class="mb-0 text-warning">Cancel Leave</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'attendance:leave_cancel' leave.pk %}" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="cancellation_reason" class="form-label">
+                            Cancellation Reason <span class="text-danger">*</span>
+                        </label>
+                        <textarea name="cancellation_reason"
+                                  id="cancellation_reason"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Please provide a reason for cancellation..."
+                                  required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-warning" onclick="return confirm('Are you sure you want to cancel this leave application?')">
+                        <i class="ri-close-circle-line me-1"></i> Cancel Leave
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'attendance:leave_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
