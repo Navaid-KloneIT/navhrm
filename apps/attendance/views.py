@@ -211,8 +211,8 @@ class AttendanceCalendarView(LoginRequiredMixin, TemplateView):
         tenant = self.request.tenant
         today = timezone.now().date()
 
-        month = int(self.request.GET.get('month', today.month))
-        year = int(self.request.GET.get('year', today.year))
+        month = int(self.request.GET.get('month') or today.month)
+        year = int(self.request.GET.get('year') or today.year)
         employee_id = self.request.GET.get('employee_id', '')
 
         # Build calendar data
@@ -896,8 +896,8 @@ class LeaveCalendarView(LoginRequiredMixin, TemplateView):
         tenant = self.request.tenant
         today = timezone.now().date()
 
-        month = int(self.request.GET.get('month', today.month))
-        year = int(self.request.GET.get('year', today.year))
+        month = int(self.request.GET.get('month') or today.month)
+        year = int(self.request.GET.get('year') or today.year)
 
         # Get approved leaves for the month
         month_start = date(year, month, 1)
@@ -1486,8 +1486,8 @@ class HolidayCalendarView(LoginRequiredMixin, TemplateView):
         tenant = self.request.tenant
         today = timezone.now().date()
 
-        month = int(self.request.GET.get('month', today.month))
-        year = int(self.request.GET.get('year', today.year))
+        month = int(self.request.GET.get('month') or today.month)
+        year = int(self.request.GET.get('year') or today.year)
 
         days_in_month = calendar.monthrange(year, month)[1]
         first_day_weekday = calendar.monthrange(year, month)[0]
