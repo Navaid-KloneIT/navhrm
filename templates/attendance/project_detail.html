@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% load attendance_tags %}
+
+{% block title %}Project - {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Project Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:dashboard' %}">Attendance</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'attendance:project_list' %}">Projects</a></li>
+            <li class="breadcrumb-item active">{{ project.name }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Project Info Card -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ project.name }}</h5>
+                <span class="badge bg-{{ project.status|project_status_color }} fs-6">
+                    {{ project.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <small class="text-muted">Project Code</small>
+                        <div class="fw-medium"><code>{{ project.code|default:"-" }}</code></div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Client</small>
+                        <div class="fw-medium">{{ project.client_name|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Project Manager</small>
+                        <div class="fw-medium">{{ project.manager|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Date Range</small>
+                        <div class="fw-medium">
+                            {% if project.start_date %}
+                                {{ project.start_date|date:"M d, Y" }}
+                                {% if project.end_date %} - {{ project.end_date|date:"M d, Y" }}{% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Budget Hours</small>
+                        <div class="fw-medium">{{ project.budget_hours }} hrs</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Hourly Rate</small>
+                        <div class="fw-medium">${{ project.hourly_rate }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Billable</small>
+                        <div>
+                            {% if project.is_billable %}
+                            <span class="badge bg-success">Billable</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Non-Billable</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Total Logged Hours</small>
+                        <div class="fw-medium fs-5">{{ project.total_logged_hours }} hrs</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Billable Amount</small>
+                        <div class="fw-medium fs-5">${{ project.billable_amount }}</div>
+                    </div>
+                </div>
+
+                {% if project.budget_hours > 0 %}
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Utilization</small>
+                    {% with utilization=utilization_percent %}
+                    <div class="d-flex align-items-center mt-1">
+                        <div class="progress flex-grow-1" style="height: 10px;">
+                            <div class="progress-bar {% if utilization > 90 %}bg-danger{% elif utilization > 75 %}bg-warning{% else %}bg-success{% endif %}"
+                                 role="progressbar"
+                                 style="width: {% if utilization > 100 %}100{% else %}{{ utilization }}{% endif %}%"
+                                 aria-valuenow="{{ utilization }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                        <span class="ms-3 fw-medium">{{ utilization }}%</span>
+                    </div>
+                    {% endwith %}
+                </div>
+                {% endif %}
+
+                {% if project.description %}
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Description</small>
+                    <p class="mt-1 mb-0">{{ project.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tasks Card -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Tasks</h5>
+                <a href="{% url 'attendance:task_create' project.pk %}" class="btn btn-primary btn-sm">
+                    <i class="ri-add-line me-1"></i> Add Task
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Assigned To</th>
+                                <th>Status</th>
+                                <th>Estimated Hours</th>
+                                <th>Due Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in project.tasks.all %}
+                            <tr>
+                                <td><span class="fw-medium">{{ task.name }}</span></td>
+                                <td>{{ task.assigned_to|default:"-" }}</td>
+                                <td>
+                                    {% if task.status == 'open' %}
+                                    <span class="badge bg-info">Open</span>
+                                    {% elif task.status == 'in_progress' %}
+                                    <span class="badge bg-primary">In Progress</span>
+                                    {% elif task.status == 'completed' %}
+                                    <span class="badge bg-success">Completed</span>
+                                    {% elif task.status == 'on_hold' %}
+                                    <span class="badge bg-warning">On Hold</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ task.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ task.estimated_hours }} hrs</td>
+                                <td>{{ task.due_date|date:"M d, Y"|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <p class="mb-1">No tasks yet</p>
+                                        <p class="mb-0" style="font-size: 13px;">Add tasks to break down the project work.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Time Entries Card -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Time Entries</h5>
+                <a href="{% url 'attendance:timesheet_list' %}" class="btn btn-light btn-sm">
+                    <i class="ri-time-line me-1"></i> View All Timesheets
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Employee</th>
+                                <th>Hours</th>
+                                <th>Description</th>
+                                <th>Billable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in recent_entries %}
+                            <tr>
+                                <td>{{ entry.date|date:"M d, Y" }}</td>
+                                <td><span class="fw-medium">{{ entry.employee }}</span></td>
+                                <td>{{ entry.hours }} hrs</td>
+                                <td class="text-truncate" style="max-width: 250px;">{{ entry.description|default:"-" }}</td>
+                                <td>
+                                    {% if entry.is_billable %}
+                                    <span class="badge bg-soft-success text-success">Yes</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <p class="mb-1">No time entries yet</p>
+                                        <p class="mb-0" style="font-size: 13px;">Time entries will appear here once logged.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'attendance:project_edit' project.pk %}" class="btn btn-warning">
+                        <i class="ri-pencil-line me-1"></i> Edit Project
+                    </a>
+                    <a href="{% url 'attendance:project_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
