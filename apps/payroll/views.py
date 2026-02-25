@@ -6,8 +6,10 @@ from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Sum, Count, Q, DecimalField
 from django.db.models.functions import Coalesce
-from django.http import FileResponse, Http404
+from django.http import FileResponse, HttpResponse, Http404
+from django.template.loader import get_template
 from decimal import Decimal
+from io import BytesIO
 
 from .models import (
     PayComponent, SalaryStructure, SalaryStructureComponent,
@@ -1421,18 +1423,55 @@ class PayslipDetailView(LoginRequiredMixin, View):
 class PayslipDownloadView(LoginRequiredMixin, View):
     def get(self, request, pk):
         payslip = get_object_or_404(
-            Payslip.all_objects,
+            Payslip.all_objects.select_related(
+                'employee', 'payroll_period', 'payroll_entry',
+                'payroll_entry__employee_salary',
+            ),
             pk=pk,
             tenant=request.tenant,
         )
+        # If a pre-generated file exists, serve it directly
         if payslip.file and hasattr(payslip.file, 'path'):
             return FileResponse(
                 open(payslip.file.path, 'rb'),
                 as_attachment=True,
                 filename=f'payslip_{payslip.pk}.pdf',
             )
-        messages.error(request, 'Payslip file not found.')
-        return redirect('payroll:payslip_detail', pk=payslip.pk)
+        # Otherwise generate PDF on the fly
+        from xhtml2pdf import pisa
+
+        entry = payslip.payroll_entry
+        components = PayrollEntryComponent.all_objects.filter(
+            tenant=request.tenant, payroll_entry=entry,
+        ).select_related('pay_component').order_by('pay_component__display_order')
+        earnings = [c for c in components if c.pay_component.component_type == 'earning']
+        deductions = [c for c in components if c.pay_component.component_type == 'deduction']
+        tenant = getattr(request, 'tenant', None)
+
+        template = get_template('payroll/payslip_pdf.html')
+        html = template.render({
+            'payslip': payslip,
+            'entry': entry,
+            'earnings': earnings,
+            'deductions': deductions,
+            'company_name': tenant.name if tenant else 'Company',
+            'company_address': getattr(tenant, 'address', ''),
+        })
+
+        buf = BytesIO()
+        pdf = pisa.CreatePDF(html, dest=buf)
+        if pdf.err:
+            messages.error(request, 'Error generating payslip PDF.')
+            return redirect('payroll:payslip_detail', pk=payslip.pk)
+
+        buf.seek(0)
+        emp_id = payslip.employee.employee_id or payslip.employee.pk
+        period = f"{payslip.payroll_period.month:02d}_{payslip.payroll_period.year}"
+        filename = f"payslip_{emp_id}_{period}.pdf"
+
+        response = HttpResponse(buf.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
 
 
 class PayslipBulkGenerateView(LoginRequiredMixin, View):
