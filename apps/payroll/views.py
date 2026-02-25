@@ -356,11 +356,11 @@ class PayrollPeriodListView(LoginRequiredMixin, ListView):
 
 class PayrollPeriodCreateView(LoginRequiredMixin, View):
     def get(self, request):
-        form = PayrollPeriodForm(tenant=request.tenant)
+        form = PayrollPeriodForm()
         return render(request, 'payroll/period_form.html', {'form': form})
 
     def post(self, request):
-        form = PayrollPeriodForm(request.POST, tenant=request.tenant)
+        form = PayrollPeriodForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
             obj.tenant = request.tenant
