@@ -26,7 +26,7 @@
                 </a>
             </li>
 
-            <li class="menu-title">Core HR</li>
+            <li class="menu-title" data-toggle="menu-section">Core HR <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Employees -->
             <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'employees' %}open{% endif %}">
@@ -157,7 +157,7 @@
                 </ul>
             </li>
 
-            <li class="menu-title">Attendance & Leave</li>
+            <li class="menu-title" data-toggle="menu-section">Attendance &amp; Leave <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Attendance -->
             <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'attendance' and 'attendance' in request.resolver_match.url_name or request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name == 'attendance' or request.resolver_match.url_name == 'punch' or 'regularization' in request.resolver_match.url_name or 'shift' in request.resolver_match.url_name %}open{% endif %}">
@@ -298,7 +298,7 @@
                 </ul>
             </li>
 
-            <li class="menu-title">Recruitment</li>
+            <li class="menu-title" data-toggle="menu-section">Recruitment <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Recruitment -->
             <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'recruitment' %}open{% endif %}">
@@ -341,7 +341,7 @@
                 </ul>
             </li>
 
-            <li class="menu-title">Payroll</li>
+            <li class="menu-title" data-toggle="menu-section">Payroll <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Salary Structure -->
             <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'payroll' and 'component' in request.resolver_match.url_name or 'structure' in request.resolver_match.url_name or 'employee_salary' in request.resolver_match.url_name %}open{% endif %}">
@@ -493,7 +493,7 @@
                 </ul>
             </li>
 
-            <li class="menu-title">Administration</li>
+            <li class="menu-title" data-toggle="menu-section">Administration <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Users -->
             <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'accounts' %}open{% endif %}">

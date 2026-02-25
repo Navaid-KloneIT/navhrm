@@ -553,6 +553,7 @@
     /**
      * Walk the sidebar menu and mark the item whose href matches the
      * current page URL as active. Also expand its parent chain.
+     * Implements accordion behavior: only the active menu stays open.
      */
     Sidebar.prototype._highlightActiveItem = function () {
         var currentPath = window.location.pathname;
@@ -581,6 +582,16 @@
             ) {
                 bestMatch = links[i];
                 bestLength = linkPath.length;
+            }
+        }
+
+        // Collapse all open submenus first (accordion on page load).
+        var openItems = this._sidebarEl.querySelectorAll(".has-submenu.open, .has-submenu.mm-active, .has-sub.open, .has-sub.mm-active");
+        for (var j = 0; j < openItems.length; j++) {
+            openItems[j].classList.remove("open", "mm-active");
+            var sub = openItems[j].querySelector("ul, .sub-menu, .submenu, .collapse");
+            if (sub) {
+                sub.style.display = "none";
             }
         }
 
