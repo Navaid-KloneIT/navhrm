@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load payroll_tags %}
+
+{% block title %}Bank Files{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Bank Files</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item active">Bank Files</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Bank Files Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">All Bank Files</h5>
+                <a href="{% url 'payroll:bank_file_generate' %}" class="btn btn-primary btn-sm">
+                    <i class="ri-file-add-line me-1"></i> Generate Bank File
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Period</th>
+                                <th>Bank Format</th>
+                                <th class="text-end">Total Amount</th>
+                                <th class="text-center">Employee Count</th>
+                                <th>Status</th>
+                                <th>Generated At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in object_list %}
+                            <tr>
+                                <td><span class="fw-medium">{{ file.file_name }}</span></td>
+                                <td>{{ file.period }}</td>
+                                <td>{{ file.bank_format }}</td>
+                                <td class="text-end">{{ file.total_amount }}</td>
+                                <td class="text-center">{{ file.employee_count }}</td>
+                                <td>
+                                    <span class="badge bg-{{ file.status|bank_file_status_color }}">
+                                        {{ file.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ file.generated_at|date:"M d, Y h:i A" }}</td>
+                                <td>
+                                    <a href="{% url 'payroll:bank_file_detail' file.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="View Details">
+                                        <i class="ri-eye-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-bank-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No bank files generated yet</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            Generate a bank file for processed payroll periods.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Bank files pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
