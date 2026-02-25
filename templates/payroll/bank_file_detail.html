@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load payroll_tags %}
+
+{% block title %}Bank File - {{ object.file_name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Bank File Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:bank_file_list' %}">Bank Files</a></li>
+            <li class="breadcrumb-item active">{{ object.file_name }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- File Info Card -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">File Information</h5>
+                <span class="badge bg-{{ object.status|bank_file_status_color }} fs-6">
+                    {{ object.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">File Name</small>
+                        <div class="fw-medium">{{ object.file_name }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Period</small>
+                        <div class="fw-medium">{{ object.period }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Bank Format</small>
+                        <div class="fw-medium">{{ object.bank_format }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Generated At</small>
+                        <div class="fw-medium">{{ object.generated_at|date:"M d, Y h:i A" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Total Amount</small>
+                        <div class="fw-medium fs-5 text-primary">{{ object.total_amount }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Employee Count</small>
+                        <div class="fw-medium fs-5">{{ object.employee_count }}</div>
+                    </div>
+                </div>
+
+                {% if object.remarks %}
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Remarks</small>
+                    <p class="mt-1 mb-0">{{ object.remarks }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if object.file %}
+                    <a href="{{ object.file.url }}" class="btn btn-success" download>
+                        <i class="ri-download-2-line me-1"></i> Download File
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'payroll:bank_file_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
