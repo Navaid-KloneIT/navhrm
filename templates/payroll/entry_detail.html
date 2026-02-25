@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load payroll_tags %}
+
+{% block title %}{{ object.employee }} - Payroll Entry{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Payroll Entry Detail</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:period_list' %}">Payroll Periods</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:period_detail' object.payroll_period.pk %}">{{ object.payroll_period.name }}</a></li>
+            <li class="breadcrumb-item active">{{ object.employee }}</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Employee & Period Info -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Employee Payroll Details</h5>
+        <span class="badge bg-{{ object.status|payroll_status_color }}">{{ object.get_status_display }}</span>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label text-muted">Employee</label>
+                <p class="mb-0 fw-medium">{{ object.employee }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Payroll Period</label>
+                <p class="mb-0 fw-medium">{{ object.payroll_period.name }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Payment Date</label>
+                <p class="mb-0 fw-medium">{{ object.payroll_period.payment_date|date:"M d, Y"|default:"-" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Earnings -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Earnings</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in earnings %}
+                    <tr>
+                        <td class="fw-medium">{{ item.pay_component.name }}</td>
+                        <td class="text-end">{{ item.amount }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" class="text-center py-3 text-muted">No earnings</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <td class="fw-bold">Total Earnings</td>
+                        <td class="text-end fw-bold text-success">{{ object.gross_salary|default:"0.00" }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Deductions -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Deductions</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in deductions %}
+                    <tr>
+                        <td class="fw-medium">{{ item.pay_component.name }}</td>
+                        <td class="text-end">{{ item.amount }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" class="text-center py-3 text-muted">No deductions</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <td class="fw-bold">Total Deductions</td>
+                        <td class="text-end fw-bold text-danger">{{ object.total_deductions|default:"0.00" }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Summary -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Pay Summary</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="border rounded p-3 text-center">
+                    <label class="form-label text-muted">Gross Salary</label>
+                    <h4 class="mb-0 text-success">{{ object.gross_salary|default:"0.00" }}</h4>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border rounded p-3 text-center">
+                    <label class="form-label text-muted">Total Deductions</label>
+                    <h4 class="mb-0 text-danger">{{ object.total_deductions|default:"0.00" }}</h4>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border rounded p-3 text-center bg-light">
+                    <label class="form-label text-muted">Net Salary</label>
+                    <h4 class="mb-0 text-primary">{{ object.net_salary|default:"0.00" }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mt-2">
+            <div class="col-md-4">
+                <div class="border rounded p-3 text-center">
+                    <label class="form-label text-muted">LOP Days</label>
+                    <h5 class="mb-0">{{ object.lop_days|default:"0" }}</h5>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border rounded p-3 text-center">
+                    <label class="form-label text-muted">LOP Deduction</label>
+                    <h5 class="mb-0">{{ object.lop_deduction|default:"0.00" }}</h5>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border rounded p-3 text-center">
+                    <label class="form-label text-muted">Arrears</label>
+                    <h5 class="mb-0">{{ object.arrears_amount|default:"0.00" }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
