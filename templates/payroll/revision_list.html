@@ -90,8 +90,8 @@
                                         <i class="ri-eye-line"></i>
                                     </a>
                                     {% if revision.status == 'pending' %}
-                                    <a href="{% url 'payroll:revision_edit' revision.pk %}" class="btn btn-sm btn-soft-primary">
-                                        <i class="ri-pencil-line"></i>
+                                    <a href="{% url 'payroll:revision_approve' revision.pk %}" class="btn btn-sm btn-soft-success" data-bs-toggle="tooltip" title="Approve">
+                                        <i class="ri-check-line"></i>
                                     </a>
                                     {% endif %}
                                 </td>
