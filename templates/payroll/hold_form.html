@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Create Salary Hold{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Create Salary Hold</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:hold_list' %}">Salary Holds</a></li>
+            <li class="breadcrumb-item active">Create</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">New Salary Hold</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger">*</span></label>
+                    {{ form.employee }}
+                    {% for error in form.employee.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.payroll_period.id_for_label }}" class="form-label">Payroll Period <span class="text-danger">*</span></label>
+                    {{ form.payroll_period }}
+                    {% for error in form.payroll_period.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-12">
+                    <label for="{{ form.reason.id_for_label }}" class="form-label">Reason <span class="text-danger">*</span></label>
+                    {{ form.reason }}
+                    {% for error in form.reason.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Save
+                </button>
+                <a href="{% url 'payroll:hold_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
