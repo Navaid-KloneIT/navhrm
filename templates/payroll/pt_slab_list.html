@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Professional Tax Slabs{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Professional Tax Slabs</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item active">Professional Tax Slabs</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'payroll:pt_slab_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">State</label>
+                            <select class="form-select" name="state">
+                                <option value="">All States</option>
+                                {% for state in states %}
+                                <option value="{{ state }}" {% if request.GET.state == state %}selected{% endif %}>{{ state }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'payroll:pt_slab_list' %}" class="btn btn-light w-100">Clear</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PT Slabs Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">All Professional Tax Slabs</h5>
+                <a href="{% url 'payroll:pt_slab_create' %}" class="btn btn-primary btn-sm">
+                    <i class="ri-add-line me-1"></i> Add PT Slab
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>State</th>
+                                <th class="text-end">Salary From</th>
+                                <th class="text-end">Salary To</th>
+                                <th class="text-end">Tax Amount</th>
+                                <th class="text-center">Active</th>
+                                <th>Effective From</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for slab in object_list %}
+                            <tr>
+                                <td><span class="fw-medium">{{ slab.state }}</span></td>
+                                <td class="text-end">{{ slab.salary_from }}</td>
+                                <td class="text-end">{{ slab.salary_to|default:"-" }}</td>
+                                <td class="text-end">{{ slab.tax_amount }}</td>
+                                <td class="text-center">
+                                    {% if slab.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ slab.effective_from|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'payroll:pt_slab_edit' slab.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Edit">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-government-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No professional tax slabs found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.state %}
+                                                Try adjusting your filter criteria.
+                                            {% else %}
+                                                Add a professional tax slab to get started.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="PT slabs pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.state %}&state={{ request.GET.state }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.state %}&state={{ request.GET.state }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.state %}&state={{ request.GET.state }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
