@@ -315,6 +315,23 @@ h1, h2, h3, h4, h5, h6 {
     overflow: hidden;
     list-style: none;
 }
+.menu-title[data-toggle="menu-section"] {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+.menu-title[data-toggle="menu-section"]:hover {
+    color: var(--text-primary);
+}
+.menu-title-arrow {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+}
+.menu-title.collapsed .menu-title-arrow {
+    transform: rotate(-90deg);
+}
 .nav-list > .nav-item:first-child + .menu-title,
 .nav-list > .menu-title:first-child {
     padding-top: 8px;
