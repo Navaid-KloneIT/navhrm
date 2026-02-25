@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load payroll_tags %}
+
+{% block title %}Pay Components{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Pay Components</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item active">Pay Components</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Search by name or code...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Component Type</label>
+                            <select class="form-select" name="component_type">
+                                <option value="">All Types</option>
+                                <option value="earning" {% if component_type == 'earning' %}selected{% endif %}>Earning</option>
+                                <option value="deduction" {% if component_type == 'deduction' %}selected{% endif %}>Deduction</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'payroll:component_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> Add Component
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Pay Components</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th>Calculation Type</th>
+                                <th>Default Value</th>
+                                <th>Taxable</th>
+                                <th>Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for component in components %}
+                            <tr>
+                                <td class="fw-medium">{{ component.name }}</td>
+                                <td><code>{{ component.code }}</code></td>
+                                <td>
+                                    <span class="badge bg-{% if component.component_type == 'earning' %}success{% else %}danger{% endif %}">
+                                        {{ component.get_component_type_display }}
+                                    </span>
+                                </td>
+                                <td>{{ component.get_category_display|default:"-" }}</td>
+                                <td>{{ component.get_calculation_type_display }}</td>
+                                <td>{{ component.default_value|default:"0.00" }}</td>
+                                <td>
+                                    {% if component.is_taxable %}
+                                    <i class="ri-check-line text-success"></i>
+                                    {% else %}
+                                    <i class="ri-close-line text-danger"></i>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if component.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'payroll:component_edit' component.pk %}" class="btn btn-sm btn-soft-primary">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No pay components found</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
