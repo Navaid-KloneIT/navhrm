@@ -1551,7 +1551,8 @@ class PaymentRegisterListView(LoginRequiredMixin, ListView):
         context['selected_status'] = self.request.GET.get('status', '')
         context['selected_period'] = self.request.GET.get('period', '')
         context['search'] = self.request.GET.get('search', '')
-        context['periods'] = (
+        context['statuses'] = PaymentRegister.STATUS_CHOICES
+        context['payroll_periods'] = (
             PayrollPeriod.all_objects
             .filter(tenant=self.request.tenant)
             .order_by('-start_date')
