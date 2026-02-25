@@ -15,6 +15,46 @@
     </nav>
 </div>
 
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'payroll:bank_file_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in statuses %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Period</label>
+                            <select class="form-select" name="period">
+                                <option value="">All Periods</option>
+                                {% for period in payroll_periods %}
+                                <option value="{{ period.pk }}" {% if request.GET.period == period.pk|stringformat:"s" %}selected{% endif %}>{{ period }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'payroll:bank_file_list' %}" class="btn btn-light w-100">Clear</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Bank Files Table -->
 <div class="row">
     <div class="col-12">
@@ -44,8 +84,8 @@
                             {% for file in object_list %}
                             <tr>
                                 <td><span class="fw-medium">{{ file.file_name }}</span></td>
-                                <td>{{ file.period }}</td>
-                                <td>{{ file.bank_format }}</td>
+                                <td>{{ file.payroll_period }}</td>
+                                <td>{{ file.get_bank_format_display }}</td>
                                 <td class="text-end">{{ file.total_amount }}</td>
                                 <td class="text-center">{{ file.employee_count }}</td>
                                 <td>
@@ -65,9 +105,13 @@
                                 <td colspan="8" class="text-center py-5">
                                     <div class="text-muted">
                                         <i class="ri-bank-line" style="font-size: 48px; opacity: 0.3;"></i>
-                                        <p class="mt-2 mb-1">No bank files generated yet</p>
+                                        <p class="mt-2 mb-1">No bank files found</p>
                                         <p class="mb-0" style="font-size: 13px;">
-                                            Generate a bank file for processed payroll periods.
+                                            {% if request.GET.status or request.GET.period %}
+                                                Try adjusting your filter criteria.
+                                            {% else %}
+                                                Generate a bank file for processed payroll periods.
+                                            {% endif %}
                                         </p>
                                     </div>
                                 </td>
@@ -84,7 +128,7 @@
                     <ul class="pagination justify-content-center mb-0">
                         {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.period %}&period={{ request.GET.period }}{% endif %}">
                                 <i class="ri-arrow-left-s-line"></i>
                             </a>
                         </li>
@@ -99,14 +143,14 @@
                             <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.period %}&period={{ request.GET.period }}{% endif %}">{{ num }}</a>
                             </li>
                             {% endif %}
                         {% endfor %}
 
                         {% if page_obj.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.period %}&period={{ request.GET.period }}{% endif %}">
                                 <i class="ri-arrow-right-s-line"></i>
                             </a>
                         </li>
