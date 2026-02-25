@@ -76,14 +76,14 @@
                                 <td><span class="fw-medium">{{ payslip.employee }}</span></td>
                                 <td>{{ payslip.period|default:payslip.payroll_period }}</td>
                                 <td class="text-center">
-                                    {% if payslip.emailed %}
+                                    {% if payslip.is_emailed %}
                                     <i class="ri-check-line text-success"></i>
                                     {% else %}
                                     <i class="ri-close-line text-muted"></i>
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    {% if payslip.viewed %}
+                                    {% if payslip.is_viewed %}
                                     <i class="ri-check-line text-success"></i>
                                     {% else %}
                                     <i class="ri-close-line text-muted"></i>
