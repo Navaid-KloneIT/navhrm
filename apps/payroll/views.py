@@ -98,7 +98,7 @@ class PayrollDashboardView(LoginRequiredMixin, TemplateView):
 class PayComponentListView(LoginRequiredMixin, ListView):
     model = PayComponent
     template_name = 'payroll/component_list.html'
-    context_object_name = 'items'
+    context_object_name = 'components'
     paginate_by = 20
 
     def get_queryset(self):
@@ -157,7 +157,7 @@ class PayComponentUpdateView(LoginRequiredMixin, View):
 class SalaryStructureListView(LoginRequiredMixin, ListView):
     model = SalaryStructure
     template_name = 'payroll/structure_list.html'
-    context_object_name = 'items'
+    context_object_name = 'structures'
     paginate_by = 20
 
     def get_queryset(self):
@@ -235,7 +235,7 @@ class SalaryStructureUpdateView(LoginRequiredMixin, View):
 class EmployeeSalaryListView(LoginRequiredMixin, ListView):
     model = EmployeeSalaryStructure
     template_name = 'payroll/employee_salary_list.html'
-    context_object_name = 'items'
+    context_object_name = 'salaries'
     paginate_by = 20
 
     def get_queryset(self):
@@ -334,7 +334,7 @@ class EmployeeSalaryUpdateView(LoginRequiredMixin, View):
 class PayrollPeriodListView(LoginRequiredMixin, ListView):
     model = PayrollPeriod
     template_name = 'payroll/period_list.html'
-    context_object_name = 'items'
+    context_object_name = 'periods'
     paginate_by = 20
 
     def get_queryset(self):
@@ -624,7 +624,7 @@ class PayrollEntryHoldView(LoginRequiredMixin, View):
 class SalaryHoldListView(LoginRequiredMixin, ListView):
     model = SalaryHold
     template_name = 'payroll/hold_list.html'
-    context_object_name = 'items'
+    context_object_name = 'holds'
     paginate_by = 20
 
     def get_queryset(self):
@@ -688,7 +688,7 @@ class SalaryHoldReleaseView(LoginRequiredMixin, View):
 class SalaryRevisionListView(LoginRequiredMixin, ListView):
     model = SalaryRevision
     template_name = 'payroll/revision_list.html'
-    context_object_name = 'items'
+    context_object_name = 'revisions'
     paginate_by = 20
 
     def get_queryset(self):
