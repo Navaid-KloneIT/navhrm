@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Payslip - {{ payslip.employee }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 11px;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h2 { margin: 0 0 3px 0; font-size: 18px; color: #1a1a2e; }
+        h4 { margin: 0 0 2px 0; font-size: 13px; color: #16213e; }
+        .text-muted { color: #6c757d; font-size: 10px; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .fw-bold { font-weight: bold; }
+
+        /* Header */
+        .header-table { width: 100%; margin-bottom: 15px; border-bottom: 2px solid #0d6efd; padding-bottom: 10px; }
+        .header-table td { vertical-align: top; }
+
+        /* Employee Info */
+        .info-table { width: 100%; margin-bottom: 15px; }
+        .info-table td { padding: 3px 5px; font-size: 11px; }
+        .info-label { color: #6c757d; width: 130px; }
+
+        /* Earnings & Deductions */
+        .payroll-section { width: 48%; display: inline-block; vertical-align: top; }
+        .payroll-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .payroll-table th {
+            background-color: #e8f5e9;
+            padding: 6px 8px;
+            text-align: left;
+            font-size: 11px;
+            border-bottom: 1px solid #ccc;
+        }
+        .payroll-table.deductions th {
+            background-color: #ffebee;
+        }
+        .payroll-table td {
+            padding: 4px 8px;
+            font-size: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .payroll-table tfoot th {
+            background-color: #f5f5f5;
+            padding: 6px 8px;
+            border-top: 2px solid #ccc;
+        }
+
+        /* Net Pay */
+        .net-pay-box {
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #e3f2fd;
+            border: 1px solid #90caf9;
+            text-align: center;
+        }
+        .net-pay-box .label { font-size: 11px; color: #6c757d; }
+        .net-pay-box .amount { font-size: 20px; font-weight: bold; color: #0d6efd; }
+
+        /* Summary row */
+        .summary-table { width: 100%; margin-top: 15px; }
+        .summary-table td { padding: 8px; text-align: center; }
+        .summary-table .label { font-size: 10px; color: #6c757d; display: block; }
+        .summary-table .value { font-size: 14px; font-weight: bold; }
+        .summary-table .earnings .value { color: #2e7d32; }
+        .summary-table .deductions .value { color: #c62828; }
+        .summary-table .netpay .value { color: #0d6efd; }
+
+        /* Footer */
+        .footer { margin-top: 25px; text-align: center; font-size: 9px; color: #999; border-top: 1px solid #eee; padding-top: 8px; }
+    </style>
+</head>
+<body>
+    <!-- Company Header -->
+    <table class="header-table">
+        <tr>
+            <td style="width:70%">
+                <h2>{{ company_name }}</h2>
+                {% if company_address %}<p class="text-muted">{{ company_address }}</p>{% endif %}
+            </td>
+            <td style="width:30%" class="text-right">
+                <h4 style="color: #0d6efd;">PAYSLIP</h4>
+                <span class="text-muted">{{ payslip.payroll_period }}</span>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Employee Info -->
+    <table class="info-table">
+        <tr>
+            <td class="info-label">Employee Name</td>
+            <td class="fw-bold">{{ payslip.employee }}</td>
+            <td class="info-label">Designation</td>
+            <td class="fw-bold">{{ payslip.employee.designation|default:"-" }}</td>
+        </tr>
+        <tr>
+            <td class="info-label">Employee ID</td>
+            <td class="fw-bold">{{ payslip.employee.employee_id|default:"-" }}</td>
+            <td class="info-label">Bank Account</td>
+            <td class="fw-bold">{{ payslip.employee.bank_account|default:"-" }}</td>
+        </tr>
+        <tr>
+            <td class="info-label">Department</td>
+            <td class="fw-bold">{{ payslip.employee.department|default:"-" }}</td>
+            <td class="info-label">Days Present / Payable</td>
+            <td class="fw-bold">{{ entry.days_present }} / {{ entry.days_payable }}</td>
+        </tr>
+    </table>
+
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 10px 0;">
+
+    <!-- Earnings & Deductions side by side -->
+    <table style="width: 100%;">
+        <tr>
+            <!-- Earnings -->
+            <td style="width: 48%; vertical-align: top; padding-right: 10px;">
+                <table class="payroll-table">
+                    <thead>
+                        <tr>
+                            <th>Earnings</th>
+                            <th class="text-right">Amount (&#8377;)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comp in earnings %}
+                        <tr>
+                            <td>{{ comp.pay_component.name }}</td>
+                            <td class="text-right">{{ comp.amount }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if entry.bonus_amount %}
+                        <tr>
+                            <td>Bonus</td>
+                            <td class="text-right">{{ entry.bonus_amount }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if entry.arrears_amount %}
+                        <tr>
+                            <td>Arrears</td>
+                            <td class="text-right">{{ entry.arrears_amount }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Total Earnings</th>
+                            <th class="text-right">{{ entry.gross_earnings }}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </td>
+
+            <!-- Deductions -->
+            <td style="width: 48%; vertical-align: top; padding-left: 10px;">
+                <table class="payroll-table deductions">
+                    <thead>
+                        <tr>
+                            <th>Deductions</th>
+                            <th class="text-right">Amount (&#8377;)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comp in deductions %}
+                        <tr>
+                            <td>{{ comp.pay_component.name }}</td>
+                            <td class="text-right">{{ comp.amount }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if entry.lop_amount %}
+                        <tr>
+                            <td>Loss of Pay ({{ entry.lop_days }} days)</td>
+                            <td class="text-right">{{ entry.lop_amount }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Total Deductions</th>
+                            <th class="text-right">{{ entry.total_deductions }}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Net Pay Summary -->
+    <table class="summary-table">
+        <tr>
+            <td class="earnings">
+                <span class="label">Total Earnings</span>
+                <span class="value">&#8377; {{ entry.gross_earnings }}</span>
+            </td>
+            <td style="font-size: 18px; color: #999;">&minus;</td>
+            <td class="deductions">
+                <span class="label">Total Deductions</span>
+                <span class="value">&#8377; {{ entry.total_deductions }}</span>
+            </td>
+            <td style="font-size: 18px; color: #999;">=</td>
+            <td class="netpay">
+                <span class="label">Net Pay</span>
+                <span class="value">&#8377; {{ entry.net_pay }}</span>
+            </td>
+        </tr>
+    </table>
+
+    <div class="net-pay-box">
+        <span class="label">Net Payable Amount</span><br>
+        <span class="amount">&#8377; {{ entry.net_pay }}</span>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        This is a computer-generated payslip and does not require a signature.
+    </div>
+</body>
+</html>
