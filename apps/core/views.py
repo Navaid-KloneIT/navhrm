@@ -110,7 +110,7 @@ class DashboardView(LoginRequiredMixin, View):
         recent_applications = JobApplication.all_objects.filter(
             tenant=tenant
         ).select_related(
-            'candidate', 'job_requisition'
+            'candidate', 'job'
         ).order_by('-created_at')[:5]
 
         # ── Payroll ──────────────────────────────────────────────────
