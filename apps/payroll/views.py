@@ -1397,11 +1397,25 @@ class PayslipDetailView(LoginRequiredMixin, View):
         obj = get_object_or_404(
             Payslip.all_objects.select_related(
                 'employee', 'payroll_period', 'payroll_entry',
+                'payroll_entry__employee_salary',
             ),
             pk=pk,
             tenant=request.tenant,
         )
-        return render(request, 'payroll/payslip_detail.html', {'object': obj})
+        entry = obj.payroll_entry
+        components = PayrollEntryComponent.all_objects.filter(
+            tenant=request.tenant, payroll_entry=entry,
+        ).select_related('pay_component').order_by('pay_component__display_order')
+        earnings = [c for c in components if c.pay_component.component_type == 'earning']
+        deductions = [c for c in components if c.pay_component.component_type == 'deduction']
+        company = getattr(request, 'tenant', None)
+        return render(request, 'payroll/payslip_detail.html', {
+            'object': obj,
+            'entry': entry,
+            'earnings': earnings,
+            'deductions': deductions,
+            'company': company,
+        })
 
 
 class PayslipDownloadView(LoginRequiredMixin, View):
