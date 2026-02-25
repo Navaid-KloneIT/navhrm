@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} PF Configuration{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{% if form.instance.pk %}Edit{% else %}Add{% endif %} PF Configuration</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:pf_config_list' %}">PF Configurations</a></li>
+            <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}Add{% endif %}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>PF Configuration Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="{{ form.pf_number.id_for_label }}" class="form-label">
+                                PF Number <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="{{ form.pf_number.html_name }}"
+                                   id="{{ form.pf_number.id_for_label }}"
+                                   class="form-control {% if form.pf_number.errors %}is-invalid{% endif %}"
+                                   value="{{ form.pf_number.value|default:'' }}"
+                                   placeholder="e.g., MH/BOM/12345">
+                            {% for error in form.pf_number.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.employee_contribution_rate.id_for_label }}" class="form-label">
+                                Employee Contribution Rate (%) <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.employee_contribution_rate.html_name }}"
+                                   id="{{ form.employee_contribution_rate.id_for_label }}"
+                                   class="form-control {% if form.employee_contribution_rate.errors %}is-invalid{% endif %}"
+                                   value="{{ form.employee_contribution_rate.value|default:'' }}"
+                                   step="0.01" min="0" max="100">
+                            {% for error in form.employee_contribution_rate.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.employer_contribution_rate.id_for_label }}" class="form-label">
+                                Employer Contribution Rate (%) <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.employer_contribution_rate.html_name }}"
+                                   id="{{ form.employer_contribution_rate.id_for_label }}"
+                                   class="form-control {% if form.employer_contribution_rate.errors %}is-invalid{% endif %}"
+                                   value="{{ form.employer_contribution_rate.value|default:'' }}"
+                                   step="0.01" min="0" max="100">
+                            {% for error in form.employer_contribution_rate.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.eps_rate.id_for_label }}" class="form-label">
+                                EPS Rate (%) <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.eps_rate.html_name }}"
+                                   id="{{ form.eps_rate.id_for_label }}"
+                                   class="form-control {% if form.eps_rate.errors %}is-invalid{% endif %}"
+                                   value="{{ form.eps_rate.value|default:'' }}"
+                                   step="0.01" min="0" max="100">
+                            {% for error in form.eps_rate.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.admin_charge_rate.id_for_label }}" class="form-label">
+                                Admin Charge Rate (%)
+                            </label>
+                            <input type="number"
+                                   name="{{ form.admin_charge_rate.html_name }}"
+                                   id="{{ form.admin_charge_rate.id_for_label }}"
+                                   class="form-control {% if form.admin_charge_rate.errors %}is-invalid{% endif %}"
+                                   value="{{ form.admin_charge_rate.value|default:'' }}"
+                                   step="0.01" min="0" max="100">
+                            {% for error in form.admin_charge_rate.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.edli_rate.id_for_label }}" class="form-label">
+                                EDLI Rate (%)
+                            </label>
+                            <input type="number"
+                                   name="{{ form.edli_rate.html_name }}"
+                                   id="{{ form.edli_rate.id_for_label }}"
+                                   class="form-control {% if form.edli_rate.errors %}is-invalid{% endif %}"
+                                   value="{{ form.edli_rate.value|default:'' }}"
+                                   step="0.01" min="0" max="100">
+                            {% for error in form.edli_rate.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.pf_ceiling.id_for_label }}" class="form-label">
+                                PF Ceiling
+                            </label>
+                            <input type="number"
+                                   name="{{ form.pf_ceiling.html_name }}"
+                                   id="{{ form.pf_ceiling.id_for_label }}"
+                                   class="form-control {% if form.pf_ceiling.errors %}is-invalid{% endif %}"
+                                   value="{{ form.pf_ceiling.value|default:'' }}"
+                                   step="0.01" min="0">
+                            {% for error in form.pf_ceiling.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.effective_from.id_for_label }}" class="form-label">
+                                Effective From <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   name="{{ form.effective_from.html_name }}"
+                                   id="{{ form.effective_from.id_for_label }}"
+                                   class="form-control {% if form.effective_from.errors %}is-invalid{% endif %}"
+                                   value="{{ form.effective_from.value|default:'' }}">
+                            {% for error in form.effective_from.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label d-block">Active</label>
+                            <div class="form-check form-switch mt-2">
+                                <input type="checkbox"
+                                       name="{{ form.is_active.html_name }}"
+                                       id="{{ form.is_active.id_for_label }}"
+                                       class="form-check-input"
+                                       {% if form.is_active.value %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Mark as active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex gap-2 mb-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> {% if form.instance.pk %}Update{% else %}Save{% endif %} Configuration
+                </button>
+                <a href="{% url 'payroll:pf_config_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
