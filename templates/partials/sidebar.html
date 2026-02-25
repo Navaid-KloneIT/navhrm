@@ -341,6 +341,158 @@
                 </ul>
             </li>
 
+            <li class="menu-title">Payroll</li>
+
+            <!-- Salary Structure -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'payroll' and 'component' in request.resolver_match.url_name or 'structure' in request.resolver_match.url_name or 'employee_salary' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-money-dollar-circle-line"></i>
+                    <span class="menu-text">Salary Structure</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'payroll' and 'component' in request.resolver_match.url_name or 'structure' in request.resolver_match.url_name or 'employee_salary' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:component_list' %}" class="menu-link {% if request.resolver_match.url_name == 'component_list' and request.resolver_match.app_name == 'payroll' %}active{% endif %}">
+                            <span class="menu-text">Pay Components</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:structure_list' %}" class="menu-link {% if request.resolver_match.url_name == 'structure_list' %}active{% endif %}">
+                            <span class="menu-text">Structures</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:employee_salary_list' %}" class="menu-link {% if request.resolver_match.url_name == 'employee_salary_list' %}active{% endif %}">
+                            <span class="menu-text">Employee Salary</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Payroll Run -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'payroll' and 'period' in request.resolver_match.url_name or 'entry' in request.resolver_match.url_name or 'hold' in request.resolver_match.url_name or 'revision' in request.resolver_match.url_name or request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name == 'payroll' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-calculator-line"></i>
+                    <span class="menu-text">Payroll Run</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'payroll' and 'period' in request.resolver_match.url_name or 'entry' in request.resolver_match.url_name or 'hold' in request.resolver_match.url_name or 'revision' in request.resolver_match.url_name or request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name == 'payroll' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name == 'payroll' %}active{% endif %}">
+                            <span class="menu-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:period_list' %}" class="menu-link {% if request.resolver_match.url_name == 'period_list' %}active{% endif %}">
+                            <span class="menu-text">Payroll Periods</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:hold_list' %}" class="menu-link {% if request.resolver_match.url_name == 'hold_list' %}active{% endif %}">
+                            <span class="menu-text">Salary Holds</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:revision_list' %}" class="menu-link {% if request.resolver_match.url_name == 'revision_list' %}active{% endif %}">
+                            <span class="menu-text">Revisions</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Statutory Compliance -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'payroll' and 'pf_config' in request.resolver_match.url_name or 'esi_config' in request.resolver_match.url_name or 'pt_slab' in request.resolver_match.url_name or 'lwf_config' in request.resolver_match.url_name or 'statutory' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-government-line"></i>
+                    <span class="menu-text">Statutory</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'payroll' and 'pf_config' in request.resolver_match.url_name or 'esi_config' in request.resolver_match.url_name or 'pt_slab' in request.resolver_match.url_name or 'lwf_config' in request.resolver_match.url_name or 'statutory' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:pf_config_list' %}" class="menu-link {% if request.resolver_match.url_name == 'pf_config_list' %}active{% endif %}">
+                            <span class="menu-text">PF Config</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:esi_config_list' %}" class="menu-link {% if request.resolver_match.url_name == 'esi_config_list' %}active{% endif %}">
+                            <span class="menu-text">ESI Config</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:pt_slab_list' %}" class="menu-link {% if request.resolver_match.url_name == 'pt_slab_list' %}active{% endif %}">
+                            <span class="menu-text">Prof. Tax Slabs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:lwf_config_list' %}" class="menu-link {% if request.resolver_match.url_name == 'lwf_config_list' %}active{% endif %}">
+                            <span class="menu-text">LWF Config</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:statutory_contribution_list' %}" class="menu-link {% if request.resolver_match.url_name == 'statutory_contribution_list' %}active{% endif %}">
+                            <span class="menu-text">Contributions</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Tax & Investment -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'payroll' and 'tax' in request.resolver_match.url_name or 'declaration' in request.resolver_match.url_name or 'proof' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-list-3-line"></i>
+                    <span class="menu-text">Tax & Investment</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'payroll' and 'tax' in request.resolver_match.url_name or 'declaration' in request.resolver_match.url_name or 'proof' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:tax_regime_list' %}" class="menu-link {% if request.resolver_match.url_name == 'tax_regime_list' %}active{% endif %}">
+                            <span class="menu-text">Tax Regime</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:declaration_list' %}" class="menu-link {% if request.resolver_match.url_name == 'declaration_list' %}active{% endif %}">
+                            <span class="menu-text">Declarations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:tax_computation_list' %}" class="menu-link {% if request.resolver_match.url_name == 'tax_computation_list' %}active{% endif %}">
+                            <span class="menu-text">Tax Computation</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Payout & Reports -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'payroll' and 'bank_file' in request.resolver_match.url_name or 'payslip' in request.resolver_match.url_name or 'payment' in request.resolver_match.url_name or 'reimbursement' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-bank-card-line"></i>
+                    <span class="menu-text">Payout & Reports</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'payroll' and 'bank_file' in request.resolver_match.url_name or 'payslip' in request.resolver_match.url_name or 'payment' in request.resolver_match.url_name or 'reimbursement' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:bank_file_list' %}" class="menu-link {% if request.resolver_match.url_name == 'bank_file_list' %}active{% endif %}">
+                            <span class="menu-text">Bank Files</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:payslip_list' %}" class="menu-link {% if request.resolver_match.url_name == 'payslip_list' %}active{% endif %}">
+                            <span class="menu-text">Payslips</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:payment_register_list' %}" class="menu-link {% if request.resolver_match.url_name == 'payment_register_list' %}active{% endif %}">
+                            <span class="menu-text">Payment Register</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'payroll:reimbursement_list' %}" class="menu-link {% if request.resolver_match.url_name == 'reimbursement_list' %}active{% endif %}">
+                            <span class="menu-text">Reimbursements</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title">Administration</li>
 
             <!-- Users -->
