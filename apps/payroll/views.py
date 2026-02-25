@@ -120,11 +120,11 @@ class PayComponentListView(LoginRequiredMixin, ListView):
 
 class PayComponentCreateView(LoginRequiredMixin, View):
     def get(self, request):
-        form = PayComponentForm(tenant=request.tenant)
+        form = PayComponentForm()
         return render(request, 'payroll/component_form.html', {'form': form})
 
     def post(self, request):
-        form = PayComponentForm(request.POST, tenant=request.tenant)
+        form = PayComponentForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
             obj.tenant = request.tenant
@@ -137,12 +137,12 @@ class PayComponentCreateView(LoginRequiredMixin, View):
 class PayComponentUpdateView(LoginRequiredMixin, View):
     def get(self, request, pk):
         obj = get_object_or_404(PayComponent.all_objects, pk=pk, tenant=request.tenant)
-        form = PayComponentForm(instance=obj, tenant=request.tenant)
+        form = PayComponentForm(instance=obj)
         return render(request, 'payroll/component_form.html', {'form': form, 'object': obj})
 
     def post(self, request, pk):
         obj = get_object_or_404(PayComponent.all_objects, pk=pk, tenant=request.tenant)
-        form = PayComponentForm(request.POST, instance=obj, tenant=request.tenant)
+        form = PayComponentForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()
             messages.success(request, 'Pay component updated successfully.')
@@ -508,7 +508,7 @@ class PayrollApproveView(LoginRequiredMixin, View):
             pk=pk,
             tenant=request.tenant,
         )
-        form = PayrollApprovalForm(tenant=request.tenant)
+        form = PayrollApprovalForm()
         entries = (
             PayrollEntry.all_objects
             .filter(tenant=request.tenant, payroll_period=period)
@@ -533,7 +533,7 @@ class PayrollApproveView(LoginRequiredMixin, View):
             pk=pk,
             tenant=request.tenant,
         )
-        form = PayrollApprovalForm(request.POST, tenant=request.tenant)
+        form = PayrollApprovalForm(request.POST)
         if form.is_valid():
             period.status = 'approved'
             period.approved_by = request.user
@@ -593,7 +593,7 @@ class PayrollEntryHoldView(LoginRequiredMixin, View):
             pk=pk,
             tenant=request.tenant,
         )
-        form = PayrollEntryHoldForm(tenant=request.tenant)
+        form = PayrollEntryHoldForm()
         return render(request, 'payroll/entry_detail.html', {
             'object': entry,
             'hold_form': form,
@@ -605,7 +605,7 @@ class PayrollEntryHoldView(LoginRequiredMixin, View):
             pk=pk,
             tenant=request.tenant,
         )
-        form = PayrollEntryHoldForm(request.POST, tenant=request.tenant)
+        form = PayrollEntryHoldForm(request.POST)
         if form.is_valid():
             entry.status = 'on_hold'
             entry.save()
@@ -747,7 +747,7 @@ class SalaryRevisionApproveView(LoginRequiredMixin, View):
             pk=pk,
             tenant=request.tenant,
         )
-        form = SalaryRevisionApprovalForm(tenant=request.tenant)
+        form = SalaryRevisionApprovalForm()
         return render(request, 'payroll/revision_detail.html', {
             'object': revision,
             'approval_form': form,
@@ -759,7 +759,7 @@ class SalaryRevisionApproveView(LoginRequiredMixin, View):
             pk=pk,
             tenant=request.tenant,
         )
-        form = SalaryRevisionApprovalForm(request.POST, tenant=request.tenant)
+        form = SalaryRevisionApprovalForm(request.POST)
         if form.is_valid():
             revision.status = 'approved'
             revision.approved_by = request.user
@@ -798,11 +798,11 @@ class PFConfigListView(LoginRequiredMixin, ListView):
 
 class PFConfigCreateView(LoginRequiredMixin, View):
     def get(self, request):
-        form = PFConfigurationForm(tenant=request.tenant)
+        form = PFConfigurationForm()
         return render(request, 'payroll/pf_config_form.html', {'form': form})
 
     def post(self, request):
-        form = PFConfigurationForm(request.POST, tenant=request.tenant)
+        form = PFConfigurationForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
             obj.tenant = request.tenant
@@ -815,12 +815,12 @@ class PFConfigCreateView(LoginRequiredMixin, View):
 class PFConfigUpdateView(LoginRequiredMixin, View):
     def get(self, request, pk):
         obj = get_object_or_404(PFConfiguration.all_objects, pk=pk, tenant=request.tenant)
-        form = PFConfigurationForm(instance=obj, tenant=request.tenant)
+        form = PFConfigurationForm(instance=obj)
         return render(request, 'payroll/pf_config_form.html', {'form': form, 'object': obj})
 
     def post(self, request, pk):
         obj = get_object_or_404(PFConfiguration.all_objects, pk=pk, tenant=request.tenant)
-        form = PFConfigurationForm(request.POST, instance=obj, tenant=request.tenant)
+        form = PFConfigurationForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()
             messages.success(request, 'PF configuration updated successfully.')
@@ -853,11 +853,11 @@ class ESIConfigListView(LoginRequiredMixin, ListView):
 
 class ESIConfigCreateView(LoginRequiredMixin, View):
     def get(self, request):
-        form = ESIConfigurationForm(tenant=request.tenant)
+        form = ESIConfigurationForm()
         return render(request, 'payroll/esi_config_form.html', {'form': form})
 
     def post(self, request):
-        form = ESIConfigurationForm(request.POST, tenant=request.tenant)
+        form = ESIConfigurationForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
             obj.tenant = request.tenant
@@ -870,12 +870,12 @@ class ESIConfigCreateView(LoginRequiredMixin, View):
 class ESIConfigUpdateView(LoginRequiredMixin, View):
     def get(self, request, pk):
         obj = get_object_or_404(ESIConfiguration.all_objects, pk=pk, tenant=request.tenant)
-        form = ESIConfigurationForm(instance=obj, tenant=request.tenant)
+        form = ESIConfigurationForm(instance=obj)
         return render(request, 'payroll/esi_config_form.html', {'form': form, 'object': obj})
 
     def post(self, request, pk):
         obj = get_object_or_404(ESIConfiguration.all_objects, pk=pk, tenant=request.tenant)
-        form = ESIConfigurationForm(request.POST, instance=obj, tenant=request.tenant)
+        form = ESIConfigurationForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()
             messages.success(request, 'ESI configuration updated successfully.')
@@ -908,11 +908,11 @@ class PTSlabListView(LoginRequiredMixin, ListView):
 
 class PTSlabCreateView(LoginRequiredMixin, View):
     def get(self, request):
-        form = ProfessionalTaxSlabForm(tenant=request.tenant)
+        form = ProfessionalTaxSlabForm()
         return render(request, 'payroll/pt_slab_form.html', {'form': form})
 
     def post(self, request):
-        form = ProfessionalTaxSlabForm(request.POST, tenant=request.tenant)
+        form = ProfessionalTaxSlabForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
             obj.tenant = request.tenant
@@ -925,12 +925,12 @@ class PTSlabCreateView(LoginRequiredMixin, View):
 class PTSlabUpdateView(LoginRequiredMixin, View):
     def get(self, request, pk):
         obj = get_object_or_404(ProfessionalTaxSlab.all_objects, pk=pk, tenant=request.tenant)
-        form = ProfessionalTaxSlabForm(instance=obj, tenant=request.tenant)
+        form = ProfessionalTaxSlabForm(instance=obj)
         return render(request, 'payroll/pt_slab_form.html', {'form': form, 'object': obj})
 
     def post(self, request, pk):
         obj = get_object_or_404(ProfessionalTaxSlab.all_objects, pk=pk, tenant=request.tenant)
-        form = ProfessionalTaxSlabForm(request.POST, instance=obj, tenant=request.tenant)
+        form = ProfessionalTaxSlabForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()
             messages.success(request, 'Professional tax slab updated successfully.')
@@ -963,11 +963,11 @@ class LWFConfigListView(LoginRequiredMixin, ListView):
 
 class LWFConfigCreateView(LoginRequiredMixin, View):
     def get(self, request):
-        form = LWFConfigurationForm(tenant=request.tenant)
+        form = LWFConfigurationForm()
         return render(request, 'payroll/lwf_config_form.html', {'form': form})
 
     def post(self, request):
-        form = LWFConfigurationForm(request.POST, tenant=request.tenant)
+        form = LWFConfigurationForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
             obj.tenant = request.tenant
@@ -980,12 +980,12 @@ class LWFConfigCreateView(LoginRequiredMixin, View):
 class LWFConfigUpdateView(LoginRequiredMixin, View):
     def get(self, request, pk):
         obj = get_object_or_404(LWFConfiguration.all_objects, pk=pk, tenant=request.tenant)
-        form = LWFConfigurationForm(instance=obj, tenant=request.tenant)
+        form = LWFConfigurationForm(instance=obj)
         return render(request, 'payroll/lwf_config_form.html', {'form': form, 'object': obj})
 
     def post(self, request, pk):
         obj = get_object_or_404(LWFConfiguration.all_objects, pk=pk, tenant=request.tenant)
-        form = LWFConfigurationForm(request.POST, instance=obj, tenant=request.tenant)
+        form = LWFConfigurationForm(request.POST, instance=obj)
         if form.is_valid():
             form.save()
             messages.success(request, 'LWF configuration updated successfully.')
@@ -1159,7 +1159,7 @@ class InvestmentDeclarationVerifyView(LoginRequiredMixin, View):
             pk=pk,
             tenant=request.tenant,
         )
-        form = InvestmentDeclarationVerifyForm(tenant=request.tenant)
+        form = InvestmentDeclarationVerifyForm()
         proofs = (
             InvestmentProof.all_objects
             .filter(tenant=request.tenant, declaration=declaration)
@@ -1177,7 +1177,7 @@ class InvestmentDeclarationVerifyView(LoginRequiredMixin, View):
             pk=pk,
             tenant=request.tenant,
         )
-        form = InvestmentDeclarationVerifyForm(request.POST, tenant=request.tenant)
+        form = InvestmentDeclarationVerifyForm(request.POST)
         if form.is_valid():
             declaration.status = form.cleaned_data.get('status', 'verified')
             declaration.verified_by = request.user
@@ -1205,11 +1205,11 @@ class InvestmentDeclarationVerifyView(LoginRequiredMixin, View):
 
 class InvestmentProofUploadView(LoginRequiredMixin, View):
     def get(self, request):
-        form = InvestmentProofForm(tenant=request.tenant)
+        form = InvestmentProofForm()
         return render(request, 'payroll/proof_upload_form.html', {'form': form})
 
     def post(self, request):
-        form = InvestmentProofForm(request.POST, request.FILES, tenant=request.tenant)
+        form = InvestmentProofForm(request.POST, request.FILES)
         if form.is_valid():
             obj = form.save(commit=False)
             obj.tenant = request.tenant
@@ -1580,7 +1580,7 @@ class PaymentReconcileView(LoginRequiredMixin, View):
             pk=pk,
             tenant=request.tenant,
         )
-        form = PaymentReconcileForm(tenant=request.tenant)
+        form = PaymentReconcileForm()
         return render(request, 'payroll/payment_register_list.html', {
             'object': register,
             'reconcile_form': form,
@@ -1592,7 +1592,7 @@ class PaymentReconcileView(LoginRequiredMixin, View):
             pk=pk,
             tenant=request.tenant,
         )
-        form = PaymentReconcileForm(request.POST, tenant=request.tenant)
+        form = PaymentReconcileForm(request.POST)
         if form.is_valid():
             register.status = 'reconciled'
             register.reconciled_by = request.user
@@ -1679,7 +1679,7 @@ class ReimbursementApproveView(LoginRequiredMixin, View):
             pk=pk,
             tenant=request.tenant,
         )
-        form = ReimbursementApprovalForm(tenant=request.tenant)
+        form = ReimbursementApprovalForm()
         return render(request, 'payroll/reimbursement_detail.html', {
             'object': reimbursement,
             'approval_form': form,
@@ -1691,7 +1691,7 @@ class ReimbursementApproveView(LoginRequiredMixin, View):
             pk=pk,
             tenant=request.tenant,
         )
-        form = ReimbursementApprovalForm(request.POST, tenant=request.tenant)
+        form = ReimbursementApprovalForm(request.POST)
         if form.is_valid():
             reimbursement.status = form.cleaned_data.get('status', 'approved')
             reimbursement.approved_by = request.user
