@@ -1007,19 +1007,20 @@ class StatutoryContributionListView(LoginRequiredMixin, ListView):
         qs = StatutoryContribution.all_objects.filter(
             tenant=self.request.tenant,
         ).select_related('employee', 'payroll_period')
-        contribution_type = self.request.GET.get('type', '')
+        contribution_type = self.request.GET.get('contribution_type', '')
         if contribution_type:
             qs = qs.filter(contribution_type=contribution_type)
-        period = self.request.GET.get('period', '')
+        period = self.request.GET.get('payroll_period', '')
         if period:
             qs = qs.filter(payroll_period_id=period)
         return qs.order_by('-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['selected_type'] = self.request.GET.get('type', '')
-        context['selected_period'] = self.request.GET.get('period', '')
-        context['periods'] = (
+        context['selected_type'] = self.request.GET.get('contribution_type', '')
+        context['selected_period'] = self.request.GET.get('payroll_period', '')
+        context['contribution_types'] = StatutoryContribution.CONTRIBUTION_TYPE_CHOICES
+        context['payroll_periods'] = (
             PayrollPeriod.all_objects
             .filter(tenant=self.request.tenant)
             .order_by('-start_date')
