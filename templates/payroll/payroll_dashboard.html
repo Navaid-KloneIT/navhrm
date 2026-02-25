@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% load payroll_tags %}
+
+{% block title %}Payroll Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Payroll Dashboard</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item active">Payroll</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Salary Cost</p>
+                        <h3 class="stats-value mb-0">{{ total_salary_cost|default:"0.00" }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-primary text-primary">
+                        <i class="ri-money-dollar-circle-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Monthly payroll cost</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Active Structures</p>
+                        <h3 class="stats-value mb-0">{{ active_structures }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-success text-success">
+                        <i class="ri-stack-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Salary structures in use</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Pending Payrolls</p>
+                        <h3 class="stats-value mb-0">{{ pending_payrolls }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-warning text-warning">
+                        <i class="ri-file-list-3-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Awaiting processing</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Pending Reimbursements</p>
+                        <h3 class="stats-value mb-0">{{ pending_reimbursements }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-info text-info">
+                        <i class="ri-refund-2-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Awaiting approval</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'payroll:period_create' %}" class="btn btn-soft-primary text-start">
+                        <i class="ri-calendar-2-line me-2"></i> Create Payroll Period
+                    </a>
+                    <a href="{% url 'payroll:employee_salary_list' %}" class="btn btn-soft-info text-start">
+                        <i class="ri-user-settings-line me-2"></i> Manage Employee Salaries
+                    </a>
+                    <a href="{% url 'payroll:revision_create' %}" class="btn btn-soft-warning text-start">
+                        <i class="ri-arrow-up-circle-line me-2"></i> New Salary Revision
+                    </a>
+                    <a href="{% url 'payroll:component_list' %}" class="btn btn-soft-secondary text-start">
+                        <i class="ri-settings-3-line me-2"></i> Manage Components
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Pending Holds</h5>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="mb-2 {% if pending_holds > 0 %}text-warning{% else %}text-muted{% endif %}">{{ pending_holds|default:"0" }}</h2>
+                <p class="text-muted mb-3">Salaries on hold</p>
+                <a href="{% url 'payroll:hold_list' %}?status=active" class="btn btn-sm btn-soft-warning">
+                    <i class="ri-arrow-right-line me-1"></i> View Holds
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Pending Revisions</h5>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="mb-2 {% if pending_revisions > 0 %}text-warning{% else %}text-muted{% endif %}">{{ pending_revisions|default:"0" }}</h2>
+                <p class="text-muted mb-3">Awaiting approval</p>
+                <a href="{% url 'payroll:revision_list' %}?status=pending" class="btn btn-sm btn-soft-warning">
+                    <i class="ri-arrow-right-line me-1"></i> View Revisions
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Payroll Periods -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Recent Payroll Periods</h5>
+                <a href="{% url 'payroll:period_list' %}" class="btn btn-sm btn-soft-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Month / Year</th>
+                                <th>Status</th>
+                                <th>Total Net</th>
+                                <th>Employees</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for period in recent_periods %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'payroll:period_detail' period.pk %}" class="fw-medium">{{ period.name }}</a>
+                                </td>
+                                <td>{{ period.get_month_display }} {{ period.year }}</td>
+                                <td>
+                                    <span class="badge bg-{{ period.status|payroll_status_color }}">{{ period.get_status_display }}</span>
+                                </td>
+                                <td>{{ period.total_net|default:"0.00" }}</td>
+                                <td>{{ period.employee_count|default:"0" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">No payroll periods yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Revisions -->
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Recent Salary Revisions</h5>
+                <a href="{% url 'payroll:revision_list' %}" class="btn btn-sm btn-soft-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Old CTC</th>
+                                <th>New CTC</th>
+                                <th>Effective From</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for revision in recent_revisions %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'payroll:revision_detail' revision.pk %}" class="fw-medium">{{ revision.employee }}</a>
+                                </td>
+                                <td>{{ revision.old_ctc }}</td>
+                                <td>{{ revision.new_ctc }}</td>
+                                <td>{{ revision.effective_from|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge bg-{{ revision.status|payroll_status_color }}">{{ revision.get_status_display }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">No salary revisions yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
