@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load payroll_tags %}
+
+{% block title %}{{ object.name }} - Payroll Period{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Payroll Period Detail</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:period_list' %}">Payroll Periods</a></li>
+            <li class="breadcrumb-item active">{{ object.name }}</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Period Summary -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Period Summary</h5>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-{{ object.status|payroll_status_color }}">{{ object.get_status_display }}</span>
+            {% if object.status == 'draft' %}
+            <a href="{% url 'payroll:period_edit' object.pk %}" class="btn btn-sm btn-soft-primary">
+                <i class="ri-pencil-line me-1"></i> Edit
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label text-muted">Period Name</label>
+                <p class="mb-0 fw-medium">{{ object.name }}</p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Month / Year</label>
+                <p class="mb-0 fw-medium">{{ object.get_month_display }} {{ object.year }}</p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Start Date</label>
+                <p class="mb-0 fw-medium">{{ object.start_date|date:"M d, Y" }}</p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">End Date</label>
+                <p class="mb-0 fw-medium">{{ object.end_date|date:"M d, Y" }}</p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Payment Date</label>
+                <p class="mb-0 fw-medium">{{ object.payment_date|date:"M d, Y"|default:"-" }}</p>
+            </div>
+            <div class="col-md-9">
+                <label class="form-label text-muted">Remarks</label>
+                <p class="mb-0 fw-medium">{{ object.remarks|default:"-" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Totals Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <label class="form-label text-muted">Total Gross</label>
+                <h4 class="mb-0 text-success">{{ object.total_gross|default:"0.00" }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <label class="form-label text-muted">Total Deductions</label>
+                <h4 class="mb-0 text-danger">{{ object.total_deductions|default:"0.00" }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <label class="form-label text-muted">Total Net</label>
+                <h4 class="mb-0 text-primary">{{ object.total_net|default:"0.00" }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <label class="form-label text-muted">Employee Count</label>
+                <h4 class="mb-0">{{ object.employee_count|default:"0" }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+{% if object.status == 'draft' %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body d-flex gap-2">
+                <form method="POST" action="{% url 'payroll:period_process' object.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning" onclick="return confirm('Are you sure you want to process this payroll period?')">
+                        <i class="ri-play-circle-line me-1"></i> Process Payroll
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% elif object.status == 'processed' %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body d-flex gap-2">
+                <form method="POST" action="{% url 'payroll:period_approve' object.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to approve this payroll period?')">
+                        <i class="ri-check-double-line me-1"></i> Approve Payroll
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Payroll Entries Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Payroll Entries</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th class="text-end">Gross Salary</th>
+                                <th class="text-end">Deductions</th>
+                                <th class="text-end">Net Salary</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in entries %}
+                            <tr>
+                                <td class="fw-medium">{{ entry.employee }}</td>
+                                <td class="text-end">{{ entry.gross_salary|default:"0.00" }}</td>
+                                <td class="text-end">{{ entry.total_deductions|default:"0.00" }}</td>
+                                <td class="text-end">{{ entry.net_salary|default:"0.00" }}</td>
+                                <td>
+                                    <span class="badge bg-{{ entry.status|payroll_status_color }}">{{ entry.get_status_display }}</span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'payroll:entry_detail' entry.pk %}" class="btn btn-sm btn-soft-info">
+                                        <i class="ri-eye-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No payroll entries yet</p>
+                                        {% if object.status == 'draft' %}
+                                        <p class="text-muted">Process the payroll to generate entries</p>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
