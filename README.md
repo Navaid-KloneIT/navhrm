@@ -24,6 +24,13 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Time Tracking** - Projects & tasks, weekly timesheets with approval workflow, time entries against projects, overtime requests & approval, billable hours tracking
 - **Holiday Management** - National/regional/company holidays, holiday calendar, floating/optional holidays, location-based holiday policies
 
+### Payroll Module
+- **Salary Structure** - Pay components (earnings/deductions), salary structure templates, grade-wise CTC breakdown, employee salary assignments
+- **Payroll Processing** - Monthly payroll periods, calculation engine, payroll approval workflow, salary holds, salary revisions with arrears
+- **Statutory Compliance** - PF management (12%/12%, EPS, EDLI), ESI management (0.75%/3.25%), professional tax (state-wise slabs), LWF management, contribution tracking
+- **Tax & Investment** - Old vs New tax regime selection, investment declarations (80C, 80D, HRA, LTA, etc.), proof uploads with verification, annual tax computation, monthly TDS projection
+- **Payout & Reports** - Bank file generation (HDFC/ICICI/SBI/Axis/NEFT/CSV), digital payslips, payment register with reconciliation, reimbursement claims (LTA, medical, fuel, mobile)
+
 ### Recruitment Module
 - **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
 - **Job Templates** - Pre-defined job description templates for quick requisition creation
@@ -103,6 +110,7 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
    python manage.py seed_data
    python manage.py seed_recruitment
    python manage.py seed_attendance
+   python manage.py seed_payroll
    ```
 
 8. **Run the development server**
@@ -139,7 +147,8 @@ navhrm/
 │   ├── onboarding/        # Onboarding tasks, assets, orientation
 │   ├── offboarding/       # Resignations, exit interviews, clearance, F&F
 │   ├── recruitment/       # Job requisitions, candidates, interviews, offers
-│   └── attendance/        # Attendance, leave, time tracking, holidays
+│   ├── attendance/        # Attendance, leave, time tracking, holidays
+│   └── payroll/           # Salary structure, payroll, statutory, tax, payout
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS
@@ -155,7 +164,8 @@ navhrm/
 │   ├── onboarding/        # Onboarding templates
 │   ├── offboarding/       # Offboarding templates
 │   ├── recruitment/       # Recruitment templates + public career page
-│   └── attendance/        # Attendance & leave module templates
+│   ├── attendance/        # Attendance & leave module templates
+│   └── payroll/           # Payroll module templates (44 files)
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
