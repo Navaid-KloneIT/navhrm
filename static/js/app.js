@@ -355,9 +355,11 @@
         this._createOverlay();
         this._bindToggleButtons();
         this._bindSubmenus();
+        this._bindMenuSections();
         this._bindHoverExpand();
         this._bindResize();
         this._highlightActiveItem();
+        this._collapseInactiveSections();
         this._handleMobileInit();
     };
 
@@ -497,6 +499,116 @@
             submenu.removeEventListener("transitionend", done);
         };
         submenu.addEventListener("transitionend", done);
+    };
+
+    // -- Menu Section (group-level) accordion --------------------------------
+
+    /**
+     * Bind click events on menu-title elements that act as section headers.
+     */
+    Sidebar.prototype._bindMenuSections = function () {
+        var titles = this._sidebarEl.querySelectorAll('.menu-title[data-toggle="menu-section"]');
+        var self = this;
+
+        for (var i = 0; i < titles.length; i++) {
+            titles[i].addEventListener("click", function (e) {
+                e.preventDefault();
+                var titleLi = this;
+                var isCollapsed = titleLi.classList.contains("collapsed");
+
+                // Accordion: collapse all other sections first.
+                var allTitles = self._sidebarEl.querySelectorAll('.menu-title[data-toggle="menu-section"]');
+                for (var j = 0; j < allTitles.length; j++) {
+                    if (allTitles[j] !== titleLi) {
+                        self._collapseSection(allTitles[j]);
+                    }
+                }
+
+                if (isCollapsed) {
+                    self._expandSection(titleLi);
+                } else {
+                    self._collapseSection(titleLi);
+                }
+            });
+        }
+    };
+
+    /**
+     * Get all nav-item siblings belonging to a menu-title section
+     * (everything between this menu-title and the next one).
+     */
+    Sidebar.prototype._getSectionItems = function (menuTitleLi) {
+        var items = [];
+        var sibling = menuTitleLi.nextElementSibling;
+        while (sibling && !sibling.classList.contains("menu-title")) {
+            items.push(sibling);
+            sibling = sibling.nextElementSibling;
+        }
+        return items;
+    };
+
+    /**
+     * Collapse a section: hide its nav-items and mark title as collapsed.
+     */
+    Sidebar.prototype._collapseSection = function (menuTitleLi) {
+        if (menuTitleLi.classList.contains("collapsed")) return;
+        var items = this._getSectionItems(menuTitleLi);
+        for (var i = 0; i < items.length; i++) {
+            items[i].style.display = "none";
+        }
+        menuTitleLi.classList.add("collapsed");
+    };
+
+    /**
+     * Expand a section: show its nav-items and remove collapsed state.
+     */
+    Sidebar.prototype._expandSection = function (menuTitleLi) {
+        if (!menuTitleLi.classList.contains("collapsed")) return;
+        var items = this._getSectionItems(menuTitleLi);
+        for (var i = 0; i < items.length; i++) {
+            items[i].style.display = "";
+        }
+        menuTitleLi.classList.remove("collapsed");
+    };
+
+    /**
+     * On page load, collapse all sections except the one containing
+     * the active menu item.
+     */
+    Sidebar.prototype._collapseInactiveSections = function () {
+        var activeLink = this._sidebarEl.querySelector(".menu-link.active");
+        var activeSectionTitle = null;
+
+        // Walk backwards from the active link's top-level nav-item to find its section title.
+        if (activeLink) {
+            var navList = this._sidebarEl.querySelector(".nav-list");
+            var topItem = activeLink.closest(".nav-list > .nav-item");
+            if (!topItem && navList) {
+                // Fallback: walk up to find a nav-item that is a direct child of nav-list.
+                var el = activeLink.closest(".nav-item");
+                while (el && el.parentElement !== navList) {
+                    el = el.parentElement ? el.parentElement.closest(".nav-item") : null;
+                }
+                topItem = el;
+            }
+            if (topItem) {
+                var prev = topItem.previousElementSibling;
+                while (prev) {
+                    if (prev.classList.contains("menu-title")) {
+                        activeSectionTitle = prev;
+                        break;
+                    }
+                    prev = prev.previousElementSibling;
+                }
+            }
+        }
+
+        var allTitles = this._sidebarEl.querySelectorAll('.menu-title[data-toggle="menu-section"]');
+        for (var i = 0; i < allTitles.length; i++) {
+            if (allTitles[i] !== activeSectionTitle) {
+                this._collapseSection(allTitles[i]);
+            }
+        }
     };
 
     /**
