@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load payroll_tags %}
+
+{% block title %}{{ object.employee }} - Salary Details{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Employee Salary Detail</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:employee_salary_list' %}">Employee Salaries</a></li>
+            <li class="breadcrumb-item active">{{ object.employee }}</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Employee Info -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Salary Details</h5>
+        <div>
+            <span class="badge bg-{{ object.status|payroll_status_color }} me-2">{{ object.get_status_display }}</span>
+            <a href="{% url 'payroll:employee_salary_edit' object.pk %}" class="btn btn-sm btn-soft-primary">
+                <i class="ri-pencil-line me-1"></i> Edit
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label text-muted">Employee</label>
+                <p class="mb-0 fw-medium">{{ object.employee }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Salary Structure</label>
+                <p class="mb-0 fw-medium">{{ object.salary_structure|default:"-" }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">CTC</label>
+                <p class="mb-0 fw-medium">{{ object.ctc }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Effective From</label>
+                <p class="mb-0 fw-medium">{{ object.effective_from|date:"M d, Y" }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Effective To</label>
+                <p class="mb-0 fw-medium">{{ object.effective_to|date:"M d, Y"|default:"Ongoing" }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Remarks</label>
+                <p class="mb-0 fw-medium">{{ object.remarks|default:"-" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTC Breakdown - Earnings -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Earnings</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Calculation Type</th>
+                        <th class="text-end">Monthly Amount</th>
+                        <th class="text-end">Annual Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in earnings %}
+                    <tr>
+                        <td class="fw-medium">{{ item.component_name }}</td>
+                        <td>{{ item.calculation_type }}</td>
+                        <td class="text-end">{{ item.monthly_amount }}</td>
+                        <td class="text-end">{{ item.annual_amount }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-3 text-muted">No earnings components</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <td colspan="2" class="fw-bold">Total Gross Salary</td>
+                        <td class="text-end fw-bold">{{ total_gross_monthly|default:"0.00" }}</td>
+                        <td class="text-end fw-bold">{{ total_gross_annual|default:"0.00" }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- CTC Breakdown - Deductions -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Deductions</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Calculation Type</th>
+                        <th class="text-end">Monthly Amount</th>
+                        <th class="text-end">Annual Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in deductions %}
+                    <tr>
+                        <td class="fw-medium">{{ item.component_name }}</td>
+                        <td>{{ item.calculation_type }}</td>
+                        <td class="text-end">{{ item.monthly_amount }}</td>
+                        <td class="text-end">{{ item.annual_amount }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-3 text-muted">No deduction components</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <td colspan="2" class="fw-bold">Total Deductions</td>
+                        <td class="text-end fw-bold">{{ total_deductions_monthly|default:"0.00" }}</td>
+                        <td class="text-end fw-bold">{{ total_deductions_annual|default:"0.00" }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Net Salary Summary -->
+<div class="card">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="border rounded p-3 text-center">
+                    <label class="form-label text-muted">Total Gross</label>
+                    <h4 class="mb-0 text-success">{{ total_gross_monthly|default:"0.00" }}</h4>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border rounded p-3 text-center">
+                    <label class="form-label text-muted">Total Deductions</label>
+                    <h4 class="mb-0 text-danger">{{ total_deductions_monthly|default:"0.00" }}</h4>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border rounded p-3 text-center bg-light">
+                    <label class="form-label text-muted">Net Salary</label>
+                    <h4 class="mb-0 text-primary">{{ net_salary_monthly|default:"0.00" }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
