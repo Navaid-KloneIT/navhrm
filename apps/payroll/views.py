@@ -1317,6 +1317,12 @@ class BankFileListView(LoginRequiredMixin, ListView):
         qs = BankFile.all_objects.filter(
             tenant=self.request.tenant,
         ).select_related('payroll_period')
+        status = self.request.GET.get('status', '')
+        if status:
+            qs = qs.filter(status=status)
+        period = self.request.GET.get('period', '')
+        if period:
+            qs = qs.filter(payroll_period_id=period)
         search = self.request.GET.get('search', '')
         if search:
             qs = qs.filter(Q(file_name__icontains=search))
@@ -1325,6 +1331,12 @@ class BankFileListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search'] = self.request.GET.get('search', '')
+        context['statuses'] = BankFile.STATUS_CHOICES
+        context['payroll_periods'] = (
+            PayrollPeriod.all_objects
+            .filter(tenant=self.request.tenant)
+            .order_by('-start_date')
+        )
         return context
 
 
@@ -1370,7 +1382,7 @@ class PayslipListView(LoginRequiredMixin, ListView):
         qs = Payslip.all_objects.filter(
             tenant=self.request.tenant,
         ).select_related('employee', 'payroll_period')
-        period = self.request.GET.get('period', '')
+        period = self.request.GET.get('payroll_period', '')
         if period:
             qs = qs.filter(payroll_period_id=period)
         search = self.request.GET.get('search', '')
@@ -1384,9 +1396,9 @@ class PayslipListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['selected_period'] = self.request.GET.get('period', '')
+        context['selected_period'] = self.request.GET.get('payroll_period', '')
         context['search'] = self.request.GET.get('search', '')
-        context['periods'] = (
+        context['payroll_periods'] = (
             PayrollPeriod.all_objects
             .filter(tenant=self.request.tenant)
             .order_by('-start_date')
@@ -1628,6 +1640,8 @@ class ReimbursementListView(LoginRequiredMixin, ListView):
         context['selected_category'] = self.request.GET.get('category', '')
         context['selected_status'] = self.request.GET.get('status', '')
         context['search'] = self.request.GET.get('search', '')
+        context['categories'] = Reimbursement.CATEGORY_CHOICES
+        context['statuses'] = Reimbursement.STATUS_CHOICES
         return context
 
 
