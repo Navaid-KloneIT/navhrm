@@ -577,8 +577,8 @@ class PayrollEntryDetailView(LoginRequiredMixin, View):
         components = (
             PayrollEntryComponent.all_objects
             .filter(tenant=request.tenant, payroll_entry=entry)
-            .select_related('component')
-            .order_by('component__component_type', 'component__name')
+            .select_related('pay_component')
+            .order_by('pay_component__component_type', 'pay_component__name')
         )
         return render(request, 'payroll/entry_detail.html', {
             'object': entry,
