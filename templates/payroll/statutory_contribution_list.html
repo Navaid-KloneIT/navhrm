@@ -77,7 +77,7 @@
                             {% for contribution in object_list %}
                             <tr>
                                 <td><span class="fw-medium">{{ contribution.employee }}</span></td>
-                                <td>{{ contribution.payroll_period|default:contribution.period }}</td>
+                                <td>{{ contribution.payroll_period }}</td>
                                 <td>
                                     <span class="badge bg-info">{{ contribution.get_contribution_type_display|default:contribution.contribution_type }}</span>
                                 </td>
