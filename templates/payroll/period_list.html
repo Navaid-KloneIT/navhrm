@@ -101,8 +101,8 @@
                                         <i class="ri-eye-line"></i>
                                     </a>
                                     {% if period.status == 'draft' %}
-                                    <a href="{% url 'payroll:period_edit' period.pk %}" class="btn btn-sm btn-soft-primary">
-                                        <i class="ri-pencil-line"></i>
+                                    <a href="{% url 'payroll:period_detail' period.pk %}" class="btn btn-sm btn-soft-primary" title="Manage">
+                                        <i class="ri-settings-3-line"></i>
                                     </a>
                                     {% endif %}
                                 </td>
