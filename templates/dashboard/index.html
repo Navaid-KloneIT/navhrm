@@ -14,7 +14,10 @@
     </nav>
 </div>
 
-<!-- Stats Cards -->
+<!-- ═══ Core HR Stats ═══ -->
+<h6 class="text-uppercase text-muted fw-bold mb-3" style="font-size:11px; letter-spacing:0.8px;">
+    <i class="ri-team-line me-1"></i> Core HR
+</h6>
 <div class="row g-4 mb-4">
     <div class="col-xl-3 col-md-6">
         <div class="card stats-card">
@@ -91,6 +94,244 @@
     </div>
 </div>
 
+<!-- ═══ Attendance & Leave Stats ═══ -->
+<h6 class="text-uppercase text-muted fw-bold mb-3" style="font-size:11px; letter-spacing:0.8px;">
+    <i class="ri-fingerprint-line me-1"></i> Attendance & Leave
+</h6>
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Present Today</p>
+                        <h3 class="stats-value mb-0">{{ today_present }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-success text-success">
+                        <i class="ri-user-follow-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-danger" style="font-size:12px;">{{ today_absent }} absent</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Pending Leaves</p>
+                        <h3 class="stats-value mb-0">{{ pending_leaves }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-warning text-warning">
+                        <i class="ri-calendar-todo-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Awaiting approval</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Regularizations</p>
+                        <h3 class="stats-value mb-0">{{ pending_regularizations }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-info text-info">
+                        <i class="ri-edit-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Pending requests</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Overtime Requests</p>
+                        <h3 class="stats-value mb-0">{{ pending_overtime }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-primary text-primary">
+                        <i class="ri-time-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Pending approval</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ Recruitment Stats ═══ -->
+<h6 class="text-uppercase text-muted fw-bold mb-3" style="font-size:11px; letter-spacing:0.8px;">
+    <i class="ri-briefcase-4-line me-1"></i> Recruitment
+</h6>
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Open Positions</p>
+                        <h3 class="stats-value mb-0">{{ open_positions }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-primary text-primary">
+                        <i class="ri-briefcase-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Approved & published</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Active Applications</p>
+                        <h3 class="stats-value mb-0">{{ active_applications }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-info text-info">
+                        <i class="ri-file-user-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">In pipeline</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Upcoming Interviews</p>
+                        <h3 class="stats-value mb-0">{{ upcoming_interviews }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-warning text-warning">
+                        <i class="ri-discuss-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Scheduled</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Pending Offers</p>
+                        <h3 class="stats-value mb-0">{{ pending_offers }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-success text-success">
+                        <i class="ri-mail-send-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Awaiting response</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ Payroll Stats ═══ -->
+<h6 class="text-uppercase text-muted fw-bold mb-3" style="font-size:11px; letter-spacing:0.8px;">
+    <i class="ri-money-dollar-circle-line me-1"></i> Payroll
+</h6>
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Last Payroll</p>
+                        <h3 class="stats-value mb-0">&#8377; {{ last_payroll_net|floatformat:0|intcomma }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-success text-success">
+                        <i class="ri-wallet-3-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">{{ last_payroll_label|default:"No payroll yet" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Employees Paid</p>
+                        <h3 class="stats-value mb-0">{{ last_payroll_employees }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-primary text-primary">
+                        <i class="ri-group-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Last payroll period</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Pending Reimbursements</p>
+                        <h3 class="stats-value mb-0">{{ pending_reimbursements }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-warning text-warning">
+                        <i class="ri-refund-2-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Awaiting approval</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Salary Holds</p>
+                        <h3 class="stats-value mb-0">{{ active_holds }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-danger text-danger">
+                        <i class="ri-hand-coin-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Currently active</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ Charts & Details Row ═══ -->
 <div class="row g-4">
     <!-- Department Distribution -->
     <div class="col-xl-8">
@@ -115,17 +356,17 @@
                     <a href="{% url 'employees:create' %}" class="btn btn-soft-primary text-start">
                         <i class="ri-user-add-line me-2"></i> Add New Employee
                     </a>
-                    <a href="{% url 'organization:department_create' %}" class="btn btn-soft-info text-start">
-                        <i class="ri-building-line me-2"></i> Add Department
+                    <a href="{% url 'attendance:leave_apply' %}" class="btn btn-soft-warning text-start">
+                        <i class="ri-calendar-check-line me-2"></i> Apply Leave
                     </a>
-                    <a href="{% url 'accounts:invite_send' %}" class="btn btn-soft-success text-start">
-                        <i class="ri-mail-send-line me-2"></i> Invite User
+                    <a href="{% url 'recruitment:job_list' %}" class="btn btn-soft-info text-start">
+                        <i class="ri-briefcase-line me-2"></i> Job Requisitions
                     </a>
-                    <a href="{% url 'employees:directory' %}" class="btn btn-soft-warning text-start">
+                    <a href="{% url 'payroll:dashboard' %}" class="btn btn-soft-success text-start">
+                        <i class="ri-money-dollar-circle-line me-2"></i> Payroll Dashboard
+                    </a>
+                    <a href="{% url 'employees:directory' %}" class="btn btn-soft-secondary text-start">
                         <i class="ri-group-line me-2"></i> Employee Directory
-                    </a>
-                    <a href="{% url 'organization:org_chart' %}" class="btn btn-soft-secondary text-start">
-                        <i class="ri-organization-chart me-2"></i> Org Chart
                     </a>
                 </div>
             </div>
@@ -135,7 +376,7 @@
 
 <div class="row g-4 mt-0">
     <!-- Recent Employees -->
-    <div class="col-xl-8">
+    <div class="col-xl-6">
         <div class="card table-card">
             <div class="card-header">
                 <h5>Recent Employees</h5>
@@ -148,7 +389,6 @@
                             <tr>
                                 <th>Employee</th>
                                 <th>Department</th>
-                                <th>Designation</th>
                                 <th>Status</th>
                                 <th>Joined</th>
                             </tr>
@@ -172,7 +412,6 @@
                                     </div>
                                 </td>
                                 <td>{{ emp.department|default:"-" }}</td>
-                                <td>{{ emp.designation|default:"-" }}</td>
                                 <td>
                                     <span class="status-badge badge-soft-{% if emp.status == 'active' %}success{% elif emp.status == 'on_leave' %}warning{% else %}danger{% endif %}">
                                         <span class="status-dot bg-{% if emp.status == 'active' %}success{% elif emp.status == 'on_leave' %}warning{% else %}danger{% endif %}"></span>
@@ -183,7 +422,7 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">No employees yet</td>
+                                <td colspan="4" class="text-center py-4 text-muted">No employees yet</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -193,6 +432,134 @@
         </div>
     </div>
 
+    <!-- Recent Leave Applications -->
+    <div class="col-xl-6">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Recent Leave Applications</h5>
+                <a href="{% url 'attendance:leave_list' %}" class="btn btn-sm btn-soft-warning">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Type</th>
+                                <th>Dates</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for leave in recent_leaves %}
+                            <tr>
+                                <td><span class="fw-medium">{{ leave.employee }}</span></td>
+                                <td>{{ leave.leave_type }}</td>
+                                <td style="font-size:12px;">{{ leave.from_date|date:"M d" }} - {{ leave.to_date|date:"M d" }}</td>
+                                <td>
+                                    <span class="badge bg-{% if leave.status == 'approved' %}success{% elif leave.status == 'pending' %}warning{% elif leave.status == 'rejected' %}danger{% else %}secondary{% endif %}">
+                                        {{ leave.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No leave applications</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-0">
+    <!-- Recent Applications (Recruitment) -->
+    <div class="col-xl-6">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Recent Job Applications</h5>
+                <a href="{% url 'recruitment:application_list' %}" class="btn btn-sm btn-soft-info">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in recent_applications %}
+                            <tr>
+                                <td><span class="fw-medium">{{ app.candidate }}</span></td>
+                                <td>{{ app.job_requisition.title|truncatewords:4 }}</td>
+                                <td>
+                                    <span class="badge bg-{% if app.status == 'hired' %}success{% elif app.status == 'interview' or app.status == 'shortlisted' %}info{% elif app.status == 'rejected' %}danger{% elif app.status == 'offered' %}primary{% else %}secondary{% endif %}">
+                                        {{ app.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">No applications yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payroll Periods -->
+    <div class="col-xl-6">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Recent Payroll Periods</h5>
+                <a href="{% url 'payroll:period_list' %}" class="btn btn-sm btn-soft-success">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th class="text-end">Net Pay</th>
+                                <th class="text-center">Employees</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for period in payroll_periods %}
+                            <tr>
+                                <td><span class="fw-medium">{{ period }}</span></td>
+                                <td class="text-end">&#8377; {{ period.total_net|floatformat:0|intcomma }}</td>
+                                <td class="text-center">{{ period.employee_count }}</td>
+                                <td>
+                                    <span class="badge bg-{% if period.status == 'paid' %}success{% elif period.status == 'approved' %}primary{% elif period.status == 'processed' %}info{% elif period.status == 'processing' %}warning{% else %}secondary{% endif %}">
+                                        {{ period.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No payroll periods yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-0">
     <!-- Upcoming Birthdays -->
     <div class="col-xl-4">
         <div class="card">
