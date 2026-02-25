@@ -62,7 +62,7 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Navaid-KloneIT/navhrm.git
    cd navhrm
    ```
 
