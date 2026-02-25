@@ -88,7 +88,7 @@
                                 <td>{{ payment.get_payment_mode_display|default:payment.payment_mode }}</td>
                                 <td>{{ payment.bank_name|default:"-" }}</td>
                                 <td>{{ payment.account_number|default:"-" }}</td>
-                                <td>{{ payment.transaction_ref|default:"-" }}</td>
+                                <td>{{ payment.transaction_reference|default:"-" }}</td>
                                 <td>{{ payment.payment_date|date:"M d, Y"|default:"-" }}</td>
                                 <td>
                                     <span class="badge bg-{{ payment.status|payment_status_color }}">
