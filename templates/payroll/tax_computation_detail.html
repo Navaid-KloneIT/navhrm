@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Tax Computation - {{ object.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Tax Computation Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:tax_computation_list' %}">Tax Computations</a></li>
+            <li class="breadcrumb-item active">{{ object.employee }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Employee & Regime Info -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ object.employee }}</h5>
+                {% if object.regime == 'old' %}
+                <span class="badge bg-warning fs-6">Old Regime</span>
+                {% else %}
+                <span class="badge bg-success fs-6">New Regime</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Financial Year</small>
+                        <div class="fw-medium">{{ object.financial_year }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Last Updated</small>
+                        <div class="fw-medium">{{ object.updated_at|date:"M d, Y h:i A" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Income Details -->
+        <div class="card">
+            <div class="card-header bg-soft-success">
+                <h5 class="mb-0 text-success"><i class="ri-money-dollar-circle-line me-1"></i> Income</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="ps-3">Gross Salary (Annual)</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.total_income }}</td>
+                        </tr>
+                        {% if object.exemptions %}
+                        <tr>
+                            <td class="ps-3 text-danger">Less: Exemptions (HRA, LTA, etc.)</td>
+                            <td class="text-end pe-3 fw-medium text-danger">- {{ object.exemptions }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr class="table-light">
+                            <td class="ps-3 fw-bold">Net Salary Income</td>
+                            <td class="text-end pe-3 fw-bold">{{ object.net_salary_income|default:object.total_income }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Deductions -->
+        <div class="card">
+            <div class="card-header bg-soft-info">
+                <h5 class="mb-0 text-info"><i class="ri-subtract-line me-1"></i> Deductions</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        {% if object.deductions_80c %}
+                        <tr>
+                            <td class="ps-3">Section 80C (PPF, ELSS, LIC, etc.)</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.deductions_80c }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if object.deductions_80d %}
+                        <tr>
+                            <td class="ps-3">Section 80D (Medical Insurance)</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.deductions_80d }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if object.deductions_80e %}
+                        <tr>
+                            <td class="ps-3">Section 80E (Education Loan Interest)</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.deductions_80e }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if object.deductions_80g %}
+                        <tr>
+                            <td class="ps-3">Section 80G (Donations)</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.deductions_80g }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if object.hra_exemption %}
+                        <tr>
+                            <td class="ps-3">HRA Exemption</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.hra_exemption }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if object.standard_deduction %}
+                        <tr>
+                            <td class="ps-3">Standard Deduction</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.standard_deduction }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if object.other_deductions %}
+                        <tr>
+                            <td class="ps-3">Other Deductions</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.other_deductions }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr class="table-light">
+                            <td class="ps-3 fw-bold">Total Deductions</td>
+                            <td class="text-end pe-3 fw-bold">{{ object.total_deductions|default:"0.00" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tax Calculation -->
+        <div class="card">
+            <div class="card-header bg-soft-warning">
+                <h5 class="mb-0 text-warning"><i class="ri-calculator-line me-1"></i> Tax Calculation</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="ps-3">Taxable Income</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.taxable_income }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">Tax on Income (as per slabs)</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.tax_on_income|default:object.tax_liability }}</td>
+                        </tr>
+                        {% if object.education_cess %}
+                        <tr>
+                            <td class="ps-3">Health & Education Cess (4%)</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.education_cess }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if object.surcharge %}
+                        <tr>
+                            <td class="ps-3">Surcharge</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.surcharge }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr class="table-warning">
+                            <td class="ps-3 fw-bold">Total Tax Liability</td>
+                            <td class="text-end pe-3 fw-bold">{{ object.tax_liability }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TDS Summary -->
+        <div class="card">
+            <div class="card-header bg-soft-primary">
+                <h5 class="mb-0 text-primary"><i class="ri-bank-line me-1"></i> TDS Summary</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="ps-3">Total Tax Liability</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.tax_liability }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">TDS Deducted (Year to Date)</td>
+                            <td class="text-end pe-3 fw-medium text-success">- {{ object.tds_deducted_ytd }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">Remaining Tax</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.remaining_tax|default:"0.00" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3">Remaining Months</td>
+                            <td class="text-end pe-3 fw-medium">{{ object.remaining_months|default:"-" }}</td>
+                        </tr>
+                        <tr class="table-primary">
+                            <td class="ps-3 fw-bold">Monthly TDS</td>
+                            <td class="text-end pe-3 fw-bold fs-5">{{ object.monthly_tds }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'payroll:tax_computation_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Summary Card -->
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <small class="text-muted d-block mb-1">Monthly TDS Deduction</small>
+                <h2 class="mb-0 text-primary">{{ object.monthly_tds }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
