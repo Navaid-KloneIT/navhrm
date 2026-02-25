@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Tax Computations{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Tax Computations</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item active">Tax Computations</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'payroll:tax_computation_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Financial Year</label>
+                            <select class="form-select" name="financial_year">
+                                <option value="">All Years</option>
+                                {% for fy in financial_years %}
+                                <option value="{{ fy }}" {% if request.GET.financial_year == fy %}selected{% endif %}>{{ fy }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'payroll:tax_computation_list' %}" class="btn btn-light w-100">Clear</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tax Computations Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">All Tax Computations</h5>
+                <form method="POST" action="{% url 'payroll:tax_computation_recalculate' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Are you sure you want to recalculate all tax computations?')">
+                        <i class="ri-refresh-line me-1"></i> Recalculate All
+                    </button>
+                </form>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>FY</th>
+                                <th>Regime</th>
+                                <th class="text-end">Total Income</th>
+                                <th class="text-end">Taxable Income</th>
+                                <th class="text-end">Tax Liability</th>
+                                <th class="text-end">TDS Deducted YTD</th>
+                                <th class="text-end">Monthly TDS</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for computation in object_list %}
+                            <tr>
+                                <td><span class="fw-medium">{{ computation.employee }}</span></td>
+                                <td>{{ computation.financial_year }}</td>
+                                <td>
+                                    {% if computation.regime == 'old' %}
+                                    <span class="badge bg-warning">Old</span>
+                                    {% else %}
+                                    <span class="badge bg-success">New</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">{{ computation.total_income }}</td>
+                                <td class="text-end">{{ computation.taxable_income }}</td>
+                                <td class="text-end">{{ computation.tax_liability }}</td>
+                                <td class="text-end">{{ computation.tds_deducted_ytd }}</td>
+                                <td class="text-end fw-medium">{{ computation.monthly_tds }}</td>
+                                <td>
+                                    <a href="{% url 'payroll:tax_computation_detail' computation.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="View Details">
+                                        <i class="ri-eye-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-calculator-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No tax computations found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.financial_year %}
+                                                Try adjusting your filter criteria.
+                                            {% else %}
+                                                Tax computations will appear here after payroll processing.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Tax computations pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.financial_year %}&financial_year={{ request.GET.financial_year }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.financial_year %}&financial_year={{ request.GET.financial_year }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.financial_year %}&financial_year={{ request.GET.financial_year }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
