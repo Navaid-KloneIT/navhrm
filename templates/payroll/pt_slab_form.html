@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Professional Tax Slab{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Professional Tax Slab</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:pt_slab_list' %}">Professional Tax Slabs</a></li>
+            <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}Add{% endif %}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Professional Tax Slab Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.state.id_for_label }}" class="form-label">
+                                State <span class="text-danger">*</span>
+                            </label>
+                            {% if form.state.field.choices %}
+                            <select name="{{ form.state.html_name }}"
+                                    id="{{ form.state.id_for_label }}"
+                                    class="form-select {% if form.state.errors %}is-invalid{% endif %}">
+                                <option value="">Select State</option>
+                                {% for value, label in form.state.field.choices %}
+                                <option value="{{ value }}" {% if form.state.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            {% else %}
+                            <input type="text"
+                                   name="{{ form.state.html_name }}"
+                                   id="{{ form.state.id_for_label }}"
+                                   class="form-control {% if form.state.errors %}is-invalid{% endif %}"
+                                   value="{{ form.state.value|default:'' }}"
+                                   placeholder="e.g., Maharashtra">
+                            {% endif %}
+                            {% for error in form.state.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="{{ form.salary_from.id_for_label }}" class="form-label">
+                                Salary From <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.salary_from.html_name }}"
+                                   id="{{ form.salary_from.id_for_label }}"
+                                   class="form-control {% if form.salary_from.errors %}is-invalid{% endif %}"
+                                   value="{{ form.salary_from.value|default:'' }}"
+                                   step="0.01" min="0">
+                            {% for error in form.salary_from.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="{{ form.salary_to.id_for_label }}" class="form-label">
+                                Salary To
+                            </label>
+                            <input type="number"
+                                   name="{{ form.salary_to.html_name }}"
+                                   id="{{ form.salary_to.id_for_label }}"
+                                   class="form-control {% if form.salary_to.errors %}is-invalid{% endif %}"
+                                   value="{{ form.salary_to.value|default:'' }}"
+                                   step="0.01" min="0"
+                                   placeholder="Leave blank for no upper limit">
+                            {% for error in form.salary_to.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.tax_amount.id_for_label }}" class="form-label">
+                                Tax Amount <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.tax_amount.html_name }}"
+                                   id="{{ form.tax_amount.id_for_label }}"
+                                   class="form-control {% if form.tax_amount.errors %}is-invalid{% endif %}"
+                                   value="{{ form.tax_amount.value|default:'' }}"
+                                   step="0.01" min="0">
+                            {% for error in form.tax_amount.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.effective_from.id_for_label }}" class="form-label">
+                                Effective From <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   name="{{ form.effective_from.html_name }}"
+                                   id="{{ form.effective_from.id_for_label }}"
+                                   class="form-control {% if form.effective_from.errors %}is-invalid{% endif %}"
+                                   value="{{ form.effective_from.value|default:'' }}">
+                            {% for error in form.effective_from.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label d-block">Active</label>
+                            <div class="form-check form-switch mt-2">
+                                <input type="checkbox"
+                                       name="{{ form.is_active.html_name }}"
+                                       id="{{ form.is_active.id_for_label }}"
+                                       class="form-check-input"
+                                       {% if form.is_active.value %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Mark as active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex gap-2 mb-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> {% if form.instance.pk %}Update{% else %}Save{% endif %} Slab
+                </button>
+                <a href="{% url 'payroll:pt_slab_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
