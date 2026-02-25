@@ -90,7 +90,7 @@
                                 <td>
                                     <div class="d-flex gap-1">
                                         {% if not choice.locked %}
-                                        <a href="{% url 'payroll:tax_regime_edit' choice.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Edit">
+                                        <a href="{% url 'payroll:tax_regime_set' %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Change Regime">
                                             <i class="ri-pencil-line"></i>
                                         </a>
                                         {% endif %}
