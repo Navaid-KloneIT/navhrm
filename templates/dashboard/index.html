@@ -497,7 +497,7 @@
                             {% for app in recent_applications %}
                             <tr>
                                 <td><span class="fw-medium">{{ app.candidate }}</span></td>
-                                <td>{{ app.job_requisition.title|truncatewords:4 }}</td>
+                                <td>{{ app.job.title|truncatewords:4 }}</td>
                                 <td>
                                     <span class="badge bg-{% if app.status == 'hired' %}success{% elif app.status == 'interview' or app.status == 'shortlisted' %}info{% elif app.status == 'rejected' %}danger{% elif app.status == 'offered' %}primary{% else %}secondary{% endif %}">
                                         {{ app.get_status_display }}
