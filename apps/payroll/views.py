@@ -569,7 +569,7 @@ class PayrollEntryDetailView(LoginRequiredMixin, View):
     def get(self, request, pk):
         entry = get_object_or_404(
             PayrollEntry.all_objects.select_related(
-                'employee', 'payroll_period', 'employee_salary_structure',
+                'employee', 'payroll_period', 'employee_salary',
             ),
             pk=pk,
             tenant=request.tenant,
