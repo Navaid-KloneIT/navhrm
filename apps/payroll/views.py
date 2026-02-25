@@ -1490,10 +1490,11 @@ class PayslipDownloadView(LoginRequiredMixin, View):
 class PayslipBulkGenerateView(LoginRequiredMixin, View):
     """Generates payslips for all entries in a payroll period. POST only."""
 
-    def post(self, request, pk):
+    def post(self, request):
+        period_pk = request.POST.get('period')
         period = get_object_or_404(
             PayrollPeriod.all_objects,
-            pk=pk,
+            pk=period_pk,
             tenant=request.tenant,
         )
         entries = (
