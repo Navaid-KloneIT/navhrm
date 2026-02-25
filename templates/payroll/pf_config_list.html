@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}PF Configurations{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>PF Configurations</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item active">PF Configurations</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- PF Configurations Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">All PF Configurations</h5>
+                <a href="{% url 'payroll:pf_config_create' %}" class="btn btn-primary btn-sm">
+                    <i class="ri-add-line me-1"></i> Add PF Configuration
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>PF Number</th>
+                                <th class="text-end">Employee Rate (%)</th>
+                                <th class="text-end">Employer Rate (%)</th>
+                                <th class="text-end">EPS Rate (%)</th>
+                                <th class="text-end">PF Ceiling</th>
+                                <th class="text-center">Active</th>
+                                <th>Effective From</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for config in object_list %}
+                            <tr>
+                                <td><span class="fw-medium">{{ config.pf_number }}</span></td>
+                                <td class="text-end">{{ config.employee_contribution_rate }}%</td>
+                                <td class="text-end">{{ config.employer_contribution_rate }}%</td>
+                                <td class="text-end">{{ config.eps_rate }}%</td>
+                                <td class="text-end">{{ config.pf_ceiling|default:"-" }}</td>
+                                <td class="text-center">
+                                    {% if config.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ config.effective_from|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'payroll:pf_config_edit' config.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Edit">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-shield-check-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No PF configurations found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            Add a PF configuration to get started.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="PF configurations pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
