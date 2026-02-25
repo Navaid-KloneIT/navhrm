@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Statutory Contributions{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Statutory Contributions</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item active">Statutory Contributions</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'payroll:statutory_contribution_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Contribution Type</label>
+                            <select class="form-select" name="contribution_type">
+                                <option value="">All Types</option>
+                                {% for value, label in contribution_types %}
+                                <option value="{{ value }}" {% if request.GET.contribution_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Payroll Period</label>
+                            <select class="form-select" name="payroll_period">
+                                <option value="">All Periods</option>
+                                {% for period in payroll_periods %}
+                                <option value="{{ period.pk }}" {% if request.GET.payroll_period == period.pk|stringformat:"s" %}selected{% endif %}>{{ period }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'payroll:statutory_contribution_list' %}" class="btn btn-light w-100">Clear</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statutory Contributions Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5 class="mb-0">All Statutory Contributions</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Period</th>
+                                <th>Type</th>
+                                <th class="text-end">Base Amount</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contribution in object_list %}
+                            <tr>
+                                <td><span class="fw-medium">{{ contribution.employee }}</span></td>
+                                <td>{{ contribution.payroll_period|default:contribution.period }}</td>
+                                <td>
+                                    <span class="badge bg-info">{{ contribution.get_contribution_type_display|default:contribution.contribution_type }}</span>
+                                </td>
+                                <td class="text-end">{{ contribution.base_amount }}</td>
+                                <td class="text-end fw-medium">{{ contribution.amount }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No statutory contributions found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.contribution_type or request.GET.payroll_period %}
+                                                Try adjusting your filter criteria.
+                                            {% else %}
+                                                Statutory contributions are auto-generated during payroll processing.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Statutory contributions pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.contribution_type %}&contribution_type={{ request.GET.contribution_type }}{% endif %}{% if request.GET.payroll_period %}&payroll_period={{ request.GET.payroll_period }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.contribution_type %}&contribution_type={{ request.GET.contribution_type }}{% endif %}{% if request.GET.payroll_period %}&payroll_period={{ request.GET.payroll_period }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.contribution_type %}&contribution_type={{ request.GET.contribution_type }}{% endif %}{% if request.GET.payroll_period %}&payroll_period={{ request.GET.payroll_period }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
