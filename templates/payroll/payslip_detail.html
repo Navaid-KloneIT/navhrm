@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Payslip - {{ object.employee }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+        .page-title-box,
+        .no-print,
+        .topbar,
+        .navbar,
+        .sidebar,
+        .footer,
+        .card-header .btn {
+            display: none !important;
+        }
+        .card {
+            border: 1px solid #dee2e6 !important;
+            box-shadow: none !important;
+        }
+        body {
+            background: #fff !important;
+        }
+        .content-page {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-title-box no-print">
+    <h4>Payslip</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:dashboard' %}">Payroll</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payroll:payslip_list' %}">Payslips</a></li>
+            <li class="breadcrumb-item active">{{ object.employee }}</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Print / Download Actions -->
+<div class="row mb-3 no-print">
+    <div class="col-12">
+        <div class="d-flex gap-2 justify-content-end">
+            <button onclick="window.print()" class="btn btn-soft-primary">
+                <i class="ri-printer-line me-1"></i> Print
+            </button>
+            <a href="{% url 'payroll:payslip_download' object.pk %}" class="btn btn-soft-success">
+                <i class="ri-download-2-line me-1"></i> Download PDF
+            </a>
+            <a href="{% url 'payroll:payslip_list' %}" class="btn btn-light">
+                <i class="ri-arrow-left-line me-1"></i> Back to List
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <!-- Company Header -->
+            <div class="card-header border-bottom-0">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h4 class="mb-1">{{ company.name|default:"Company Name" }}</h4>
+                        <p class="text-muted mb-0">{{ company.address|default:"" }}</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <h5 class="text-primary mb-1">PAYSLIP</h5>
+                        <p class="text-muted mb-0">{{ object.period|default:object.payroll_period }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <!-- Employee Info -->
+                <div class="row mb-4 pb-3 border-bottom">
+                    <div class="col-md-6">
+                        <div class="row g-2">
+                            <div class="col-5"><small class="text-muted">Employee Name</small></div>
+                            <div class="col-7"><span class="fw-medium">{{ object.employee }}</span></div>
+
+                            <div class="col-5"><small class="text-muted">Employee ID</small></div>
+                            <div class="col-7"><span class="fw-medium">{{ object.employee.employee_id|default:"-" }}</span></div>
+
+                            <div class="col-5"><small class="text-muted">Department</small></div>
+                            <div class="col-7"><span class="fw-medium">{{ object.employee.department|default:"-" }}</span></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row g-2">
+                            <div class="col-5"><small class="text-muted">Designation</small></div>
+                            <div class="col-7"><span class="fw-medium">{{ object.employee.designation|default:"-" }}</span></div>
+
+                            <div class="col-5"><small class="text-muted">Bank Account</small></div>
+                            <div class="col-7"><span class="fw-medium">{{ object.employee.bank_account_number|default:"-" }}</span></div>
+
+                            <div class="col-5"><small class="text-muted">PAN</small></div>
+                            <div class="col-7"><span class="fw-medium">{{ object.employee.pan_number|default:"-" }}</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earnings & Deductions -->
+                <div class="row">
+                    <!-- Earnings -->
+                    <div class="col-md-6">
+                        <table class="table table-sm">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Earnings</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for earning in object.earnings.all %}
+                                <tr>
+                                    <td>{{ earning.component|default:earning.name }}</td>
+                                    <td class="text-end">{{ earning.amount }}</td>
+                                </tr>
+                                {% empty %}
+                                {% if object.basic_salary %}
+                                <tr>
+                                    <td>Basic Salary</td>
+                                    <td class="text-end">{{ object.basic_salary }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if object.hra %}
+                                <tr>
+                                    <td>HRA</td>
+                                    <td class="text-end">{{ object.hra }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if object.special_allowance %}
+                                <tr>
+                                    <td>Special Allowance</td>
+                                    <td class="text-end">{{ object.special_allowance }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if object.other_allowances %}
+                                <tr>
+                                    <td>Other Allowances</td>
+                                    <td class="text-end">{{ object.other_allowances }}</td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <th>Total Earnings</th>
+                                    <th class="text-end">{{ object.total_earnings|default:object.gross_salary }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Deductions -->
+                    <div class="col-md-6">
+                        <table class="table table-sm">
+                            <thead class="table-danger">
+                                <tr>
+                                    <th>Deductions</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for deduction in object.deductions.all %}
+                                <tr>
+                                    <td>{{ deduction.component|default:deduction.name }}</td>
+                                    <td class="text-end">{{ deduction.amount }}</td>
+                                </tr>
+                                {% empty %}
+                                {% if object.pf_deduction %}
+                                <tr>
+                                    <td>Provident Fund</td>
+                                    <td class="text-end">{{ object.pf_deduction }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if object.esi_deduction %}
+                                <tr>
+                                    <td>ESI</td>
+                                    <td class="text-end">{{ object.esi_deduction }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if object.professional_tax %}
+                                <tr>
+                                    <td>Professional Tax</td>
+                                    <td class="text-end">{{ object.professional_tax }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if object.tds %}
+                                <tr>
+                                    <td>TDS (Income Tax)</td>
+                                    <td class="text-end">{{ object.tds }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if object.other_deductions %}
+                                <tr>
+                                    <td>Other Deductions</td>
+                                    <td class="text-end">{{ object.other_deductions }}</td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <th>Total Deductions</th>
+                                    <th class="text-end">{{ object.total_deductions }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Net Pay Summary -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="p-3 bg-primary bg-opacity-10 rounded text-center">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <small class="text-muted d-block">Total Earnings</small>
+                                    <span class="fw-bold text-success fs-5">{{ object.total_earnings|default:object.gross_salary }}</span>
+                                </div>
+                                <div class="col-md-1 d-none d-md-block">
+                                    <span class="fs-4 text-muted">-</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted d-block">Total Deductions</small>
+                                    <span class="fw-bold text-danger fs-5">{{ object.total_deductions }}</span>
+                                </div>
+                                <div class="col-md-1 d-none d-md-block">
+                                    <span class="fs-4 text-muted">=</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted d-block">Net Pay</small>
+                                    <span class="fw-bold text-primary fs-4">{{ object.net_pay|default:object.net_salary }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Note -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <p class="text-muted text-center mb-0" style="font-size: 12px;">
+                            This is a computer-generated payslip and does not require a signature.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
