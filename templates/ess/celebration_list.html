@@ -8,7 +8,7 @@
     <h4>Celebrations</h4>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
             <li class="breadcrumb-item active">Celebrations</li>
         </ol>
     </nav>
@@ -19,7 +19,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <form method="GET" action="{% url 'ess:celebration_list' %}">
+                <form method="GET">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-4">
                             <label class="form-label">Select Month</label>
@@ -41,8 +41,8 @@
 <div class="row mb-4">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <h5><i class="ri-cake-2-line me-2 text-danger"></i>Birthdays This Month</h5>
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0"><i class="ri-cake-2-line me-2 text-danger"></i>Birthdays This Month</h5>
             </div>
             <div class="card-body">
                 <div class="row g-3">
@@ -61,7 +61,7 @@
                             <div class="flex-grow-1">
                                 <h6 class="mb-1">{{ emp.first_name }} {{ emp.last_name }}</h6>
                                 <small class="text-muted d-block">{{ emp.department }}</small>
-                                <small class="text-muted"><i class="ri-cake-2-line me-1"></i>{{ emp.date_of_birth|date:"M d" }}</small>
+                                <small class="text-muted"><i class="ri-cake-2-line me-1"></i>{{ emp.date_of_birth|date:"d M" }}</small>
                             </div>
                             <div class="flex-shrink-0">
                                 {% wish_sent sent_wish_set emp.pk 'birthday' as already_wished %}
@@ -120,8 +120,8 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <h5><i class="ri-award-line me-2 text-warning"></i>Work Anniversaries This Month</h5>
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0"><i class="ri-award-line me-2 text-warning"></i>Work Anniversaries This Month</h5>
             </div>
             <div class="card-body">
                 <div class="row g-3">
@@ -140,7 +140,7 @@
                             <div class="flex-grow-1">
                                 <h6 class="mb-1">{{ emp.first_name }} {{ emp.last_name }}</h6>
                                 <small class="text-muted d-block">{{ emp.department }}</small>
-                                <small class="text-muted"><i class="ri-calendar-check-line me-1"></i>Joined {{ emp.date_of_joining|date:"M d, Y" }}</small>
+                                <small class="text-muted"><i class="ri-calendar-check-line me-1"></i>Joined {{ emp.date_of_joining|date:"d M Y" }}</small>
                             </div>
                             <div class="flex-shrink-0">
                                 {% wish_sent sent_wish_set emp.pk 'work_anniversary' as already_wished %}
