@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Self Service{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>Employee Self Service</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">ESS Dashboard</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'ess:my_profile' %}" class="btn btn-soft-primary">
+            <i class="ri-user-line me-1"></i> My Profile
+        </a>
+    </div>
+</div>
+
+<!-- Welcome Banner -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-primary bg-gradient text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    {% if employee.avatar %}
+                    <img src="{{ employee.avatar.url }}" alt="Avatar" class="rounded-circle me-3" width="64" height="64" style="object-fit: cover;">
+                    {% else %}
+                    <div class="rounded-circle bg-white bg-opacity-25 d-flex align-items-center justify-content-center me-3" style="width: 64px; height: 64px;">
+                        <i class="ri-user-3-line text-white" style="font-size: 28px;"></i>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <h5 class="text-white mb-1">Welcome back, {{ employee.first_name }}!</h5>
+                        <p class="mb-0 text-white-50">{{ employee.designation|default:"-" }} &middot; {{ employee.department|default:"-" }} &middot; {{ employee.employee_id }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-4 col-xl-2 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-2">
+                    <i class="ri-calendar-check-line text-warning" style="font-size: 28px;"></i>
+                </div>
+                <h4 class="mb-1">{{ pending_leaves|length }}</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">Pending Leaves</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-2 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-2">
+                    <i class="ri-time-line text-info" style="font-size: 28px;"></i>
+                </div>
+                <h4 class="mb-1">{{ pending_regularizations|length }}</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">Regularizations</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-2 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-2">
+                    <i class="ri-file-text-line text-primary" style="font-size: 28px;"></i>
+                </div>
+                <h4 class="mb-1">{{ pending_doc_requests|length }}</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">Doc Requests</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-2 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-2">
+                    <i class="ri-laptop-line text-success" style="font-size: 28px;"></i>
+                </div>
+                <h4 class="mb-1">{{ pending_asset_requests|length }}</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">Asset Requests</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-2 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-2">
+                    <i class="ri-id-card-line text-secondary" style="font-size: 28px;"></i>
+                </div>
+                <h4 class="mb-1">{{ pending_idcard_requests|length }}</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">ID Card Requests</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-2 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-2">
+                    <i class="ri-customer-service-2-line text-danger" style="font-size: 28px;"></i>
+                </div>
+                <h4 class="mb-1">{{ open_tickets|length }}</h4>
+                <p class="text-muted mb-0" style="font-size: 13px;">Open Tickets</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Announcements -->
+    <div class="col-lg-8 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="ri-megaphone-line me-1"></i> Recent Announcements</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for announcement in recent_announcements %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ announcement.title }}</h6>
+                                <p class="text-muted mb-0" style="font-size: 13px;">{{ announcement.content|truncatewords:25 }}</p>
+                            </div>
+                            <small class="text-muted text-nowrap ms-3">{{ announcement.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item text-center py-4">
+                        <div class="text-muted">
+                            <i class="ri-megaphone-line" style="font-size: 36px; opacity: 0.3;"></i>
+                            <p class="mt-2 mb-0">No recent announcements.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Surveys -->
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="ri-survey-line me-1"></i> Active Surveys</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for survey in active_surveys %}
+                    <div class="list-group-item">
+                        <h6 class="mb-1">{{ survey.title }}</h6>
+                        <small class="text-muted">Due: {{ survey.end_date|date:"M d, Y"|default:"N/A" }}</small>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item text-center py-4">
+                        <div class="text-muted">
+                            <i class="ri-survey-line" style="font-size: 36px; opacity: 0.3;"></i>
+                            <p class="mt-2 mb-0">No active surveys.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Birthdays -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="ri-cake-2-line me-1"></i> Upcoming Birthdays</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for person in birthdays %}
+                    <div class="list-group-item d-flex align-items-center">
+                        <div class="rounded-circle bg-soft-primary text-primary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px;">
+                            <i class="ri-cake-2-line"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">{{ person.first_name }} {{ person.last_name }}</h6>
+                            <small class="text-muted">{{ person.date_of_birth|date:"M d" }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item text-center py-4">
+                        <div class="text-muted">
+                            <i class="ri-cake-2-line" style="font-size: 36px; opacity: 0.3;"></i>
+                            <p class="mt-2 mb-0">No upcoming birthdays.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Work Anniversaries -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="ri-award-line me-1"></i> Work Anniversaries</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for person in anniversaries %}
+                    <div class="list-group-item d-flex align-items-center">
+                        <div class="rounded-circle bg-soft-success text-success d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px;">
+                            <i class="ri-award-line"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">{{ person.first_name }} {{ person.last_name }}</h6>
+                            <small class="text-muted">Joined {{ person.date_of_joining|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item text-center py-4">
+                        <div class="text-muted">
+                            <i class="ri-award-line" style="font-size: 36px; opacity: 0.3;"></i>
+                            <p class="mt-2 mb-0">No upcoming work anniversaries.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
