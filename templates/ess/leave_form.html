@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Employee Self Service</li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:leave_list' %}">My Leaves</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Leave Application</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label for="{{ form.leave_type.id_for_label }}" class="form-label">
+                        Leave Type <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.leave_type.html_name }}"
+                            id="{{ form.leave_type.id_for_label }}"
+                            class="form-select {% if form.leave_type.errors %}is-invalid{% endif %}">
+                        <option value="">Select Leave Type</option>
+                        {% for choice in form.leave_type.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.leave_type.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.leave_type.errors %}<div class="invalid-feedback">{{ form.leave_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.from_date.id_for_label }}" class="form-label">
+                        From Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           name="{{ form.from_date.html_name }}"
+                           id="{{ form.from_date.id_for_label }}"
+                           class="form-control {% if form.from_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.from_date.value|default:'' }}">
+                    {% if form.from_date.errors %}<div class="invalid-feedback">{{ form.from_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.to_date.id_for_label }}" class="form-label">
+                        To Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           name="{{ form.to_date.html_name }}"
+                           id="{{ form.to_date.id_for_label }}"
+                           class="form-control {% if form.to_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.to_date.value|default:'' }}">
+                    {% if form.to_date.errors %}<div class="invalid-feedback">{{ form.to_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.from_day_type.id_for_label }}" class="form-label">
+                        From Day Type <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.from_day_type.html_name }}"
+                            id="{{ form.from_day_type.id_for_label }}"
+                            class="form-select {% if form.from_day_type.errors %}is-invalid{% endif %}">
+                        {% for value, label in form.from_day_type.field.choices %}
+                        {% if value %}
+                        <option value="{{ value }}" {% if form.from_day_type.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.from_day_type.errors %}<div class="invalid-feedback">{{ form.from_day_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.to_day_type.id_for_label }}" class="form-label">
+                        To Day Type <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.to_day_type.html_name }}"
+                            id="{{ form.to_day_type.id_for_label }}"
+                            class="form-select {% if form.to_day_type.errors %}is-invalid{% endif %}">
+                        {% for value, label in form.to_day_type.field.choices %}
+                        {% if value %}
+                        <option value="{{ value }}" {% if form.to_day_type.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.to_day_type.errors %}<div class="invalid-feedback">{{ form.to_day_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label for="{{ form.reason.id_for_label }}" class="form-label">
+                        Reason <span class="text-danger">*</span>
+                    </label>
+                    <textarea name="{{ form.reason.html_name }}"
+                              id="{{ form.reason.id_for_label }}"
+                              class="form-control {% if form.reason.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Please provide the reason for your leave...">{{ form.reason.value|default:'' }}</textarea>
+                    {% if form.reason.errors %}<div class="invalid-feedback">{{ form.reason.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label for="{{ form.document.id_for_label }}" class="form-label">
+                        Supporting Document
+                    </label>
+                    <input type="file"
+                           name="{{ form.document.html_name }}"
+                           id="{{ form.document.id_for_label }}"
+                           class="form-control {% if form.document.errors %}is-invalid{% endif %}">
+                    {% if form.document.errors %}<div class="invalid-feedback">{{ form.document.errors.0 }}</div>{% endif %}
+                    <small class="text-muted">Upload medical certificate or other supporting documents if required.</small>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-send-plane-line me-1"></i> Submit Leave Application
+                </button>
+                <a href="{% url 'ess:leave_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
