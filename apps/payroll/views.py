@@ -1453,11 +1453,29 @@ class BankFileGenerateView(LoginRequiredMixin, View):
     def post(self, request):
         form = BankFileGenerateForm(request.POST, tenant=request.tenant)
         if form.is_valid():
-            obj = form.save(commit=False)
-            obj.tenant = request.tenant
-            obj.generated_by = request.user
-            obj.generated_date = timezone.now()
-            obj.save()
+            period = form.cleaned_data['payroll_period']
+            bank_format = form.cleaned_data['bank_format']
+            remarks = form.cleaned_data.get('remarks', '')
+            entries = PayrollEntry.all_objects.filter(
+                tenant=request.tenant,
+                payroll_period=period,
+                status__in=['approved', 'paid'],
+            )
+            total_amount = sum(e.net_pay for e in entries)
+            employee_count = entries.count()
+            format_label = dict(BankFile.BANK_FORMAT_CHOICES).get(bank_format, bank_format)
+            file_name = f"{format_label}_{period.name}_{timezone.now().strftime('%Y%m%d%H%M%S')}"
+            obj = BankFile.objects.create(
+                tenant=request.tenant,
+                payroll_period=period,
+                file_name=file_name,
+                bank_format=bank_format,
+                total_amount=total_amount,
+                employee_count=employee_count,
+                status='generated',
+                generated_at=timezone.now(),
+                remarks=remarks,
+            )
             messages.success(request, 'Bank file generated successfully.')
             return redirect('payroll:bank_file_detail', pk=obj.pk)
         return render(request, 'payroll/bank_file_generate_form.html', {'form': form})
