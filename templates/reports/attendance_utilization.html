@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% load report_tags %}
+
+{% block title %}Attendance Utilization Report{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Attendance Utilization Report</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'reports:reports_dashboard' %}">Reports</a></li>
+            <li class="breadcrumb-item active">Attendance Utilization</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Month</label>
+                        {{ form.month }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Year</label>
+                        {{ form.year }}
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-filter-3-line me-1"></i> Apply
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Hours Worked</p>
+                        <h3 class="stats-value mb-0">{{ total_hours }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-primary text-primary">
+                        <i class="ri-time-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">{{ selected_month }} {{ selected_year }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Avg Hours/Day</p>
+                        <h3 class="stats-value mb-0">{{ avg_hours }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-info text-info">
+                        <i class="ri-bar-chart-box-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Across {{ total_present_days }} present days</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Utilization %</p>
+                        <h3 class="stats-value mb-0">{{ utilization_pct }}%</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-success text-success">
+                        <i class="ri-pie-chart-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Overall workforce utilization</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Billable Hours</p>
+                        <h3 class="stats-value mb-0">{{ billable_hours }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-warning text-warning">
+                        <i class="ri-money-dollar-circle-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">From approved timesheets</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Department Utilization Chart -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Department Utilization % - {{ selected_month }} {{ selected_year }}</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="deptUtilizationChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Timesheet Summary Card -->
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Timesheet Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-soft-success text-success mb-3" style="width:56px;height:56px;">
+                                <i class="ri-checkbox-circle-line fs-4"></i>
+                            </div>
+                            <h3 class="mb-1">{{ approved_timesheets }}</h3>
+                            <p class="text-muted mb-0">Approved Timesheets</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-soft-primary text-primary mb-3" style="width:56px;height:56px;">
+                                <i class="ri-time-line fs-4"></i>
+                            </div>
+                            <h3 class="mb-1">{{ timesheet_hours }}</h3>
+                            <p class="text-muted mb-0">Timesheet Hours</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-soft-warning text-warning mb-3" style="width:56px;height:56px;">
+                                <i class="ri-money-dollar-circle-line fs-4"></i>
+                            </div>
+                            <h3 class="mb-1">{{ billable_hours }}</h3>
+                            <p class="text-muted mb-0">Billable Hours</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deptLabels = {{ dept_labels|safe }};
+    const deptUtilization = {{ dept_utilization|safe }};
+
+    const ctx = document.getElementById('deptUtilizationChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: deptLabels,
+            datasets: [{
+                label: 'Utilization %',
+                data: deptUtilization,
+                backgroundColor: function(context) {
+                    const value = context.parsed.y;
+                    if (value >= 90) return '#45cb85';
+                    if (value >= 70) return '#39afd1';
+                    if (value >= 50) return '#ffbe0b';
+                    return '#ef5350';
+                },
+                borderColor: function(context) {
+                    const value = context.parsed.y;
+                    if (value >= 90) return '#45cb85';
+                    if (value >= 70) return '#39afd1';
+                    if (value >= 50) return '#ffbe0b';
+                    return '#ef5350';
+                },
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + '% utilization';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Utilization %'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
