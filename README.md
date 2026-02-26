@@ -42,6 +42,11 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Learning Management (LMS)** - Course management with content types (video/document/SCORM/blended), course content ordering, role-based learning paths with ordered course sequences, assessments (quizzes/tests/certification exams) with multiple question types, gamification with badges and points, course enrollment with progress tracking (completion status, time spent, scores)
 - **Training Administration** - Employee nomination with approval/rejection workflow, session attendance tracking (present/absent/late/excused), post-training feedback with multi-criteria ratings (overall/content/instructor/relevance), auto-generated completion certificates with expiry tracking, department-wise training budget allocation and utilization tracking
 
+### Employee Self-Service Module
+- **Personal Information** - Profile management (personal/contact/bank details), avatar upload, emergency contacts CRUD, family members with dependent/nominee tracking, insurance coverage, personal document viewer
+- **Request Management** - Leave application (wraps attendance module), attendance regularization requests, document requests (experience letter/salary certificate/employment certificate/bonafide/address proof), ID card requests (new/replacement/renewal/update), asset requests (laptop/monitor/headset/furniture/etc.) with priority levels and approval workflow
+- **Communication Hub** - Company/department announcements with pinning and priority, birthday & work anniversary celebrations with wish sending, employee engagement surveys with multiple question types (text/single choice/multiple choice/rating/yes-no), anonymous suggestion box with upvotes and admin response, HR help desk ticketing system with comment threads and status tracking
+
 ### Recruitment Module
 - **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
 - **Job Templates** - Pre-defined job description templates for quick requisition creation
@@ -125,6 +130,7 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
    python manage.py seed_payout
    python manage.py seed_performance
    python manage.py seed_training
+   python manage.py seed_ess
    ```
 
 8. **Run the development server**
@@ -164,7 +170,8 @@ navhrm/
 │   ├── attendance/        # Attendance, leave, time tracking, holidays
 │   ├── payroll/           # Salary structure, payroll, statutory, tax, payout
 │   ├── performance/       # Goals, reviews, feedback, PIP, warnings, coaching
-│   └── training/          # Training management, LMS, administration
+│   ├── training/          # Training management, LMS, administration
+│   └── ess/               # Employee self-service, requests, communication
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS
@@ -183,7 +190,8 @@ navhrm/
 │   ├── attendance/        # Attendance & leave module templates
 │   ├── payroll/           # Payroll module templates (44 files)
 │   ├── performance/       # Performance management templates (33 files)
-│   └── training/          # Training & development templates (35 files)
+│   ├── training/          # Training & development templates (35 files)
+│   └── ess/               # Employee self-service templates (39 files)
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
