@@ -542,6 +542,111 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Self-Service <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- My Profile -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'ess' and 'profile' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'emergency_contact' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'family' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'my_documents' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-user-line"></i>
+                    <span class="menu-text">My Profile</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'ess' and 'profile' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'emergency_contact' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'family' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'my_documents' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:profile' %}" class="menu-link {% if request.resolver_match.url_name == 'profile' and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">View Profile</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:emergency_contact_list' %}" class="menu-link {% if 'emergency_contact' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">Emergency Contacts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:family_list' %}" class="menu-link {% if 'family' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">Family Members</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:my_documents' %}" class="menu-link {% if request.resolver_match.url_name == 'my_documents' and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">My Documents</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- My Requests -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'ess' and 'leave' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'regularization' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'document_request' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'idcard_request' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'asset_request' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-list-3-line"></i>
+                    <span class="menu-text">My Requests</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'ess' and 'leave' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'regularization' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'document_request' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'idcard_request' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'asset_request' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:leave_list' %}" class="menu-link {% if 'leave' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">Leave Requests</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:regularization_list' %}" class="menu-link {% if 'regularization' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">Regularization</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:document_request_list' %}" class="menu-link {% if 'document_request' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">Document Requests</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:idcard_request_list' %}" class="menu-link {% if 'idcard_request' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">ID Card Requests</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:asset_request_list' %}" class="menu-link {% if 'asset_request' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">Asset Requests</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Communication -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'ess' and 'announcement' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'celebration' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'wish' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'survey' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'suggestion' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'ticket' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-chat-3-line"></i>
+                    <span class="menu-text">Communication</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'ess' and 'announcement' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'celebration' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'wish' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'survey' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'suggestion' in request.resolver_match.url_name or request.resolver_match.app_name == 'ess' and 'ticket' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:announcement_list' %}" class="menu-link {% if 'announcement' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">Announcements</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:celebration_list' %}" class="menu-link {% if 'celebration' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' or 'wish' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">Celebrations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:survey_list' %}" class="menu-link {% if 'survey' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">Surveys</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:suggestion_list' %}" class="menu-link {% if 'suggestion' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">Suggestions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ess:ticket_list' %}" class="menu-link {% if 'ticket' in request.resolver_match.url_name and request.resolver_match.app_name == 'ess' %}active{% endif %}">
+                            <span class="menu-text">Help Desk</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Payroll <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Salary Structure -->
