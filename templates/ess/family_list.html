@@ -4,28 +4,67 @@
 
 {% block content %}
 <div class="page-title-box">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h4>Family Members</h4>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'ess:profile' %}">My Profile</a></li>
-                    <li class="breadcrumb-item active">Family Members</li>
-                </ol>
-            </nav>
+    <h4>Family Members</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:profile' %}">My Profile</a></li>
+            <li class="breadcrumb-item active">Family Members</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Search by name or occupation...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Relationship</label>
+                            <select class="form-select" name="relationship">
+                                <option value="">All Relationships</option>
+                                {% for value, label in relationship_choices %}
+                                <option value="{{ value }}" {% if request.GET.relationship == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Dependent</label>
+                            <select class="form-select" name="dependent">
+                                <option value="">All</option>
+                                <option value="yes" {% if request.GET.dependent == 'yes' %}selected{% endif %}>Dependents Only</option>
+                                <option value="no" {% if request.GET.dependent == 'no' %}selected{% endif %}>Non-Dependents</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'ess:family_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> Add Member
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-        <a href="{% url 'ess:family_create' %}" class="btn btn-primary">
-            <i class="ri-add-line me-1"></i> Add Family Member
-        </a>
     </div>
 </div>
 
+<!-- Table -->
 <div class="row">
     <div class="col-12">
         <div class="card table-card">
-            <div class="card-header">
-                <h5>All Family Members</h5>
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Family Members</h5>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -36,6 +75,7 @@
                                 <th>Relationship</th>
                                 <th>Date of Birth</th>
                                 <th>Gender</th>
+                                <th>Occupation</th>
                                 <th>Dependent</th>
                                 <th>Nominee</th>
                                 <th>Insurance</th>
@@ -47,8 +87,9 @@
                             <tr>
                                 <td class="fw-medium">{{ member.name }}</td>
                                 <td>{{ member.get_relationship_display }}</td>
-                                <td>{{ member.date_of_birth|date:"M d, Y"|default:"-" }}</td>
+                                <td>{{ member.date_of_birth|date:"d M Y"|default:"-" }}</td>
                                 <td>{{ member.get_gender_display|default:"-" }}</td>
+                                <td>{{ member.occupation|default:"-" }}</td>
                                 <td>
                                     {% if member.is_dependent %}
                                     <span class="badge bg-soft-success text-success">Yes</span>
@@ -86,13 +127,13 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="8" class="text-center py-5">
+                                <td colspan="9" class="text-center py-5">
                                     <div class="text-muted">
                                         <i class="ri-group-line" style="font-size: 48px; opacity: 0.3;"></i>
                                         <p class="mt-2 mb-1">No family members found</p>
-                                        <p class="mb-0" style="font-size: 13px;">
-                                            Add your family members for records and insurance purposes.
-                                        </p>
+                                        <a href="{% url 'ess:family_create' %}" class="btn btn-sm btn-primary mt-2">
+                                            <i class="ri-add-line me-1"></i> Add First Member
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
