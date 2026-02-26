@@ -3,7 +3,8 @@ from apps.employees.models import Employee, EmergencyContact
 from apps.attendance.models import LeaveApplication, LeaveType, AttendanceRegularization, Attendance
 from .models import (
     FamilyMember, DocumentRequest, IDCardRequest, AssetRequest,
-    BirthdayWish, Suggestion, HelpDeskTicket, TicketComment,
+    Announcement, BirthdayWish, Survey, SurveyQuestion,
+    Suggestion, HelpDeskTicket, TicketComment,
 )
 
 
@@ -199,6 +200,76 @@ class AssetRequestForm(forms.ModelForm):
 # ===========================================================================
 # 7.3 Communication Hub
 # ===========================================================================
+
+class AnnouncementForm(forms.ModelForm):
+    class Meta:
+        model = Announcement
+        fields = ['title', 'content', 'category', 'priority', 'publish_date',
+                  'expiry_date', 'is_pinned', 'target_departments', 'attachment']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'priority': forms.Select(attrs={'class': 'form-select'}),
+            'publish_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'expiry_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'is_pinned': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'target_departments': forms.SelectMultiple(attrs={'class': 'form-select', 'size': 5}),
+            'attachment': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, tenant=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if tenant:
+            from apps.organization.models import Department
+            self.fields['target_departments'].queryset = Department.objects.filter(tenant=tenant)
+        self.fields['target_departments'].required = False
+        self.fields['expiry_date'].required = False
+        self.fields['target_departments'].help_text = 'Leave empty for company-wide. Hold Ctrl to select multiple.'
+
+
+class SurveyForm(forms.ModelForm):
+    class Meta:
+        model = Survey
+        fields = ['title', 'description', 'start_date', 'end_date',
+                  'is_anonymous', 'target_departments']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'is_anonymous': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'target_departments': forms.SelectMultiple(attrs={'class': 'form-select', 'size': 5}),
+        }
+
+    def __init__(self, *args, tenant=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if tenant:
+            from apps.organization.models import Department
+            self.fields['target_departments'].queryset = Department.objects.filter(tenant=tenant)
+        self.fields['target_departments'].required = False
+        self.fields['target_departments'].help_text = 'Leave empty for all departments. Hold Ctrl to select multiple.'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start = cleaned_data.get('start_date')
+        end = cleaned_data.get('end_date')
+        if start and end and end < start:
+            raise forms.ValidationError('End date must be on or after the start date.')
+
+
+class SurveyQuestionForm(forms.ModelForm):
+    class Meta:
+        model = SurveyQuestion
+        fields = ['question_text', 'question_type', 'choices', 'is_required', 'order']
+        widgets = {
+            'question_text': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter question'}),
+            'question_type': forms.Select(attrs={'class': 'form-select'}),
+            'choices': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Option1|Option2|Option3'}),
+            'is_required': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+        }
+
 
 class BirthdayWishForm(forms.ModelForm):
     class Meta:
