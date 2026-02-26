@@ -4,28 +4,67 @@
 
 {% block content %}
 <div class="page-title-box">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h4>Emergency Contacts</h4>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'ess:profile' %}">My Profile</a></li>
-                    <li class="breadcrumb-item active">Emergency Contacts</li>
-                </ol>
-            </nav>
+    <h4>Emergency Contacts</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:profile' %}">My Profile</a></li>
+            <li class="breadcrumb-item active">Emergency Contacts</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Search by name or phone...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Relationship</label>
+                            <select class="form-select" name="relationship">
+                                <option value="">All Relationships</option>
+                                {% for value, label in relationship_choices %}
+                                <option value="{{ value }}" {% if request.GET.relationship == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Primary</label>
+                            <select class="form-select" name="primary">
+                                <option value="">All</option>
+                                <option value="yes" {% if request.GET.primary == 'yes' %}selected{% endif %}>Primary Only</option>
+                                <option value="no" {% if request.GET.primary == 'no' %}selected{% endif %}>Non-Primary</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'ess:emergency_contact_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> Add Contact
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-        <a href="{% url 'ess:emergency_contact_create' %}" class="btn btn-primary">
-            <i class="ri-add-line me-1"></i> Add Contact
-        </a>
     </div>
 </div>
 
+<!-- Table -->
 <div class="row">
     <div class="col-12">
         <div class="card table-card">
-            <div class="card-header">
-                <h5>All Emergency Contacts</h5>
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Emergency Contacts</h5>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -36,6 +75,7 @@
                                 <th>Relationship</th>
                                 <th>Phone</th>
                                 <th>Email</th>
+                                <th>Address</th>
                                 <th>Primary</th>
                                 <th>Actions</th>
                             </tr>
@@ -47,6 +87,7 @@
                                 <td>{{ contact.get_relationship_display }}</td>
                                 <td>{{ contact.phone }}</td>
                                 <td>{{ contact.email|default:"-" }}</td>
+                                <td>{{ contact.address|truncatewords:8|default:"-" }}</td>
                                 <td>
                                     {% if contact.is_primary %}
                                     <span class="badge bg-soft-success text-success">Primary</span>
@@ -70,13 +111,13 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="6" class="text-center py-5">
+                                <td colspan="7" class="text-center py-5">
                                     <div class="text-muted">
                                         <i class="ri-phone-line" style="font-size: 48px; opacity: 0.3;"></i>
                                         <p class="mt-2 mb-1">No emergency contacts found</p>
-                                        <p class="mb-0" style="font-size: 13px;">
-                                            Add your emergency contacts for safety purposes.
-                                        </p>
+                                        <a href="{% url 'ess:emergency_contact_create' %}" class="btn btn-sm btn-primary mt-2">
+                                            <i class="ri-add-line me-1"></i> Add First Contact
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
