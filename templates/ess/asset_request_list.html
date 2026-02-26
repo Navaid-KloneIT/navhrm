@@ -7,8 +7,8 @@
     <h4>My Asset Requests</h4>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
-            <li class="breadcrumb-item">Employee Self Service</li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:asset_request_list' %}">My Requests</a></li>
             <li class="breadcrumb-item active">Asset Requests</li>
         </ol>
     </nav>
@@ -19,9 +19,31 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <form method="GET" action="{% url 'ess:asset_request_list' %}">
+                <form method="GET">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Search by asset name...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Asset Type</label>
+                            <select class="form-select" name="type">
+                                <option value="">All Types</option>
+                                {% for value, label in asset_type_choices %}
+                                <option value="{{ value }}" {% if request.GET.type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" name="priority">
+                                <option value="">All</option>
+                                {% for value, label in priority_choices %}
+                                <option value="{{ value }}" {% if request.GET.priority == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
                             <label class="form-label">Status</label>
                             <select class="form-select" name="status">
                                 <option value="">All Statuses</option>
@@ -30,13 +52,13 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <button type="submit" class="btn btn-primary w-100">
-                                <i class="ri-filter-3-line me-1"></i> Filter
+                                <i class="ri-filter-3-line"></i>
                             </button>
                         </div>
-                        <div class="col-md-7 text-end">
-                            <a href="{% url 'ess:asset_request_create' %}" class="btn btn-success">
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'ess:asset_request_create' %}" class="btn btn-primary">
                                 <i class="ri-add-line me-1"></i> Request Asset
                             </a>
                         </div>
@@ -47,11 +69,11 @@
     </div>
 </div>
 
-<!-- Asset Requests Table -->
+<!-- Table -->
 <div class="row">
     <div class="col-12">
         <div class="card table-card">
-            <div class="card-header">
+            <div class="card-header d-flex align-items-center justify-content-between">
                 <h5 class="mb-0">My Asset Requests</h5>
             </div>
             <div class="card-body p-0">
@@ -70,7 +92,7 @@
                         <tbody>
                             {% for req in requests %}
                             <tr>
-                                <td><span class="fw-medium">{{ req.asset_name }}</span></td>
+                                <td class="fw-medium">{{ req.asset_name }}</td>
                                 <td>{{ req.get_asset_type_display }}</td>
                                 <td>
                                     {% if req.priority == 'low' %}
@@ -96,7 +118,7 @@
                                     <span class="badge bg-soft-secondary text-secondary">Cancelled</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ req.created_at|date:"M d, Y" }}</td>
+                                <td>{{ req.created_at|date:"d M Y" }}</td>
                                 <td>
                                     <div class="d-flex gap-1">
                                         <a href="{% url 'ess:asset_request_detail' req.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="View Details">
@@ -112,7 +134,7 @@
                                         <i class="ri-laptop-line" style="font-size: 48px; opacity: 0.3;"></i>
                                         <p class="mt-2 mb-1">No asset requests found</p>
                                         <p class="mb-0" style="font-size: 13px;">
-                                            {% if request.GET.status %}
+                                            {% if request.GET.status or request.GET.search or request.GET.type or request.GET.priority %}
                                                 Try adjusting your filter criteria.
                                             {% else %}
                                                 Your asset requests will appear here when submitted.
@@ -130,9 +152,9 @@
             {% if page_obj.has_other_pages %}
             <div class="card-footer">
                 <nav><ul class="pagination justify-content-center mb-0">
-                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>{% endif %}
-                    {% for num in page_obj.paginator.page_range %}{% if page_obj.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}<li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a></li>{% endif %}{% endfor %}
-                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>{% endif %}
+                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.priority %}&priority={{ request.GET.priority }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>{% endif %}
+                    {% for num in page_obj.paginator.page_range %}{% if page_obj.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}<li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.priority %}&priority={{ request.GET.priority }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a></li>{% endif %}{% endfor %}
+                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.priority %}&priority={{ request.GET.priority }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>{% endif %}
                 </ul></nav>
             </div>
             {% endif %}
