@@ -128,7 +128,7 @@
                 {% endif %}
                 <div class="mb-0">
                     <small class="text-muted">Attendance</small>
-                    <div class="fw-medium">{{ attendance_list|length|default:"0" }} participant{{ attendance_list|length|pluralize }}</div>
+                    <div class="fw-medium">{{ attendance_records|length|default:"0" }} participant{{ attendance_records|length|pluralize }}</div>
                 </div>
             </div>
         </div>
@@ -155,7 +155,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for attendance in attendance_list %}
+                            {% for attendance in attendance_records %}
                             <tr>
                                 <td class="fw-medium">{{ attendance.employee }}</td>
                                 <td>
@@ -171,13 +171,9 @@
                                     <span class="badge bg-soft-secondary text-secondary">{{ attendance.get_status_display }}</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ attendance.check_in|time:"h:i A"|default:"-" }}</td>
-                                <td>{{ attendance.check_out|time:"h:i A"|default:"-" }}</td>
-                                <td>
-                                    <a href="{% url 'training:attendance_edit' attendance.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
-                                        <i class="ri-pencil-line"></i>
-                                    </a>
-                                </td>
+                                <td>{{ attendance.check_in_time|time:"h:i A"|default:"-" }}</td>
+                                <td>{{ attendance.check_out_time|time:"h:i A"|default:"-" }}</td>
+                                <td>-</td>
                             </tr>
                             {% empty %}
                             <tr>
@@ -194,7 +190,7 @@
             <!-- Mark Attendance Form -->
             <div class="card-footer">
                 <h6 class="mb-3">Mark Attendance</h6>
-                <form method="post" action="{% url 'training:attendance_create' session.pk %}" novalidate>
+                <form method="post" action="{% url 'training:mark_attendance' session.pk %}" novalidate>
                     {% csrf_token %}
                     <div class="row g-3 align-items-end">
                         <!-- Employee -->
