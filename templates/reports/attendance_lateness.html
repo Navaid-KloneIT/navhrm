@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% load report_tags %}
+
+{% block title %}Lateness Report{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Lateness Report</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'reports:reports_dashboard' %}">Reports</a></li>
+            <li class="breadcrumb-item active">Lateness Report</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Month</label>
+                        {{ form.month }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Year</label>
+                        {{ form.year }}
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-filter-3-line me-1"></i> Apply
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-4 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Late Arrivals</p>
+                        <h3 class="stats-value mb-0">{{ total_late }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-danger text-danger">
+                        <i class="ri-time-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">{{ selected_month }} {{ selected_year }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Early Departures</p>
+                        <h3 class="stats-value mb-0">{{ total_early_dep }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-warning text-warning">
+                        <i class="ri-logout-box-r-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Left before shift end</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Avg Late Minutes</p>
+                        <h3 class="stats-value mb-0">{{ avg_late_minutes }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-info text-info">
+                        <i class="ri-timer-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Average minutes late per occurrence</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lateness by Day of Week Chart -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Lateness by Day of Week - {{ selected_month }} {{ selected_year }}</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="latenessByDayChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Latecomers Table -->
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Top Latecomers</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Late Count</th>
+                                <th>Avg Minutes Late</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in top_latecomers %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ item.employee__employee_id }}</td>
+                                <td>
+                                    <span class="fw-medium">{{ item.employee__first_name }} {{ item.employee__last_name }}</span>
+                                </td>
+                                <td>{{ item.employee__department__name|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-danger">{{ item.late_count }}</span>
+                                </td>
+                                <td>{{ item.avg_minutes|floatformat:1 }} min</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">No lateness records found for this period</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dayLabels = {{ day_labels|safe }};
+    const dayData = {{ day_data|safe }};
+
+    const ctx = document.getElementById('latenessByDayChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dayLabels,
+            datasets: [{
+                label: 'Late Arrivals',
+                data: dayData,
+                backgroundColor: [
+                    '#4b38b3',
+                    '#45cb85',
+                    '#39afd1',
+                    '#ffbe0b',
+                    '#ef5350',
+                    '#4b38b3',
+                    '#45cb85'
+                ],
+                borderColor: [
+                    '#4b38b3',
+                    '#45cb85',
+                    '#39afd1',
+                    '#ffbe0b',
+                    '#ef5350',
+                    '#4b38b3',
+                    '#45cb85'
+                ],
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + ' late arrivals';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
