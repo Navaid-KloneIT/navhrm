@@ -792,6 +792,13 @@ class AnnouncementCreateView(EmployeeSelfServiceMixin, View):
 # 7.3 Celebrations (Birthday / Work Anniversary)
 # ===========================================================================
 
+MONTH_CHOICES = [
+    (1, 'January'), (2, 'February'), (3, 'March'), (4, 'April'),
+    (5, 'May'), (6, 'June'), (7, 'July'), (8, 'August'),
+    (9, 'September'), (10, 'October'), (11, 'November'), (12, 'December'),
+]
+
+
 class CelebrationListView(EmployeeSelfServiceMixin, View):
     def get(self, request):
         today = date.today()
@@ -818,6 +825,7 @@ class CelebrationListView(EmployeeSelfServiceMixin, View):
             'birthdays': birthdays,
             'anniversaries': anniversaries,
             'current_month': month,
+            'month_choices': MONTH_CHOICES,
             'sent_wish_set': sent_wish_set,
             'today': today,
         })
