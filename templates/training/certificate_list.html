@@ -78,7 +78,7 @@
                                     </a>
                                 </td>
                                 <td>{{ cert.employee }}</td>
-                                <td>{{ cert.training|default:cert.course_name|truncatewords:6 }}</td>
+                                <td>{{ cert.training|default:cert.course|default:"-" }}</td>
                                 <td>{{ cert.issue_date|date:"M d, Y" }}</td>
                                 <td>{{ cert.expiry_date|date:"M d, Y"|default:"-" }}</td>
                                 <td>
