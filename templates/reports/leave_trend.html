@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% load report_tags %}
+
+{% block title %}Leave Trend Analysis{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Leave Trend Analysis</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'reports:reports_dashboard' %}">Reports</a></li>
+            <li class="breadcrumb-item active">Leave Trend</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Department</label>
+                        {{ form.department }}
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-filter-3-line me-1"></i> Apply
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-4 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Approved Leaves This Year</p>
+                        <h3 class="stats-value mb-0">{{ total_approved_year }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-success text-success">
+                        <i class="ri-check-double-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Current calendar year</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <!-- Monthly Leave Trend Line Chart -->
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0">Monthly Leave Trend</h5>
+                <span class="text-muted" style="font-size: 12px;">Last 12 Months</span>
+            </div>
+            <div class="card-body">
+                <div style="height: 350px;">
+                    <canvas id="leaveTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Leave by Type Doughnut Chart -->
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Leave by Type</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 350px;">
+                    <canvas id="leaveTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Heatmap Table -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0">
+                    <i class="ri-calendar-2-line me-1"></i> Monthly Leave Heatmap
+                </h5>
+                <span class="badge bg-soft-primary text-primary">12 Months</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Month</th>
+                                <th class="text-end">Applications</th>
+                                <th class="text-end">Total Days</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for month_name, data in heatmap %}
+                            <tr>
+                                <td>
+                                    <span class="fw-medium">{{ month_name }}</span>
+                                </td>
+                                <td class="text-end">
+                                    {% if data.count > 0 %}
+                                    <span class="badge bg-soft-primary text-primary">{{ data.count }}</span>
+                                    {% else %}
+                                    <span class="text-muted">0</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    {% if data.days > 0 %}
+                                    <span class="fw-semibold">{{ data.days }}</span>
+                                    {% else %}
+                                    <span class="text-muted">0</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">
+                                    <i class="ri-inbox-line fs-3 d-block mb-2"></i>
+                                    No heatmap data available.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var colors = ['#4b38b3', '#45cb85', '#ef5350', '#ffbe0b', '#39afd1', '#878a99'];
+
+    // Monthly Leave Trend - Line Chart
+    var trendLabels = {{ trend_labels|safe }};
+    var trendData = {{ trend_data|safe }};
+
+    var trendCtx = document.getElementById('leaveTrendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: trendLabels,
+            datasets: [{
+                label: 'Leave Applications',
+                data: trendData,
+                fill: true,
+                tension: 0.3,
+                backgroundColor: 'rgba(75, 56, 179, 0.1)',
+                borderColor: '#4b38b3',
+                borderWidth: 2,
+                pointBackgroundColor: '#4b38b3',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + ' applications';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#878a99' }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: {
+                        color: '#878a99',
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // Leave by Type - Doughnut Chart
+    var typeLabels = {{ type_labels|safe }};
+    var typeData = {{ type_data|safe }};
+
+    var typeCtx = document.getElementById('leaveTypeChart').getContext('2d');
+    new Chart(typeCtx, {
+        type: 'doughnut',
+        data: {
+            labels: typeLabels,
+            datasets: [{
+                data: typeData,
+                backgroundColor: colors,
+                borderColor: '#fff',
+                borderWidth: 2,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 16,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        color: '#878a99'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
