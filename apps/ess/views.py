@@ -9,7 +9,7 @@ from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from apps.employees.models import Employee, EmergencyContact, EmployeeDocument
-from apps.attendance.models import LeaveApplication, AttendanceRegularization
+from apps.attendance.models import LeaveApplication, LeaveType, AttendanceRegularization
 
 from .models import (
     FamilyMember, DocumentRequest, IDCardRequest, AssetRequest,
@@ -393,14 +393,21 @@ class MyLeaveListView(EmployeeSelfServiceMixin, ListView):
     def get_queryset(self):
         qs = LeaveApplication.objects.filter(
             tenant=self.request.tenant, employee=self.employee)
+        search = self.request.GET.get('search', '').strip()
         status = self.request.GET.get('status', '')
+        leave_type = self.request.GET.get('leave_type', '')
+        if search:
+            qs = qs.filter(Q(reason__icontains=search) | Q(leave_type__name__icontains=search))
         if status:
             qs = qs.filter(status=status)
+        if leave_type:
+            qs = qs.filter(leave_type_id=leave_type)
         return qs.select_related('leave_type')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['status_choices'] = LeaveApplication.STATUS_CHOICES
+        context['leave_types'] = LeaveType.objects.filter(tenant=self.request.tenant, is_active=True)
         return context
 
 
@@ -463,14 +470,21 @@ class MyRegularizationListView(EmployeeSelfServiceMixin, ListView):
     def get_queryset(self):
         qs = AttendanceRegularization.objects.filter(
             tenant=self.request.tenant, employee=self.employee)
+        search = self.request.GET.get('search', '').strip()
         status = self.request.GET.get('status', '')
+        reason = self.request.GET.get('reason', '')
+        if search:
+            qs = qs.filter(Q(reason_detail__icontains=search))
         if status:
             qs = qs.filter(status=status)
+        if reason:
+            qs = qs.filter(reason=reason)
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['status_choices'] = AttendanceRegularization.STATUS_CHOICES
+        context['reason_choices'] = AttendanceRegularization.REASON_CHOICES
         return context
 
 
@@ -516,14 +530,21 @@ class DocumentRequestListView(EmployeeSelfServiceMixin, ListView):
     def get_queryset(self):
         qs = DocumentRequest.objects.filter(
             tenant=self.request.tenant, employee=self.employee)
+        search = self.request.GET.get('search', '').strip()
         status = self.request.GET.get('status', '')
+        doc_type = self.request.GET.get('type', '')
+        if search:
+            qs = qs.filter(Q(purpose__icontains=search) | Q(additional_notes__icontains=search))
         if status:
             qs = qs.filter(status=status)
+        if doc_type:
+            qs = qs.filter(document_type=doc_type)
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['status_choices'] = DocumentRequest.STATUS_CHOICES
+        context['document_type_choices'] = DocumentRequest.DOCUMENT_TYPE_CHOICES
         return context
 
 
@@ -580,8 +601,21 @@ class IDCardRequestListView(EmployeeSelfServiceMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return IDCardRequest.objects.filter(
+        qs = IDCardRequest.objects.filter(
             tenant=self.request.tenant, employee=self.employee)
+        status = self.request.GET.get('status', '')
+        request_type = self.request.GET.get('type', '')
+        if status:
+            qs = qs.filter(status=status)
+        if request_type:
+            qs = qs.filter(request_type=request_type)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status_choices'] = IDCardRequest.STATUS_CHOICES
+        context['request_type_choices'] = IDCardRequest.REQUEST_TYPE_CHOICES
+        return context
 
 
 class IDCardRequestCreateView(EmployeeSelfServiceMixin, View):
@@ -626,14 +660,25 @@ class AssetRequestListView(EmployeeSelfServiceMixin, ListView):
     def get_queryset(self):
         qs = AssetRequest.objects.filter(
             tenant=self.request.tenant, employee=self.employee)
+        search = self.request.GET.get('search', '').strip()
         status = self.request.GET.get('status', '')
+        asset_type = self.request.GET.get('type', '')
+        priority = self.request.GET.get('priority', '')
+        if search:
+            qs = qs.filter(Q(asset_name__icontains=search) | Q(reason__icontains=search))
         if status:
             qs = qs.filter(status=status)
+        if asset_type:
+            qs = qs.filter(asset_type=asset_type)
+        if priority:
+            qs = qs.filter(priority=priority)
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['status_choices'] = AssetRequest.STATUS_CHOICES
+        context['asset_type_choices'] = AssetRequest.ASSET_TYPE_CHOICES
+        context['priority_choices'] = AssetRequest.PRIORITY_CHOICES
         return context
 
 
