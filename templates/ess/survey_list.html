@@ -7,10 +7,26 @@
     <h4>Surveys</h4>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
             <li class="breadcrumb-item active">Surveys</li>
         </ol>
     </nav>
+</div>
+
+<!-- Action Bar -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <p class="text-muted mb-0">Active surveys available for you to respond.</p>
+                    <a href="{% url 'ess:survey_create' %}" class="btn btn-primary">
+                        <i class="ri-add-line me-1"></i> Create Survey
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row">
@@ -32,7 +48,7 @@
                 <div class="mt-auto">
                     <div class="d-flex flex-wrap gap-2 mb-3" style="font-size: 13px;">
                         <span class="text-muted">
-                            <i class="ri-calendar-line me-1"></i>{{ survey.start_date|date:"M d" }} - {{ survey.end_date|date:"M d, Y" }}
+                            <i class="ri-calendar-line me-1"></i>{{ survey.start_date|date:"d M" }} - {{ survey.end_date|date:"d M Y" }}
                         </span>
                     </div>
                     <div class="d-flex align-items-center gap-2">
