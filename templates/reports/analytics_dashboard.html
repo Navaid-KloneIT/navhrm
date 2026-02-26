@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+{% load report_tags %}
+
+{% block title %}Executive Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Executive Dashboard</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'reports:reports_dashboard' %}">Reports</a></li>
+            <li class="breadcrumb-item active">Executive Dashboard</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Stat Cards Row 1 -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-2 col-md-4 col-sm-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Employees</p>
+                        <h3 class="stats-value mb-0">{{ total_employees }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-primary text-primary">
+                        <i class="ri-team-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-sm-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Attrition Rate</p>
+                        <h3 class="stats-value mb-0">{{ attrition_rate }}%</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-danger text-danger">
+                        <i class="ri-user-unfollow-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-sm-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Avg Salary</p>
+                        <h3 class="stats-value mb-0">{{ avg_salary|indian_number }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-success text-success">
+                        <i class="ri-money-dollar-circle-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-sm-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Open Positions</p>
+                        <h3 class="stats-value mb-0">{{ open_positions }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-warning text-warning">
+                        <i class="ri-briefcase-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-sm-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Attendance Rate</p>
+                        <h3 class="stats-value mb-0">{{ attendance_rate }}%</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-info text-info">
+                        <i class="ri-calendar-check-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-sm-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Pending Leaves</p>
+                        <h3 class="stats-value mb-0">{{ pending_leaves }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-secondary text-secondary">
+                        <i class="ri-calendar-event-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 1: Headcount Trend + Workforce Composition -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0">Headcount Trend</h5>
+                <span class="text-muted" style="font-size: 12px;">Last 12 Months</span>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="headcountChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Workforce Composition</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="workforceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 2: Monthly Attrition + Department Salary Cost -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0">Monthly Attrition</h5>
+                <span class="text-muted" style="font-size: 12px;">Last 12 Months</span>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="attritionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Department Salary Cost</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="deptSalaryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 3: Gender Distribution + Quick Links -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Gender Distribution</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 250px;">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="ri-links-line me-1"></i> Quick Links
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4 col-sm-6">
+                        <a href="{% url 'reports:hr_headcount' %}" class="d-flex align-items-center p-3 rounded border text-decoration-none text-body">
+                            <div class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-size: 16px;">
+                                <i class="ri-user-line"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">HR Reports</h6>
+                                <small class="text-muted">Headcount, attrition & diversity</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <a href="{% url 'reports:attendance_summary' %}" class="d-flex align-items-center p-3 rounded border text-decoration-none text-body">
+                            <div class="bg-soft-info text-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-size: 16px;">
+                                <i class="ri-calendar-check-line"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Attendance Reports</h6>
+                                <small class="text-muted">Daily logs & summaries</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <a href="{% url 'reports:leave_register' %}" class="d-flex align-items-center p-3 rounded border text-decoration-none text-body">
+                            <div class="bg-soft-warning text-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-size: 16px;">
+                                <i class="ri-calendar-event-line"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Leave Reports</h6>
+                                <small class="text-muted">Balances & utilization</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <a href="{% url 'reports:payroll_register' %}" class="d-flex align-items-center p-3 rounded border text-decoration-none text-body">
+                            <div class="bg-soft-success text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-size: 16px;">
+                                <i class="ri-money-dollar-circle-line"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Payroll Reports</h6>
+                                <small class="text-muted">Salary & compensation</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <a href="{% url 'reports:hr_hiring' %}" class="d-flex align-items-center p-3 rounded border text-decoration-none text-body">
+                            <div class="bg-soft-danger text-danger rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-size: 16px;">
+                                <i class="ri-briefcase-line"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Hiring Reports</h6>
+                                <small class="text-muted">Pipeline & source analysis</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <a href="{% url 'reports:hr_cost' %}" class="d-flex align-items-center p-3 rounded border text-decoration-none text-body">
+                            <div class="bg-soft-secondary text-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-size: 16px;">
+                                <i class="ri-bar-chart-box-line"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Cost Analysis</h6>
+                                <small class="text-muted">Salary cost & CTC breakdown</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Color palette
+    var colors = ['#4b38b3', '#45cb85', '#ef5350', '#ffbe0b', '#39afd1', '#878a99'];
+
+    // ------------------------------------------------------------------
+    // 1. Headcount Trend  (Line chart with area fill)
+    // ------------------------------------------------------------------
+    var hcCtx = document.getElementById('headcountChart').getContext('2d');
+    new Chart(hcCtx, {
+        type: 'line',
+        data: {
+            labels: {{ hc_labels|safe }},
+            datasets: [{
+                label: 'Headcount',
+                data: {{ hc_data|safe }},
+                fill: true,
+                tension: 0.3,
+                backgroundColor: 'rgba(75, 56, 179, 0.1)',
+                borderColor: '#4b38b3',
+                borderWidth: 2,
+                pointBackgroundColor: '#4b38b3',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#878a99' }
+                },
+                y: {
+                    beginAtZero: false,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: { color: '#878a99' }
+                }
+            }
+        }
+    });
+
+    // ------------------------------------------------------------------
+    // 2. Workforce Composition  (Doughnut chart)
+    // ------------------------------------------------------------------
+    var wfCtx = document.getElementById('workforceChart').getContext('2d');
+    new Chart(wfCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ workforce_labels|safe }},
+            datasets: [{
+                data: {{ workforce_data|safe }},
+                backgroundColor: colors,
+                borderColor: '#fff',
+                borderWidth: 2,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 16,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        color: '#878a99'
+                    }
+                }
+            }
+        }
+    });
+
+    // ------------------------------------------------------------------
+    // 3. Monthly Attrition  (Line chart)
+    // ------------------------------------------------------------------
+    var atCtx = document.getElementById('attritionChart').getContext('2d');
+    new Chart(atCtx, {
+        type: 'line',
+        data: {
+            labels: {{ attrition_labels|safe }},
+            datasets: [{
+                label: 'Exits',
+                data: {{ attrition_data|safe }},
+                fill: true,
+                tension: 0.3,
+                backgroundColor: 'rgba(239, 83, 80, 0.1)',
+                borderColor: '#ef5350',
+                borderWidth: 2,
+                pointBackgroundColor: '#ef5350',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#878a99' }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: {
+                        color: '#878a99',
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // ------------------------------------------------------------------
+    // 4. Department Salary Cost  (Horizontal bar chart)
+    // ------------------------------------------------------------------
+    var dsCtx = document.getElementById('deptSalaryChart').getContext('2d');
+    new Chart(dsCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ dept_labels|safe }},
+            datasets: [{
+                label: 'Salary Cost',
+                data: {{ dept_data|safe }},
+                backgroundColor: '#4b38b3',
+                borderColor: '#4b38b3',
+                borderWidth: 1,
+                borderRadius: 6,
+                barPercentage: 0.6
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: { color: '#878a99' }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { color: '#878a99' }
+                }
+            }
+        }
+    });
+
+    // ------------------------------------------------------------------
+    // 5. Gender Distribution  (Doughnut chart)
+    // ------------------------------------------------------------------
+    var gnCtx = document.getElementById('genderChart').getContext('2d');
+    new Chart(gnCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ gender_labels|safe }},
+            datasets: [{
+                data: {{ gender_data|safe }},
+                backgroundColor: colors,
+                borderColor: '#fff',
+                borderWidth: 2,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 16,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        color: '#878a99'
+                    }
+                }
+            }
+        }
+    });
+
+});
+</script>
+{% endblock %}
