@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'apps.performance',
     'apps.training',
     'apps.ess',
+    'apps.reports',
 ]
 
 MIDDLEWARE = [
