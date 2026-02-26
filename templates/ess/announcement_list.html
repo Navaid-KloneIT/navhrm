@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Announcements{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Announcements</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item active">Announcements</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'ess:announcement_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search announcements...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" name="category">
+                                <option value="">All Categories</option>
+                                {% for value, label in category_choices %}
+                                <option value="{{ value }}" {% if request.GET.category == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'ess:announcement_list' %}" class="btn btn-light w-100">
+                                <i class="ri-refresh-line me-1"></i> Reset
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Announcements -->
+<div class="row">
+    <div class="col-12">
+        {% for announcement in announcements %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            {% if announcement.is_pinned %}
+                            <i class="ri-pushpin-fill text-danger" data-bs-toggle="tooltip" title="Pinned"></i>
+                            {% endif %}
+                            <h5 class="mb-0">
+                                <a href="{% url 'ess:announcement_detail' announcement.pk %}" class="text-dark">{{ announcement.title }}</a>
+                            </h5>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            <span class="badge bg-soft-info text-info">{{ announcement.get_category_display }}</span>
+                            <span class="badge {% if announcement.priority == 'low' %}bg-soft-secondary text-secondary{% elif announcement.priority == 'normal' %}bg-soft-info text-info{% elif announcement.priority == 'high' %}bg-soft-warning text-warning{% elif announcement.priority == 'urgent' %}bg-soft-danger text-danger{% endif %}">
+                                {{ announcement.get_priority_display }}
+                            </span>
+                        </div>
+                        <p class="text-muted mb-2">{{ announcement.content|truncatewords:40 }}</p>
+                        <div class="d-flex align-items-center gap-3 text-muted" style="font-size: 13px;">
+                            <span><i class="ri-user-line me-1"></i>{{ announcement.published_by }}</span>
+                            <span><i class="ri-calendar-line me-1"></i>{{ announcement.publish_date|date:"M d, Y" }}</span>
+                            {% if announcement.expiry_date %}
+                            <span><i class="ri-time-line me-1"></i>Expires: {{ announcement.expiry_date|date:"M d, Y" }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="ms-3">
+                        <a href="{% url 'ess:announcement_detail' announcement.pk %}" class="btn btn-sm btn-soft-primary">
+                            <i class="ri-eye-line"></i> View
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="text-muted">
+                    <i class="ri-megaphone-line" style="font-size: 48px; opacity: 0.3;"></i>
+                    <p class="mt-2 mb-1">No announcements found</p>
+                    <p class="mb-0" style="font-size: 13px;">
+                        {% if request.GET.search or request.GET.category %}
+                            Try adjusting your search or filter criteria.
+                        {% else %}
+                            Announcements will appear here when published.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if page_obj.has_other_pages %}
+        <div class="card">
+            <div class="card-footer">
+                <nav><ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>{% endif %}
+                    {% for num in page_obj.paginator.page_range %}{% if page_obj.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}<li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a></li>{% endif %}{% endfor %}
+                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>{% endif %}
+                </ul></nav>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
