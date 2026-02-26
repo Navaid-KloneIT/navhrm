@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% load report_tags %}
+
+{% block title %}Overtime Report{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Overtime Report</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'reports:reports_dashboard' %}">Reports</a></li>
+            <li class="breadcrumb-item active">Overtime Report</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Month</label>
+                        {{ form.month }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Year</label>
+                        {{ form.year }}
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-filter-3-line me-1"></i> Apply
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total OT Hours</p>
+                        <h3 class="stats-value mb-0">{{ total_ot_hours }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-primary text-primary">
+                        <i class="ri-time-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">{{ selected_month }} {{ selected_year }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Avg OT Hours</p>
+                        <h3 class="stats-value mb-0">{{ avg_ot_hours }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-info text-info">
+                        <i class="ri-bar-chart-box-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Per employee average</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Employees with OT</p>
+                        <h3 class="stats-value mb-0">{{ ot_employees }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-warning text-warning">
+                        <i class="ri-group-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Worked overtime this month</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Approved OT Requests</p>
+                        <h3 class="stats-value mb-0">{{ approved_ot }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-success text-success">
+                        <i class="ri-checkbox-circle-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Out of {{ total_ot_requests }} total requests</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- OT Hours by Department Chart -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>OT Hours by Department - {{ selected_month }} {{ selected_year }}</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="deptOTChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Overtime Employees Table -->
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Top Overtime Employees</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Total Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in top_overtime %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ item.employee__employee_id }}</td>
+                                <td>
+                                    <span class="fw-medium">{{ item.employee__first_name }} {{ item.employee__last_name }}</span>
+                                </td>
+                                <td>{{ item.employee__department__name|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-primary">{{ item.total_hours }} hrs</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">No overtime records found for this period</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deptLabels = {{ dept_labels|safe }};
+    const deptData = {{ dept_data|safe }};
+
+    const ctx = document.getElementById('deptOTChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: deptLabels,
+            datasets: [{
+                label: 'OT Hours',
+                data: deptData,
+                backgroundColor: '#4b38b3',
+                borderColor: '#4b38b3',
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + ' hours';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Hours'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
