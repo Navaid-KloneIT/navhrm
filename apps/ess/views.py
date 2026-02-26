@@ -21,8 +21,10 @@ from .forms import (
     EmergencyContactForm, FamilyMemberForm,
     EssLeaveApplicationForm, EssRegularizationForm,
     DocumentRequestForm, IDCardRequestForm, AssetRequestForm,
+    AnnouncementForm, SurveyForm, SurveyQuestionForm,
     BirthdayWishForm, SuggestionForm, TicketForm, TicketCommentForm,
 )
+from django.forms import inlineformset_factory
 
 
 # ===========================================================================
@@ -735,13 +737,20 @@ class AnnouncementListView(EmployeeSelfServiceMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return Announcement.objects.filter(
+        qs = Announcement.objects.filter(
             tenant=self.request.tenant, is_active=True,
             publish_date__lte=timezone.now()
         ).filter(
             Q(target_departments__isnull=True) |
             Q(target_departments=self.employee.department)
         ).distinct()
+        search = self.request.GET.get('search', '').strip()
+        category = self.request.GET.get('category', '')
+        if search:
+            qs = qs.filter(Q(title__icontains=search) | Q(content__icontains=search))
+        if category:
+            qs = qs.filter(category=category)
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -757,6 +766,26 @@ class AnnouncementDetailView(EmployeeSelfServiceMixin, DetailView):
     def get_queryset(self):
         return Announcement.objects.filter(
             tenant=self.request.tenant, is_active=True)
+
+
+class AnnouncementCreateView(EmployeeSelfServiceMixin, View):
+    def get(self, request):
+        form = AnnouncementForm(tenant=request.tenant)
+        return render(request, 'ess/announcement_form.html', {
+            'form': form, 'title': 'Post Announcement'})
+
+    def post(self, request):
+        form = AnnouncementForm(request.POST, request.FILES, tenant=request.tenant)
+        if form.is_valid():
+            announcement = form.save(commit=False)
+            announcement.published_by = self.employee
+            announcement.tenant = request.tenant
+            announcement.save()
+            form.save_m2m()
+            messages.success(request, 'Announcement posted successfully.')
+            return redirect('ess:announcement_list')
+        return render(request, 'ess/announcement_form.html', {
+            'form': form, 'title': 'Post Announcement'})
 
 
 # ===========================================================================
@@ -902,6 +931,42 @@ class SurveyRespondView(EmployeeSelfServiceMixin, View):
         return redirect('ess:survey_list')
 
 
+SurveyQuestionFormSet = inlineformset_factory(
+    Survey, SurveyQuestion,
+    form=SurveyQuestionForm,
+    extra=3, can_delete=True, min_num=1, validate_min=True,
+)
+
+
+class SurveyCreateView(EmployeeSelfServiceMixin, View):
+    def get(self, request):
+        form = SurveyForm(tenant=request.tenant)
+        formset = SurveyQuestionFormSet()
+        return render(request, 'ess/survey_form.html', {
+            'form': form, 'formset': formset, 'title': 'Create Survey'})
+
+    def post(self, request):
+        form = SurveyForm(request.POST, tenant=request.tenant)
+        formset = SurveyQuestionFormSet(request.POST)
+        if form.is_valid() and formset.is_valid():
+            survey = form.save(commit=False)
+            survey.created_by = self.employee
+            survey.tenant = request.tenant
+            survey.save()
+            form.save_m2m()
+            formset.instance = survey
+            questions = formset.save(commit=False)
+            for q in questions:
+                q.tenant = request.tenant
+                q.save()
+            for q in formset.deleted_objects:
+                q.delete()
+            messages.success(request, 'Survey created successfully.')
+            return redirect('ess:survey_list')
+        return render(request, 'ess/survey_form.html', {
+            'form': form, 'formset': formset, 'title': 'Create Survey'})
+
+
 # ===========================================================================
 # 7.3 Suggestions
 # ===========================================================================
@@ -919,11 +984,22 @@ class SuggestionListView(EmployeeSelfServiceMixin, ListView):
             qs = qs.filter(status__in=['accepted', 'implemented'])
         else:
             qs = qs.filter(employee=self.employee)
+        search = self.request.GET.get('search', '').strip()
+        category = self.request.GET.get('category', '')
+        status = self.request.GET.get('status', '')
+        if search:
+            qs = qs.filter(Q(title__icontains=search) | Q(description__icontains=search))
+        if category:
+            qs = qs.filter(category=category)
+        if status:
+            qs = qs.filter(status=status)
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['current_tab'] = self.request.GET.get('tab', 'mine')
+        context['category_choices'] = Suggestion.CATEGORY_CHOICES
+        context['status_choices'] = Suggestion.STATUS_CHOICES
         return context
 
 
