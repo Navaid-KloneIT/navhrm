@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load ess_tags %}
+
+{% block title %}Celebrations{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Celebrations</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item active">Celebrations</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Month Selector -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'ess:celebration_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Select Month</label>
+                            <input type="month" class="form-control" name="month" value="{{ current_month|date:'Y-m' }}">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-calendar-line me-1"></i> Go
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Birthdays This Month -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="ri-cake-2-line me-2 text-danger"></i>Birthdays This Month</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for emp in birthdays %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="border rounded p-3 d-flex align-items-center gap-3">
+                            <div class="flex-shrink-0">
+                                {% if emp.avatar %}
+                                <img src="{{ emp.avatar.url }}" alt="{{ emp.first_name }}" class="rounded-circle" width="48" height="48">
+                                {% else %}
+                                <div class="rounded-circle bg-soft-primary text-primary d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; font-size: 18px;">
+                                    {{ emp.first_name|first }}{{ emp.last_name|first }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ emp.first_name }} {{ emp.last_name }}</h6>
+                                <small class="text-muted d-block">{{ emp.department }}</small>
+                                <small class="text-muted"><i class="ri-cake-2-line me-1"></i>{{ emp.date_of_birth|date:"M d" }}</small>
+                            </div>
+                            <div class="flex-shrink-0">
+                                {% wish_sent sent_wish_set emp.pk 'birthday' as already_wished %}
+                                {% if already_wished %}
+                                <span class="badge bg-soft-success text-success"><i class="ri-check-line me-1"></i>Wished</span>
+                                {% else %}
+                                <button type="button" class="btn btn-sm btn-soft-danger" data-bs-toggle="modal" data-bs-target="#wishModal{{ emp.pk }}birthday">
+                                    <i class="ri-heart-line me-1"></i> Send Wish
+                                </button>
+                                <!-- Wish Modal -->
+                                <div class="modal fade" id="wishModal{{ emp.pk }}birthday" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form method="POST" action="{% url 'ess:send_wish' emp.pk %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="occasion" value="birthday">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Send Birthday Wish to {{ emp.first_name }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Your Message</label>
+                                                        <textarea name="message" class="form-control" rows="3" placeholder="Write your birthday wish..."></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="ri-send-plane-line me-1"></i> Send Wish
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="text-center text-muted py-4">
+                            <i class="ri-cake-2-line" style="font-size: 48px; opacity: 0.3;"></i>
+                            <p class="mt-2 mb-0">No birthdays this month.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Work Anniversaries This Month -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="ri-award-line me-2 text-warning"></i>Work Anniversaries This Month</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for emp in anniversaries %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="border rounded p-3 d-flex align-items-center gap-3">
+                            <div class="flex-shrink-0">
+                                {% if emp.avatar %}
+                                <img src="{{ emp.avatar.url }}" alt="{{ emp.first_name }}" class="rounded-circle" width="48" height="48">
+                                {% else %}
+                                <div class="rounded-circle bg-soft-warning text-warning d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; font-size: 18px;">
+                                    {{ emp.first_name|first }}{{ emp.last_name|first }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ emp.first_name }} {{ emp.last_name }}</h6>
+                                <small class="text-muted d-block">{{ emp.department }}</small>
+                                <small class="text-muted"><i class="ri-calendar-check-line me-1"></i>Joined {{ emp.date_of_joining|date:"M d, Y" }}</small>
+                            </div>
+                            <div class="flex-shrink-0">
+                                {% wish_sent sent_wish_set emp.pk 'work_anniversary' as already_wished %}
+                                {% if already_wished %}
+                                <span class="badge bg-soft-success text-success"><i class="ri-check-line me-1"></i>Wished</span>
+                                {% else %}
+                                <button type="button" class="btn btn-sm btn-soft-warning" data-bs-toggle="modal" data-bs-target="#wishModal{{ emp.pk }}anniversary">
+                                    <i class="ri-heart-line me-1"></i> Send Wish
+                                </button>
+                                <!-- Wish Modal -->
+                                <div class="modal fade" id="wishModal{{ emp.pk }}anniversary" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form method="POST" action="{% url 'ess:send_wish' emp.pk %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="occasion" value="work_anniversary">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Send Anniversary Wish to {{ emp.first_name }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Your Message</label>
+                                                        <textarea name="message" class="form-control" rows="3" placeholder="Write your anniversary wish..."></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-warning">
+                                                        <i class="ri-send-plane-line me-1"></i> Send Wish
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="text-center text-muted py-4">
+                            <i class="ri-award-line" style="font-size: 48px; opacity: 0.3;"></i>
+                            <p class="mt-2 mb-0">No work anniversaries this month.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
