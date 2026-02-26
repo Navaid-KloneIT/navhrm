@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:family_list' %}">Family Members</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Basic Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Basic Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Name -->
+                <div class="col-md-6">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">Full Name <span class="text-danger">*</span></label>
+                    <input type="text" name="{{ form.name.html_name }}" id="{{ form.name.id_for_label }}"
+                           class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                           value="{{ form.name.value|default_if_none:'' }}" placeholder="Full name...">
+                    {% if form.name.errors %}<div class="invalid-feedback">{{ form.name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Relationship -->
+                <div class="col-md-6">
+                    <label for="{{ form.relationship.id_for_label }}" class="form-label">Relationship <span class="text-danger">*</span></label>
+                    <select name="{{ form.relationship.html_name }}" id="{{ form.relationship.id_for_label }}"
+                            class="form-select {% if form.relationship.errors %}is-invalid{% endif %}">
+                        <option value="">-- Select Relationship --</option>
+                        {% for value, label in form.relationship.field.choices %}
+                        {% if value %}
+                        <option value="{{ value }}" {% if form.relationship.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.relationship.errors %}<div class="invalid-feedback">{{ form.relationship.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="col-md-4">
+                    <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
+                    <input type="date" name="{{ form.date_of_birth.html_name }}" id="{{ form.date_of_birth.id_for_label }}"
+                           class="form-control {% if form.date_of_birth.errors %}is-invalid{% endif %}"
+                           value="{{ form.date_of_birth.value|default_if_none:'' }}">
+                    {% if form.date_of_birth.errors %}<div class="invalid-feedback">{{ form.date_of_birth.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Gender -->
+                <div class="col-md-4">
+                    <label for="{{ form.gender.id_for_label }}" class="form-label">Gender</label>
+                    <select name="{{ form.gender.html_name }}" id="{{ form.gender.id_for_label }}"
+                            class="form-select {% if form.gender.errors %}is-invalid{% endif %}">
+                        <option value="">-- Select Gender --</option>
+                        {% for value, label in form.gender.field.choices %}
+                        {% if value %}
+                        <option value="{{ value }}" {% if form.gender.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.gender.errors %}<div class="invalid-feedback">{{ form.gender.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Occupation -->
+                <div class="col-md-4">
+                    <label for="{{ form.occupation.id_for_label }}" class="form-label">Occupation</label>
+                    <input type="text" name="{{ form.occupation.html_name }}" id="{{ form.occupation.id_for_label }}"
+                           class="form-control {% if form.occupation.errors %}is-invalid{% endif %}"
+                           value="{{ form.occupation.value|default_if_none:'' }}" placeholder="Occupation...">
+                    {% if form.occupation.errors %}<div class="invalid-feedback">{{ form.occupation.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Phone -->
+                <div class="col-md-4">
+                    <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
+                    <input type="text" name="{{ form.phone.html_name }}" id="{{ form.phone.id_for_label }}"
+                           class="form-control {% if form.phone.errors %}is-invalid{% endif %}"
+                           value="{{ form.phone.value|default_if_none:'' }}" placeholder="Phone number...">
+                    {% if form.phone.errors %}<div class="invalid-feedback">{{ form.phone.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nominee & Insurance -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Nominee &amp; Insurance Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Is Dependent -->
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="{{ form.is_dependent.html_name }}"
+                               id="{{ form.is_dependent.id_for_label }}" {% if form.is_dependent.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_dependent.id_for_label }}">
+                            Is Dependent
+                        </label>
+                    </div>
+                    {% if form.is_dependent.errors %}<div class="invalid-feedback d-block">{{ form.is_dependent.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Is Nominee -->
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="{{ form.is_nominee.html_name }}"
+                               id="{{ form.is_nominee.id_for_label }}" {% if form.is_nominee.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_nominee.id_for_label }}">
+                            Is Nominee
+                        </label>
+                    </div>
+                    {% if form.is_nominee.errors %}<div class="invalid-feedback d-block">{{ form.is_nominee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Covered Under Insurance -->
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="{{ form.covered_under_insurance.html_name }}"
+                               id="{{ form.covered_under_insurance.id_for_label }}" {% if form.covered_under_insurance.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.covered_under_insurance.id_for_label }}">
+                            Covered Under Insurance
+                        </label>
+                    </div>
+                    {% if form.covered_under_insurance.errors %}<div class="invalid-feedback d-block">{{ form.covered_under_insurance.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Nominee Percentage -->
+                <div class="col-md-6">
+                    <label for="{{ form.nominee_percentage.id_for_label }}" class="form-label">Nominee Percentage (%)</label>
+                    <input type="number" name="{{ form.nominee_percentage.html_name }}" id="{{ form.nominee_percentage.id_for_label }}"
+                           class="form-control {% if form.nominee_percentage.errors %}is-invalid{% endif %}"
+                           value="{{ form.nominee_percentage.value|default_if_none:'' }}" min="0" max="100" step="0.01" placeholder="e.g., 50">
+                    {% if form.nominee_percentage.errors %}<div class="invalid-feedback">{{ form.nominee_percentage.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Insurance ID -->
+                <div class="col-md-6">
+                    <label for="{{ form.insurance_id.id_for_label }}" class="form-label">Insurance ID</label>
+                    <input type="text" name="{{ form.insurance_id.html_name }}" id="{{ form.insurance_id.id_for_label }}"
+                           class="form-control {% if form.insurance_id.errors %}is-invalid{% endif %}"
+                           value="{{ form.insurance_id.value|default_if_none:'' }}" placeholder="Insurance ID...">
+                    {% if form.insurance_id.errors %}<div class="invalid-feedback">{{ form.insurance_id.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save
+        </button>
+        <a href="{% url 'ess:family_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
