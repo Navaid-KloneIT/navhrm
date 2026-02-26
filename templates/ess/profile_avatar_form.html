@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Change Avatar{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Change Avatar</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:my_profile' %}">My Profile</a></li>
+            <li class="breadcrumb-item active">Change Avatar</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Upload Avatar</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Current Avatar Preview -->
+                    <div class="text-center mb-4">
+                        {% if form.instance.avatar %}
+                        <img src="{{ form.instance.avatar.url }}" alt="Current Avatar" class="rounded-circle mb-3" width="120" height="120" style="object-fit: cover;">
+                        <p class="text-muted" style="font-size: 13px;">Current avatar</p>
+                        {% else %}
+                        <div class="rounded-circle bg-soft-primary text-primary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px;">
+                            <i class="ri-user-3-line" style="font-size: 48px;"></i>
+                        </div>
+                        <p class="text-muted" style="font-size: 13px;">No avatar uploaded</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Avatar File -->
+                        <div class="col-12">
+                            <label for="{{ form.avatar.id_for_label }}" class="form-label">Select Image <span class="text-danger">*</span></label>
+                            <input type="file" name="{{ form.avatar.html_name }}" id="{{ form.avatar.id_for_label }}"
+                                   class="form-control {% if form.avatar.errors %}is-invalid{% endif %}"
+                                   accept="image/*">
+                            {% if form.avatar.errors %}<div class="invalid-feedback">{{ form.avatar.errors.0 }}</div>{% endif %}
+                            <div class="form-text">Accepted formats: JPG, PNG, GIF. Max size: 2MB. Recommended: 200x200 pixels.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mb-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-upload-2-line me-1"></i> Upload Avatar
+                </button>
+                <a href="{% url 'ess:my_profile' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
