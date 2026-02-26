@@ -32,10 +32,10 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Payout & Reports** - Bank file generation (HDFC/ICICI/SBI/Axis/NEFT/CSV), digital payslips, payment register with reconciliation, reimbursement claims (LTA, medical, fuel, mobile)
 
 ### Performance Management Module
-- **Goal Setting** - OKR/KPI management, goal alignment with cascading goals, weight assignment, quarterly/annual goal periods, progress tracking with milestones
-- **Performance Review** - Configurable review cycles (annual, half-yearly, quarterly), self-assessment forms, manager review with per-goal ratings, 360° peer feedback, rating calibration
-- **Continuous Feedback** - Real-time kudos/constructive/general feedback, anonymous feedback option, 1:1 meeting scheduling with notes and action items, feedback dashboard
-- **Performance Improvement** - PIP management with checkpoints, warning letters (verbal/written/final), coaching notes with follow-up tracking
+- **Goal Setting** - OKR/KPI management, goal alignment with cascading parent-child goals, weight assignment (validated to 100% per employee per period), configurable goal periods (monthly/quarterly/half-yearly/annual/custom), progress tracking with milestone updates, goal visibility (individual/team/department/organization), goal status workflow (draft → active → on_track/at_risk/behind → completed/cancelled)
+- **Performance Review** - Configurable review cycles (annual/half-yearly/quarterly), multi-phase status workflow (draft → active → self_assessment → manager_review → peer_review → calibration → completed), self-assessment forms with per-goal ratings, manager review with per-goal ratings and comments, 360° peer feedback with reviewer assignment and acceptance workflow, rating calibration with final scores, 1.0-5.0 decimal rating scale
+- **Continuous Feedback** - Real-time feedback (kudos/constructive/general), anonymous feedback option (sender hidden in UI, stored for audit), public/private/anonymous visibility controls, 1:1 meeting scheduling with date/time/location/duration, meeting notes (shared + separate manager/employee notes), meeting action items with assignment and due date tracking, given/received feedback tabs
+- **Performance Improvement** - PIP management with defined goals and support plans, PIP checkpoints with status tracking (pending/on_track/needs_improvement/met/not_met), PIP outcome tracking (success/failure/extended/cancelled), warning letters (verbal/written/final) with acknowledgement and appeal workflow, coaching notes with session tracking, action items, and follow-up scheduling
 
 ### Recruitment Module
 - **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
@@ -117,6 +117,7 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
    python manage.py seed_recruitment
    python manage.py seed_attendance
    python manage.py seed_payroll
+   python manage.py seed_payout
    python manage.py seed_performance
    ```
 
