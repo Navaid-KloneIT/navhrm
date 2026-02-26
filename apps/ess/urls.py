@@ -5,7 +5,7 @@ app_name = 'ess'
 
 urlpatterns = [
     # Dashboard
-    path('', views.EssDashboardView.as_view(), name='ess_dashboard'),
+    path('', views.EssDashboardView.as_view(), name='dashboard'),
 
     # ======================================================================
     # 7.1 Personal Information
