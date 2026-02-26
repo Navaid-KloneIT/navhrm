@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:survey_list' %}">Surveys</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {% if form.errors or formset.errors %}
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            {% for field in form %}{% for error in field.errors %}<li>{{ field.label }}: {{ error }}</li>{% endfor %}{% endfor %}
+            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+            {% for f in formset %}{% for field in f %}{% for error in field.errors %}<li>Question {{ forloop.parentloop.counter }}: {{ error }}</li>{% endfor %}{% endfor %}{% endfor %}
+            {% for error in formset.non_form_errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Survey Details -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Survey Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Title <span class="text-danger">*</span></label>
+                        {{ form.title }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        {{ form.description }}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Start Date <span class="text-danger">*</span></label>
+                            {{ form.start_date }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">End Date <span class="text-danger">*</span></label>
+                            {{ form.end_date }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Target Departments</label>
+                        {{ form.target_departments }}
+                        <small class="text-muted">{{ form.target_departments.help_text }}</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.is_anonymous }}
+                            <label class="form-check-label">
+                                <i class="ri-eye-off-line me-1"></i> Anonymous survey (respondent identity hidden)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Questions -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0">Questions</h5>
+                    <button type="button" class="btn btn-sm btn-primary" id="add-question">
+                        <i class="ri-add-line me-1"></i> Add Question
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ formset.management_form }}
+
+                    <div id="questions-container">
+                        {% for qform in formset %}
+                        <div class="question-form border rounded p-3 mb-3 {% if qform.DELETE.value %}d-none{% endif %}">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0">Question <span class="question-number">{{ forloop.counter }}</span></h6>
+                                <button type="button" class="btn btn-sm btn-soft-danger remove-question" title="Remove">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
+                            </div>
+                            {% for hidden in qform.hidden_fields %}{{ hidden }}{% endfor %}
+                            <div class="mb-3">
+                                <label class="form-label">Question Text <span class="text-danger">*</span></label>
+                                {{ qform.question_text }}
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Type <span class="text-danger">*</span></label>
+                                    {{ qform.question_type }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Order</label>
+                                    {{ qform.order }}
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <div class="form-check mb-2">
+                                        {{ qform.is_required }}
+                                        <label class="form-check-label">Required</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label">Choices <small class="text-muted">(for single/multiple choice only, pipe-separated)</small></label>
+                                {{ qform.choices }}
+                            </div>
+                            <div class="d-none">{{ qform.DELETE }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="d-flex gap-2 mb-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Create Survey
+                </button>
+                <a href="{% url 'ess:survey_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('questions-container');
+    const addBtn = document.getElementById('add-question');
+    const totalForms = document.getElementById('id_questions-TOTAL_FORMS');
+
+    addBtn.addEventListener('click', function() {
+        const formCount = parseInt(totalForms.value);
+        const template = container.querySelector('.question-form');
+        const newForm = template.cloneNode(true);
+
+        // Clear values
+        newForm.querySelectorAll('input:not([type=checkbox]):not([type=hidden]), textarea').forEach(el => el.value = '');
+        newForm.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+        newForm.querySelectorAll('input[type=checkbox]').forEach(el => el.checked = true);
+        newForm.classList.remove('d-none');
+
+        // Update form index
+        newForm.innerHTML = newForm.innerHTML.replace(/questions-\d+/g, 'questions-' + formCount);
+        newForm.innerHTML = newForm.innerHTML.replace(/id_questions-\d+/g, 'id_questions-' + formCount);
+
+        // Set order
+        const orderInput = newForm.querySelector('[name$="-order"]');
+        if (orderInput) orderInput.value = formCount + 1;
+
+        container.appendChild(newForm);
+        totalForms.value = formCount + 1;
+        renumberQuestions();
+    });
+
+    container.addEventListener('click', function(e) {
+        const removeBtn = e.target.closest('.remove-question');
+        if (!removeBtn) return;
+        const form = removeBtn.closest('.question-form');
+        const deleteInput = form.querySelector('[name$="-DELETE"]');
+        if (deleteInput) {
+            deleteInput.checked = true;
+            form.classList.add('d-none');
+        } else {
+            form.remove();
+        }
+        renumberQuestions();
+    });
+
+    function renumberQuestions() {
+        const visible = container.querySelectorAll('.question-form:not(.d-none)');
+        visible.forEach((form, idx) => {
+            const numSpan = form.querySelector('.question-number');
+            if (numSpan) numSpan.textContent = idx + 1;
+        });
+    }
+});
+</script>
+{% endblock %}
