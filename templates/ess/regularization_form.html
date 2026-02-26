@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Employee Self Service</li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:regularization_list' %}">My Regularizations</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Regularization Request</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="{{ form.date.id_for_label }}" class="form-label">
+                        Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           name="{{ form.date.html_name }}"
+                           id="{{ form.date.id_for_label }}"
+                           class="form-control {% if form.date.errors %}is-invalid{% endif %}"
+                           value="{{ form.date.value|default:'' }}">
+                    {% if form.date.errors %}<div class="invalid-feedback">{{ form.date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.requested_status.id_for_label }}" class="form-label">
+                        Requested Status <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.requested_status.html_name }}"
+                            id="{{ form.requested_status.id_for_label }}"
+                            class="form-select {% if form.requested_status.errors %}is-invalid{% endif %}">
+                        <option value="">Select Status</option>
+                        {% for value, label in form.requested_status.field.choices %}
+                        {% if value %}
+                        <option value="{{ value }}" {% if form.requested_status.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.requested_status.errors %}<div class="invalid-feedback">{{ form.requested_status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.requested_check_in.id_for_label }}" class="form-label">
+                        Requested Check-In
+                    </label>
+                    <input type="time"
+                           name="{{ form.requested_check_in.html_name }}"
+                           id="{{ form.requested_check_in.id_for_label }}"
+                           class="form-control {% if form.requested_check_in.errors %}is-invalid{% endif %}"
+                           value="{{ form.requested_check_in.value|default:'' }}">
+                    {% if form.requested_check_in.errors %}<div class="invalid-feedback">{{ form.requested_check_in.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.requested_check_out.id_for_label }}" class="form-label">
+                        Requested Check-Out
+                    </label>
+                    <input type="time"
+                           name="{{ form.requested_check_out.html_name }}"
+                           id="{{ form.requested_check_out.id_for_label }}"
+                           class="form-control {% if form.requested_check_out.errors %}is-invalid{% endif %}"
+                           value="{{ form.requested_check_out.value|default:'' }}">
+                    {% if form.requested_check_out.errors %}<div class="invalid-feedback">{{ form.requested_check_out.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-12">
+                    <label for="{{ form.reason.id_for_label }}" class="form-label">
+                        Reason <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.reason.html_name }}"
+                            id="{{ form.reason.id_for_label }}"
+                            class="form-select {% if form.reason.errors %}is-invalid{% endif %}">
+                        <option value="">Select Reason</option>
+                        {% for value, label in form.reason.field.choices %}
+                        {% if value %}
+                        <option value="{{ value }}" {% if form.reason.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.reason.errors %}<div class="invalid-feedback">{{ form.reason.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label for="{{ form.reason_detail.id_for_label }}" class="form-label">
+                        Additional Details
+                    </label>
+                    <textarea name="{{ form.reason_detail.html_name }}"
+                              id="{{ form.reason_detail.id_for_label }}"
+                              class="form-control {% if form.reason_detail.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Provide additional details about the regularization request...">{{ form.reason_detail.value|default:'' }}</textarea>
+                    {% if form.reason_detail.errors %}<div class="invalid-feedback">{{ form.reason_detail.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-send-plane-line me-1"></i> Submit Request
+                </button>
+                <a href="{% url 'ess:regularization_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
