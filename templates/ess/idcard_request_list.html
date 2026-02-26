@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}My ID Card Requests{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>My ID Card Requests</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Employee Self Service</li>
+            <li class="breadcrumb-item active">ID Card Requests</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- ID Card Requests Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">My ID Card Requests</h5>
+                <a href="{% url 'ess:idcard_request_create' %}" class="btn btn-success btn-sm">
+                    <i class="ri-add-line me-1"></i> Request ID Card
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in requests %}
+                            <tr>
+                                <td><span class="fw-medium">{{ req.get_request_type_display }}</span></td>
+                                <td>{{ req.reason|truncatewords:8 }}</td>
+                                <td>
+                                    {% if req.status == 'pending' %}
+                                    <span class="badge bg-soft-warning text-warning">Pending</span>
+                                    {% elif req.status == 'approved' %}
+                                    <span class="badge bg-soft-success text-success">Approved</span>
+                                    {% elif req.status == 'processing' %}
+                                    <span class="badge bg-soft-info text-info">Processing</span>
+                                    {% elif req.status == 'ready' %}
+                                    <span class="badge bg-soft-primary text-primary">Ready</span>
+                                    {% elif req.status == 'delivered' %}
+                                    <span class="badge bg-soft-success text-success">Delivered</span>
+                                    {% elif req.status == 'rejected' %}
+                                    <span class="badge bg-soft-danger text-danger">Rejected</span>
+                                    {% elif req.status == 'cancelled' %}
+                                    <span class="badge bg-soft-secondary text-secondary">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ req.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'ess:idcard_request_detail' req.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="View Details">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-id-card-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No ID card requests found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            Your ID card requests will appear here when submitted.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav><ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>{% endif %}
+                    {% for num in page_obj.paginator.page_range %}{% if page_obj.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}<li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a></li>{% endif %}{% endfor %}
+                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>{% endif %}
+                </ul></nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
