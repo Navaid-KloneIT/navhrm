@@ -8,7 +8,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'ess:my_profile' %}">My Profile</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:profile' %}">My Profile</a></li>
             <li class="breadcrumb-item active">Edit Contact Details</li>
         </ol>
     </nav>
@@ -130,7 +130,7 @@
         <button type="submit" class="btn btn-primary">
             <i class="ri-save-line me-1"></i> Save Changes
         </button>
-        <a href="{% url 'ess:my_profile' %}" class="btn btn-light">Cancel</a>
+        <a href="{% url 'ess:profile' %}" class="btn btn-light">Cancel</a>
     </div>
 </form>
 {% endblock %}
