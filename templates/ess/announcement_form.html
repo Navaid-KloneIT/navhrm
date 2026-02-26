@@ -14,86 +14,104 @@
     </nav>
 </div>
 
-<div class="row">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">{{ title }}</h5>
+<div class="card">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
             </div>
-            <div class="card-body">
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
+            {% endif %}
 
-                    {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            {% for field in form %}{% for error in field.errors %}<li>{{ field.label }}: {{ error }}</li>{% endfor %}{% endfor %}
-                            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
+            <div class="row g-3">
+                <!-- Title -->
+                <div class="col-12">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="{{ form.title.id_for_label }}" name="{{ form.title.html_name }}" value="{{ form.title.value|default_if_none:'' }}">
+                    {% if form.title.errors %}<div class="invalid-feedback">{{ form.title.errors.0 }}</div>{% endif %}
+                </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Title <span class="text-danger">*</span></label>
-                        {{ form.title }}
-                    </div>
+                <!-- Content -->
+                <div class="col-12">
+                    <label for="{{ form.content.id_for_label }}" class="form-label">Content <span class="text-danger">*</span></label>
+                    <textarea class="form-control {% if form.content.errors %}is-invalid{% endif %}" id="{{ form.content.id_for_label }}" name="{{ form.content.html_name }}" rows="5">{{ form.content.value|default_if_none:'' }}</textarea>
+                    {% if form.content.errors %}<div class="invalid-feedback">{{ form.content.errors.0 }}</div>{% endif %}
+                </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Content <span class="text-danger">*</span></label>
-                        {{ form.content }}
-                    </div>
+                <!-- Category & Priority -->
+                <div class="col-md-4">
+                    <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                    <select class="form-select {% if form.category.errors %}is-invalid{% endif %}" id="{{ form.category.id_for_label }}" name="{{ form.category.html_name }}">
+                        {% for value, label in form.category.field.choices %}
+                        <option value="{{ value }}" {% if form.category.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.category.errors %}<div class="invalid-feedback">{{ form.category.errors.0 }}</div>{% endif %}
+                </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Category</label>
-                            {{ form.category }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Priority</label>
-                            {{ form.priority }}
-                        </div>
-                    </div>
+                <div class="col-md-4">
+                    <label for="{{ form.priority.id_for_label }}" class="form-label">Priority</label>
+                    <select class="form-select {% if form.priority.errors %}is-invalid{% endif %}" id="{{ form.priority.id_for_label }}" name="{{ form.priority.html_name }}">
+                        {% for value, label in form.priority.field.choices %}
+                        <option value="{{ value }}" {% if form.priority.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.priority.errors %}<div class="invalid-feedback">{{ form.priority.errors.0 }}</div>{% endif %}
+                </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Publish Date <span class="text-danger">*</span></label>
-                            {{ form.publish_date }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Expiry Date</label>
-                            {{ form.expiry_date }}
-                        </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="{{ form.is_pinned.html_name }}" id="{{ form.is_pinned.id_for_label }}" {% if form.is_pinned.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_pinned.id_for_label }}">
+                            <i class="ri-pushpin-line me-1"></i> Pin this announcement
+                        </label>
                     </div>
+                </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Target Departments</label>
-                        {{ form.target_departments }}
-                        <small class="text-muted">{{ form.target_departments.help_text }}</small>
-                    </div>
+                <!-- Dates -->
+                <div class="col-md-6">
+                    <label for="{{ form.publish_date.id_for_label }}" class="form-label">Publish Date <span class="text-danger">*</span></label>
+                    <input type="datetime-local" class="form-control {% if form.publish_date.errors %}is-invalid{% endif %}" id="{{ form.publish_date.id_for_label }}" name="{{ form.publish_date.html_name }}" value="{{ form.publish_date.value|default_if_none:'' }}">
+                    {% if form.publish_date.errors %}<div class="invalid-feedback">{{ form.publish_date.errors.0 }}</div>{% endif %}
+                </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Attachment</label>
-                        {{ form.attachment }}
-                    </div>
+                <div class="col-md-6">
+                    <label for="{{ form.expiry_date.id_for_label }}" class="form-label">Expiry Date</label>
+                    <input type="datetime-local" class="form-control {% if form.expiry_date.errors %}is-invalid{% endif %}" id="{{ form.expiry_date.id_for_label }}" name="{{ form.expiry_date.html_name }}" value="{{ form.expiry_date.value|default_if_none:'' }}">
+                    {% if form.expiry_date.errors %}<div class="invalid-feedback">{{ form.expiry_date.errors.0 }}</div>{% endif %}
+                </div>
 
-                    <div class="mb-3">
-                        <div class="form-check">
-                            {{ form.is_pinned }}
-                            <label class="form-check-label">
-                                <i class="ri-pushpin-line me-1"></i> Pin this announcement
-                            </label>
-                        </div>
-                    </div>
+                <!-- Target Departments -->
+                <div class="col-12">
+                    <label for="{{ form.target_departments.id_for_label }}" class="form-label">Target Departments</label>
+                    <select class="form-select {% if form.target_departments.errors %}is-invalid{% endif %}" id="{{ form.target_departments.id_for_label }}" name="{{ form.target_departments.html_name }}" multiple size="4">
+                        {% for value, label in form.target_departments.field.choices %}
+                        <option value="{{ value }}" {% if value|stringformat:"s" in form.target_departments.value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.target_departments.errors %}<div class="invalid-feedback">{{ form.target_departments.errors.0 }}</div>{% endif %}
+                    <small class="text-muted">Leave empty for company-wide. Hold Ctrl to select multiple.</small>
+                </div>
 
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="ri-send-plane-line me-1"></i> Post Announcement
-                        </button>
-                        <a href="{% url 'ess:announcement_list' %}" class="btn btn-light">Cancel</a>
-                    </div>
-                </form>
+                <!-- Attachment -->
+                <div class="col-12">
+                    <label for="{{ form.attachment.id_for_label }}" class="form-label">Attachment</label>
+                    <input type="file" class="form-control {% if form.attachment.errors %}is-invalid{% endif %}" id="{{ form.attachment.id_for_label }}" name="{{ form.attachment.html_name }}">
+                    {% if form.attachment.errors %}<div class="invalid-feedback">{{ form.attachment.errors.0 }}</div>{% endif %}
+                </div>
             </div>
-        </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-send-plane-line me-1"></i> Post Announcement
+                </button>
+                <a href="{% url 'ess:announcement_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}
