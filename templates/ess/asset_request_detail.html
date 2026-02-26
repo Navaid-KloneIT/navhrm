@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Asset Request Details{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Asset Request Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Employee Self Service</li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:asset_request_list' %}">Asset Requests</a></li>
+            <li class="breadcrumb-item active">Details</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Asset Request Information -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Request Information</h5>
+                {% if asset_request.status == 'pending' %}
+                <span class="badge bg-soft-warning text-warning fs-6">Pending</span>
+                {% elif asset_request.status == 'approved' %}
+                <span class="badge bg-soft-success text-success fs-6">Approved</span>
+                {% elif asset_request.status == 'allocated' %}
+                <span class="badge bg-soft-success text-success fs-6">Allocated</span>
+                {% elif asset_request.status == 'rejected' %}
+                <span class="badge bg-soft-danger text-danger fs-6">Rejected</span>
+                {% elif asset_request.status == 'cancelled' %}
+                <span class="badge bg-soft-secondary text-secondary fs-6">Cancelled</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Asset Type</small>
+                        <div class="fw-medium">{{ asset_request.get_asset_type_display }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Asset Name</small>
+                        <div class="fw-medium">{{ asset_request.asset_name }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Quantity</small>
+                        <div class="fw-medium">{{ asset_request.quantity }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Priority</small>
+                        <div>
+                            {% if asset_request.priority == 'low' %}
+                            <span class="badge bg-soft-secondary text-secondary">Low</span>
+                            {% elif asset_request.priority == 'medium' %}
+                            <span class="badge bg-soft-info text-info">Medium</span>
+                            {% elif asset_request.priority == 'high' %}
+                            <span class="badge bg-soft-warning text-warning">High</span>
+                            {% elif asset_request.priority == 'urgent' %}
+                            <span class="badge bg-soft-danger text-danger">Urgent</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Expected Date</small>
+                        <div class="fw-medium">{{ asset_request.expected_date|date:"M d, Y"|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Requested On</small>
+                        <div class="fw-medium">{{ asset_request.created_at|date:"M d, Y h:i A" }}</div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Reason</small>
+                    <p class="mt-1 mb-0">{{ asset_request.reason }}</p>
+                </div>
+
+                {% if asset_request.notes %}
+                <div class="mt-3 pt-3 border-top">
+                    <small class="text-muted">Additional Notes</small>
+                    <p class="mt-1 mb-0">{{ asset_request.notes }}</p>
+                </div>
+                {% endif %}
+
+                {% if asset_request.approved_by %}
+                <div class="mt-4 pt-3 border-top">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">Approved By</small>
+                            <div class="fw-medium">{{ asset_request.approved_by }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Cancel Request (for pending requests) -->
+        {% if asset_request.status == 'pending' %}
+        <div class="card border-warning">
+            <div class="card-header bg-soft-warning">
+                <h5 class="mb-0 text-warning">Cancel Request</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'ess:asset_request_cancel' asset_request.pk %}">
+                    {% csrf_token %}
+                    <p class="text-muted mb-3">Are you sure you want to cancel this asset request?</p>
+                    <button type="submit" class="btn btn-warning" onclick="return confirm('Are you sure you want to cancel this asset request?')">
+                        <i class="ri-close-circle-line me-1"></i> Cancel Request
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'ess:asset_request_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to List
+                    </a>
+                    <a href="{% url 'ess:asset_request_create' %}" class="btn btn-success">
+                        <i class="ri-add-line me-1"></i> New Request
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
