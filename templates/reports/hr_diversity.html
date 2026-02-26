@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% load report_tags %}
+
+{% block title %}Diversity Report{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Diversity Report</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'reports:reports_dashboard' %}">Reports</a></li>
+            <li class="breadcrumb-item active">Diversity Report</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Department</label>
+                            {{ form.department }}
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="ri-filter-3-line me-1"></i> Apply
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stat Card -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Active Employees</p>
+                        <h3 class="stats-value mb-0">{{ total }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-primary text-primary">
+                        <i class="ri-team-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 1: Gender Distribution + Age Groups -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Gender Distribution</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 320px;">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Age Groups</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 320px;">
+                    <canvas id="ageChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 2: Tenure Distribution + Marital Status -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Tenure Distribution</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 320px;">
+                    <canvas id="tenureChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Marital Status</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 320px;">
+                    <canvas id="maritalChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    var colors = ['#4b38b3', '#45cb85', '#ef5350', '#ffbe0b', '#39afd1', '#878a99'];
+
+    // ------------------------------------------------------------------
+    // 1. Gender Distribution (Doughnut chart)
+    // ------------------------------------------------------------------
+    var genderCtx = document.getElementById('genderChart').getContext('2d');
+    new Chart(genderCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ gender_labels|safe }},
+            datasets: [{
+                data: {{ gender_data|safe }},
+                backgroundColor: ['#4b38b3', '#45cb85', '#ffbe0b', '#878a99'],
+                borderColor: '#fff',
+                borderWidth: 2,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 16,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        color: '#878a99'
+                    }
+                }
+            }
+        }
+    });
+
+    // ------------------------------------------------------------------
+    // 2. Age Groups (Bar chart)
+    // ------------------------------------------------------------------
+    var ageCtx = document.getElementById('ageChart').getContext('2d');
+    new Chart(ageCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ age_labels|safe }},
+            datasets: [{
+                label: 'Employees',
+                data: {{ age_data|safe }},
+                backgroundColor: 'rgba(69, 203, 133, 0.7)',
+                borderColor: '#45cb85',
+                borderWidth: 1,
+                borderRadius: 6,
+                barPercentage: 0.6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#878a99' }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: {
+                        color: '#878a99',
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // ------------------------------------------------------------------
+    // 3. Tenure Distribution (Bar chart)
+    // ------------------------------------------------------------------
+    var tenureCtx = document.getElementById('tenureChart').getContext('2d');
+    new Chart(tenureCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ tenure_labels|safe }},
+            datasets: [{
+                label: 'Employees',
+                data: {{ tenure_data|safe }},
+                backgroundColor: 'rgba(57, 175, 209, 0.7)',
+                borderColor: '#39afd1',
+                borderWidth: 1,
+                borderRadius: 6,
+                barPercentage: 0.6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#878a99' }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: {
+                        color: '#878a99',
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // ------------------------------------------------------------------
+    // 4. Marital Status (Doughnut chart)
+    // ------------------------------------------------------------------
+    var maritalCtx = document.getElementById('maritalChart').getContext('2d');
+    new Chart(maritalCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ marital_labels|safe }},
+            datasets: [{
+                data: {{ marital_data|safe }},
+                backgroundColor: ['#ef5350', '#ffbe0b', '#39afd1', '#878a99'],
+                borderColor: '#fff',
+                borderWidth: 2,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 16,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        color: '#878a99'
+                    }
+                }
+            }
+        }
+    });
+
+});
+</script>
+{% endblock %}
