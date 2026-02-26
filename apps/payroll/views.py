@@ -787,12 +787,24 @@ class PFConfigListView(LoginRequiredMixin, ListView):
         qs = PFConfiguration.all_objects.filter(tenant=self.request.tenant)
         search = self.request.GET.get('search', '')
         if search:
-            qs = qs.filter(Q(name__icontains=search))
+            qs = qs.filter(Q(pf_number__icontains=search))
+        is_active = self.request.GET.get('is_active', '')
+        if is_active:
+            qs = qs.filter(is_active=(is_active == 'true'))
+        date_from = self.request.GET.get('date_from', '')
+        if date_from:
+            qs = qs.filter(effective_from__gte=date_from)
+        date_to = self.request.GET.get('date_to', '')
+        if date_to:
+            qs = qs.filter(effective_from__lte=date_to)
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search'] = self.request.GET.get('search', '')
+        context['is_active'] = self.request.GET.get('is_active', '')
+        context['date_from'] = self.request.GET.get('date_from', '')
+        context['date_to'] = self.request.GET.get('date_to', '')
         return context
 
 
@@ -842,12 +854,24 @@ class ESIConfigListView(LoginRequiredMixin, ListView):
         qs = ESIConfiguration.all_objects.filter(tenant=self.request.tenant)
         search = self.request.GET.get('search', '')
         if search:
-            qs = qs.filter(Q(name__icontains=search))
+            qs = qs.filter(Q(esi_number__icontains=search))
+        is_active = self.request.GET.get('is_active', '')
+        if is_active:
+            qs = qs.filter(is_active=(is_active == 'true'))
+        date_from = self.request.GET.get('date_from', '')
+        if date_from:
+            qs = qs.filter(effective_from__gte=date_from)
+        date_to = self.request.GET.get('date_to', '')
+        if date_to:
+            qs = qs.filter(effective_from__lte=date_to)
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search'] = self.request.GET.get('search', '')
+        context['is_active'] = self.request.GET.get('is_active', '')
+        context['date_from'] = self.request.GET.get('date_from', '')
+        context['date_to'] = self.request.GET.get('date_to', '')
         return context
 
 
@@ -898,11 +922,30 @@ class PTSlabListView(LoginRequiredMixin, ListView):
         state = self.request.GET.get('state', '')
         if state:
             qs = qs.filter(state=state)
+        is_active = self.request.GET.get('is_active', '')
+        if is_active:
+            qs = qs.filter(is_active=(is_active == 'true'))
+        date_from = self.request.GET.get('date_from', '')
+        if date_from:
+            qs = qs.filter(effective_from__gte=date_from)
+        date_to = self.request.GET.get('date_to', '')
+        if date_to:
+            qs = qs.filter(effective_from__lte=date_to)
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['selected_state'] = self.request.GET.get('state', '')
+        context['is_active'] = self.request.GET.get('is_active', '')
+        context['date_from'] = self.request.GET.get('date_from', '')
+        context['date_to'] = self.request.GET.get('date_to', '')
+        context['states'] = (
+            ProfessionalTaxSlab.all_objects
+            .filter(tenant=self.request.tenant)
+            .values_list('state', flat=True)
+            .distinct()
+            .order_by('state')
+        )
         return context
 
 
@@ -953,11 +996,35 @@ class LWFConfigListView(LoginRequiredMixin, ListView):
         state = self.request.GET.get('state', '')
         if state:
             qs = qs.filter(state=state)
+        frequency = self.request.GET.get('frequency', '')
+        if frequency:
+            qs = qs.filter(frequency=frequency)
+        is_active = self.request.GET.get('is_active', '')
+        if is_active:
+            qs = qs.filter(is_active=(is_active == 'true'))
+        date_from = self.request.GET.get('date_from', '')
+        if date_from:
+            qs = qs.filter(effective_from__gte=date_from)
+        date_to = self.request.GET.get('date_to', '')
+        if date_to:
+            qs = qs.filter(effective_from__lte=date_to)
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['selected_state'] = self.request.GET.get('state', '')
+        context['frequency'] = self.request.GET.get('frequency', '')
+        context['is_active'] = self.request.GET.get('is_active', '')
+        context['date_from'] = self.request.GET.get('date_from', '')
+        context['date_to'] = self.request.GET.get('date_to', '')
+        context['states'] = (
+            LWFConfiguration.all_objects
+            .filter(tenant=self.request.tenant)
+            .values_list('state', flat=True)
+            .distinct()
+            .order_by('state')
+        )
+        context['frequency_choices'] = LWFConfiguration.FREQUENCY_CHOICES
         return context
 
 
