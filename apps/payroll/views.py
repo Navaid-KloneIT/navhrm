@@ -1112,6 +1112,12 @@ class TaxRegimeListView(LoginRequiredMixin, ListView):
         financial_year = self.request.GET.get('financial_year', '')
         if financial_year:
             qs = qs.filter(financial_year=financial_year)
+        regime = self.request.GET.get('regime', '')
+        if regime:
+            qs = qs.filter(regime=regime)
+        locked = self.request.GET.get('locked', '')
+        if locked:
+            qs = qs.filter(locked=(locked == 'true'))
         search = self.request.GET.get('search', '')
         if search:
             qs = qs.filter(
@@ -1124,7 +1130,17 @@ class TaxRegimeListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['selected_financial_year'] = self.request.GET.get('financial_year', '')
+        context['regime'] = self.request.GET.get('regime', '')
+        context['locked'] = self.request.GET.get('locked', '')
         context['search'] = self.request.GET.get('search', '')
+        context['financial_years'] = (
+            TaxRegimeChoice.all_objects
+            .filter(tenant=self.request.tenant)
+            .values_list('financial_year', flat=True)
+            .distinct()
+            .order_by('-financial_year')
+        )
+        context['regime_choices'] = TaxRegimeChoice.REGIME_CHOICES
         return context
 
 
@@ -1182,6 +1198,15 @@ class InvestmentDeclarationListView(LoginRequiredMixin, ListView):
         context['selected_section'] = self.request.GET.get('section', '')
         context['selected_status'] = self.request.GET.get('status', '')
         context['search'] = self.request.GET.get('search', '')
+        context['financial_years'] = (
+            InvestmentDeclaration.all_objects
+            .filter(tenant=self.request.tenant)
+            .values_list('financial_year', flat=True)
+            .distinct()
+            .order_by('-financial_year')
+        )
+        context['sections'] = InvestmentDeclaration.SECTION_CHOICES
+        context['statuses'] = InvestmentDeclaration.STATUS_CHOICES
         return context
 
 
@@ -1303,6 +1328,9 @@ class TaxComputationListView(LoginRequiredMixin, ListView):
         financial_year = self.request.GET.get('financial_year', '')
         if financial_year:
             qs = qs.filter(financial_year=financial_year)
+        regime = self.request.GET.get('regime', '')
+        if regime:
+            qs = qs.filter(regime=regime)
         search = self.request.GET.get('search', '')
         if search:
             qs = qs.filter(
@@ -1315,7 +1343,16 @@ class TaxComputationListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['selected_financial_year'] = self.request.GET.get('financial_year', '')
+        context['regime'] = self.request.GET.get('regime', '')
         context['search'] = self.request.GET.get('search', '')
+        context['financial_years'] = (
+            TaxComputation.all_objects
+            .filter(tenant=self.request.tenant)
+            .values_list('financial_year', flat=True)
+            .distinct()
+            .order_by('-financial_year')
+        )
+        context['regime_choices'] = TaxRegimeChoice.REGIME_CHOICES
         return context
 
 
