@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Session - {{ session.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>Session Detail</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'training:session_list' %}">Training Sessions</a></li>
+                    <li class="breadcrumb-item active">{{ session.title|truncatewords:5 }}</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'training:session_edit' session.pk %}" class="btn btn-soft-warning">
+            <i class="ri-pencil-line me-1"></i> Edit Session
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column: Session Info -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Session Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Training</small>
+                        <div class="fw-medium">
+                            {% if session.training %}
+                            <a href="{% url 'training:training_detail' session.training.pk %}">{{ session.training.title }}</a>
+                            {% else %}-{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Instructor</small>
+                        <div class="fw-medium">{{ session.instructor|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Date</small>
+                        <div class="fw-medium">{{ session.session_date|date:"D, M d, Y" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Start Time</small>
+                        <div class="fw-medium">{{ session.start_time|time:"h:i A" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">End Time</small>
+                        <div class="fw-medium">{{ session.end_time|time:"h:i A"|default:"-" }}</div>
+                    </div>
+                    {% if session.venue %}
+                    <div class="col-md-6">
+                        <small class="text-muted">Venue</small>
+                        <div class="fw-medium">{{ session.venue }}</div>
+                    </div>
+                    {% endif %}
+                    {% if session.meeting_link %}
+                    <div class="col-md-6">
+                        <small class="text-muted">Meeting Link</small>
+                        <div>
+                            <a href="{{ session.meeting_link }}" target="_blank" class="fw-medium">
+                                <i class="ri-video-chat-line me-1"></i> Join Meeting
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if session.max_participants %}
+                    <div class="col-md-4">
+                        <small class="text-muted">Max Participants</small>
+                        <div class="fw-medium">{{ session.max_participants }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if session.notes %}
+                <hr>
+                <h6>Notes</h6>
+                <p class="mb-0">{{ session.notes|linebreaksbr }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Status Card -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        {% if session.status == 'scheduled' %}
+                        <span class="badge bg-soft-primary text-primary">Scheduled</span>
+                        {% elif session.status == 'in_progress' %}
+                        <span class="badge bg-soft-warning text-warning">In Progress</span>
+                        {% elif session.status == 'completed' %}
+                        <span class="badge bg-soft-success text-success">Completed</span>
+                        {% elif session.status == 'cancelled' %}
+                        <span class="badge bg-soft-danger text-danger">Cancelled</span>
+                        {% else %}
+                        <span class="badge bg-soft-secondary text-secondary">{{ session.get_status_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Date</small>
+                    <div class="fw-medium">{{ session.session_date|date:"M d, Y" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Time</small>
+                    <div class="fw-medium">{{ session.start_time|time:"h:i A" }}{% if session.end_time %} - {{ session.end_time|time:"h:i A" }}{% endif %}</div>
+                </div>
+                {% if session.training %}
+                <div class="mb-3">
+                    <small class="text-muted">Training</small>
+                    <div class="fw-medium">
+                        <a href="{% url 'training:training_detail' session.training.pk %}">{{ session.training.title }}</a>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="mb-0">
+                    <small class="text-muted">Attendance</small>
+                    <div class="fw-medium">{{ attendance_list|length|default:"0" }} participant{{ attendance_list|length|pluralize }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Attendance</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Status</th>
+                                <th>Check-in</th>
+                                <th>Check-out</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attendance in attendance_list %}
+                            <tr>
+                                <td class="fw-medium">{{ attendance.employee }}</td>
+                                <td>
+                                    {% if attendance.status == 'present' %}
+                                    <span class="badge bg-soft-success text-success">Present</span>
+                                    {% elif attendance.status == 'absent' %}
+                                    <span class="badge bg-soft-danger text-danger">Absent</span>
+                                    {% elif attendance.status == 'late' %}
+                                    <span class="badge bg-soft-warning text-warning">Late</span>
+                                    {% elif attendance.status == 'excused' %}
+                                    <span class="badge bg-soft-info text-info">Excused</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ attendance.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ attendance.check_in|time:"h:i A"|default:"-" }}</td>
+                                <td>{{ attendance.check_out|time:"h:i A"|default:"-" }}</td>
+                                <td>
+                                    <a href="{% url 'training:attendance_edit' attendance.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    No attendance records yet. Add one below.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Mark Attendance Form -->
+            <div class="card-footer">
+                <h6 class="mb-3">Mark Attendance</h6>
+                <form method="post" action="{% url 'training:attendance_create' session.pk %}" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3 align-items-end">
+                        <!-- Employee -->
+                        <div class="col-md-3">
+                            <label for="{{ attendance_form.employee.id_for_label }}" class="form-label">Employee</label>
+                            <select name="{{ attendance_form.employee.html_name }}"
+                                    id="{{ attendance_form.employee.id_for_label }}"
+                                    class="form-select {% if attendance_form.employee.errors %}is-invalid{% endif %}">
+                                <option value="">Select Employee</option>
+                                {% for choice in attendance_form.employee.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if attendance_form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if attendance_form.employee.errors %}<div class="invalid-feedback">{{ attendance_form.employee.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Status -->
+                        <div class="col-md-2">
+                            <label for="{{ attendance_form.status.id_for_label }}" class="form-label">Status</label>
+                            <select name="{{ attendance_form.status.html_name }}"
+                                    id="{{ attendance_form.status.id_for_label }}"
+                                    class="form-select {% if attendance_form.status.errors %}is-invalid{% endif %}">
+                                {% for value, label in attendance_form.status.field.choices %}
+                                <option value="{{ value }}" {% if attendance_form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if attendance_form.status.errors %}<div class="invalid-feedback">{{ attendance_form.status.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Check-in -->
+                        <div class="col-md-2">
+                            <label for="{{ attendance_form.check_in.id_for_label }}" class="form-label">Check-in</label>
+                            <input type="time"
+                                   name="{{ attendance_form.check_in.html_name }}"
+                                   id="{{ attendance_form.check_in.id_for_label }}"
+                                   class="form-control {% if attendance_form.check_in.errors %}is-invalid{% endif %}"
+                                   value="{{ attendance_form.check_in.value|default_if_none:'' }}">
+                            {% if attendance_form.check_in.errors %}<div class="invalid-feedback">{{ attendance_form.check_in.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Check-out -->
+                        <div class="col-md-2">
+                            <label for="{{ attendance_form.check_out.id_for_label }}" class="form-label">Check-out</label>
+                            <input type="time"
+                                   name="{{ attendance_form.check_out.html_name }}"
+                                   id="{{ attendance_form.check_out.id_for_label }}"
+                                   class="form-control {% if attendance_form.check_out.errors %}is-invalid{% endif %}"
+                                   value="{{ attendance_form.check_out.value|default_if_none:'' }}">
+                            {% if attendance_form.check_out.errors %}<div class="invalid-feedback">{{ attendance_form.check_out.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-add-line me-1"></i> Add Attendance
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Trainings{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Trainings</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Trainings</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'training:training_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search trainings...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="training_type">
+                                <option value="">All Types</option>
+                                {% for value, label in type_choices %}
+                                <option value="{{ value }}" {% if request.GET.training_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" name="category">
+                                <option value="">All Categories</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.pk }}" {% if request.GET.category == cat.pk|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line"></i>
+                            </button>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'training:training_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> New Training
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trainings Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">All Trainings</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Duration</th>
+                                <th>Cost</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for training in trainings %}
+                            <tr>
+                                <td class="fw-medium">
+                                    <a href="{% url 'training:training_detail' training.pk %}">{{ training.title }}</a>
+                                </td>
+                                <td>{{ training.category|default:"-" }}</td>
+                                <td>
+                                    {% if training.training_type == 'online' %}
+                                    <span class="badge bg-soft-info text-info">Online</span>
+                                    {% elif training.training_type == 'classroom' %}
+                                    <span class="badge bg-soft-primary text-primary">Classroom</span>
+                                    {% elif training.training_type == 'workshop' %}
+                                    <span class="badge bg-soft-warning text-warning">Workshop</span>
+                                    {% elif training.training_type == 'seminar' %}
+                                    <span class="badge bg-soft-success text-success">Seminar</span>
+                                    {% elif training.training_type == 'webinar' %}
+                                    <span class="badge bg-soft-info text-info">Webinar</span>
+                                    {% elif training.training_type == 'on_the_job' %}
+                                    <span class="badge bg-soft-dark text-dark">On-the-Job</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ training.get_training_type_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ training.duration_hours|default:"-" }} hrs</td>
+                                <td>
+                                    {% if training.cost_per_person %}
+                                    {{ training.currency|default:"USD" }} {{ training.cost_per_person }}
+                                    {% else %}-{% endif %}
+                                </td>
+                                <td>
+                                    {% if training.status == 'draft' %}
+                                    <span class="badge bg-soft-secondary text-secondary">Draft</span>
+                                    {% elif training.status == 'published' %}
+                                    <span class="badge bg-soft-success text-success">Published</span>
+                                    {% elif training.status == 'archived' %}
+                                    <span class="badge bg-soft-dark text-dark">Archived</span>
+                                    {% elif training.status == 'scheduled' %}
+                                    <span class="badge bg-soft-primary text-primary">Scheduled</span>
+                                    {% elif training.status == 'in_progress' %}
+                                    <span class="badge bg-soft-warning text-warning">In Progress</span>
+                                    {% elif training.status == 'completed' %}
+                                    <span class="badge bg-soft-success text-success">Completed</span>
+                                    {% elif training.status == 'cancelled' %}
+                                    <span class="badge bg-soft-danger text-danger">Cancelled</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ training.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'training:training_detail' training.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="View">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                        <a href="{% url 'training:training_edit' training.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'training:training_delete' training.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this training?')">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-book-open-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No trainings found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search or request.GET.status or request.GET.training_type or request.GET.category %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Trainings will appear here when created.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Training list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.training_type %}&training_type={{ request.GET.training_type }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.training_type %}&training_type={{ request.GET.training_type }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.training_type %}&training_type={{ request.GET.training_type }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Training Calendar{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Training Calendar</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Training Calendar</li>
+        </ol>
+    </nav>
+</div>
+
+{% for month_group in grouped_sessions %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="ri-calendar-line me-1"></i> {{ month_group.month_label }}
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Session</th>
+                        <th>Training</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Venue / Link</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in month_group.sessions %}
+                    <tr>
+                        <td class="fw-medium">
+                            <a href="{% url 'training:session_detail' session.pk %}">{{ session.title }}</a>
+                        </td>
+                        <td>
+                            {% if session.training %}
+                            <a href="{% url 'training:training_detail' session.training.pk %}">{{ session.training.title }}</a>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td>{{ session.session_date|date:"D, M d, Y" }}</td>
+                        <td>{{ session.start_time|time:"h:i A" }}{% if session.end_time %} - {{ session.end_time|time:"h:i A" }}{% endif %}</td>
+                        <td>
+                            {% if session.venue %}{{ session.venue }}{% endif %}
+                            {% if session.meeting_link %}
+                            <a href="{{ session.meeting_link }}" target="_blank" class="ms-1" data-bs-toggle="tooltip" title="Join Meeting">
+                                <i class="ri-video-chat-line"></i>
+                            </a>
+                            {% endif %}
+                            {% if not session.venue and not session.meeting_link %}-{% endif %}
+                        </td>
+                        <td>
+                            {% if session.status == 'scheduled' %}
+                            <span class="badge bg-soft-primary text-primary">Scheduled</span>
+                            {% elif session.status == 'in_progress' %}
+                            <span class="badge bg-soft-warning text-warning">In Progress</span>
+                            {% elif session.status == 'completed' %}
+                            <span class="badge bg-soft-success text-success">Completed</span>
+                            {% elif session.status == 'cancelled' %}
+                            <span class="badge bg-soft-danger text-danger">Cancelled</span>
+                            {% else %}
+                            <span class="badge bg-soft-secondary text-secondary">{{ session.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <div class="text-muted">
+            <i class="ri-calendar-schedule-line" style="font-size: 48px; opacity: 0.3;"></i>
+            <p class="mt-2 mb-1">No upcoming sessions</p>
+            <p class="mb-0" style="font-size: 13px;">Training sessions will appear here when scheduled.</p>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

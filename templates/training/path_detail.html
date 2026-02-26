@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}{{ path.title }} - Learning Path{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div>
+        <h4>{{ path.title }}</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item">Training</li>
+                <li class="breadcrumb-item"><a href="{% url 'training:path_list' %}">Learning Paths</a></li>
+                <li class="breadcrumb-item active">{{ path.title }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'training:path_edit' path.pk %}" class="btn btn-warning">
+            <i class="ri-pencil-line me-1"></i> Edit
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column -->
+    <div class="col-lg-8">
+        <!-- Description -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Description</h5>
+            </div>
+            <div class="card-body">
+                {% if path.description %}
+                <p>{{ path.description|linebreaks }}</p>
+                {% else %}
+                <p class="text-muted">No description provided.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Courses in Path -->
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Courses in Path</h5>
+                <a href="{% url 'training:path_add_course' path.pk %}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> Add Course
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 60px;">Order</th>
+                                <th>Course Title</th>
+                                <th>Mandatory</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for path_course in path_courses %}
+                            <tr>
+                                <td class="text-center fw-medium">{{ path_course.order }}</td>
+                                <td class="fw-medium">
+                                    <a href="{% url 'training:course_detail' path_course.course.pk %}">{{ path_course.course.title }}</a>
+                                </td>
+                                <td>
+                                    {% if path_course.is_mandatory %}
+                                    <span class="badge bg-soft-danger text-danger">Mandatory</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">Optional</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="post" action="{% url 'training:path_remove_course' path.pk path_course.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Remove" onclick="return confirm('Are you sure you want to remove this course from the path?')">
+                                            <i class="ri-close-line"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-book-open-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No courses in this path yet</p>
+                                        <a href="{% url 'training:path_add_course' path.pk %}" class="btn btn-sm btn-primary mt-2">
+                                            <i class="ri-add-line me-1"></i> Add First Course
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-4">
+        <!-- Status Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Path Info</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="text-muted">Target Role:</span>
+                    <span>{{ path.target_role|default:"-" }}</span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted">Department:</span>
+                    <span>{{ path.target_department|default:"-" }}</span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted">Estimated Hours:</span>
+                    <span>{{ path.estimated_hours|default:"-" }} hours</span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted">Mandatory:</span>
+                    {% if path.is_mandatory %}
+                    <span class="badge bg-soft-danger text-danger">Yes</span>
+                    {% else %}
+                    <span class="badge bg-soft-secondary text-secondary">No</span>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted">Published:</span>
+                    {% if path.is_published %}
+                    <span class="badge bg-soft-success text-success">Published</span>
+                    {% else %}
+                    <span class="badge bg-soft-secondary text-secondary">Draft</span>
+                    {% endif %}
+                </div>
+                <div class="mb-0">
+                    <span class="text-muted">Courses:</span>
+                    <span class="fw-medium">{{ course_count|default:"0" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

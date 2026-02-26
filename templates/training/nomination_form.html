@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'training:nomination_list' %}">Nominations</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Training & Employee Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Training & Employee</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Training -->
+                <div class="col-md-6">
+                    <label for="{{ form.training.id_for_label }}" class="form-label">
+                        Training <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.training.html_name }}"
+                            id="{{ form.training.id_for_label }}"
+                            class="form-select {% if form.training.errors %}is-invalid{% endif %}">
+                        <option value="">Select Training</option>
+                        {% for choice in form.training.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.training.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.training.errors %}<div class="invalid-feedback">{{ form.training.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">
+                        Employee <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.employee.html_name }}"
+                            id="{{ form.employee.id_for_label }}"
+                            class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                        <option value="">Select Employee</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Nominated By -->
+                <div class="col-md-6">
+                    <label for="{{ form.nominated_by.id_for_label }}" class="form-label">
+                        Nominated By
+                    </label>
+                    <select name="{{ form.nominated_by.html_name }}"
+                            id="{{ form.nominated_by.id_for_label }}"
+                            class="form-select {% if form.nominated_by.errors %}is-invalid{% endif %}">
+                        <option value="">Select Nominator</option>
+                        {% for choice in form.nominated_by.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.nominated_by.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.nominated_by.errors %}<div class="invalid-feedback">{{ form.nominated_by.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                    <select name="{{ form.status.html_name }}"
+                            id="{{ form.status.id_for_label }}"
+                            class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reason Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Reason -->
+                <div class="col-12">
+                    <label for="{{ form.reason.id_for_label }}" class="form-label">
+                        Reason <span class="text-danger">*</span>
+                    </label>
+                    <textarea name="{{ form.reason.html_name }}"
+                              id="{{ form.reason.id_for_label }}"
+                              class="form-control {% if form.reason.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Reason for nominating this employee...">{{ form.reason.value|default_if_none:'' }}</textarea>
+                    {% if form.reason.errors %}<div class="invalid-feedback">{{ form.reason.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Nomination
+        </button>
+        <a href="{% url 'training:nomination_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}

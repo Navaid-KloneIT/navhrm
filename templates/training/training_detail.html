@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}{{ training.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>Training Detail</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'training:training_list' %}">Trainings</a></li>
+                    <li class="breadcrumb-item active">{{ training.title|truncatewords:5 }}</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'training:training_edit' training.pk %}" class="btn btn-soft-warning">
+            <i class="ri-pencil-line me-1"></i> Edit Training
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column: Content -->
+    <div class="col-lg-8">
+        <!-- Description -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Description</h5>
+            </div>
+            <div class="card-body">
+                {% if training.description %}
+                    {{ training.description|linebreaksbr }}
+                {% else %}
+                    <p class="text-muted mb-0">No description provided.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Prerequisites -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Prerequisites</h5>
+            </div>
+            <div class="card-body">
+                {% if training.prerequisites %}
+                    {{ training.prerequisites|linebreaksbr }}
+                {% else %}
+                    <p class="text-muted mb-0">No prerequisites specified.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Objectives -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Objectives</h5>
+            </div>
+            <div class="card-body">
+                {% if training.objectives %}
+                    {{ training.objectives|linebreaksbr }}
+                {% else %}
+                    <p class="text-muted mb-0">No objectives specified.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Status Card -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Training Info</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Type</small>
+                    <div>
+                        {% if training.training_type == 'online' %}
+                        <span class="badge bg-soft-info text-info">Online</span>
+                        {% elif training.training_type == 'classroom' %}
+                        <span class="badge bg-soft-primary text-primary">Classroom</span>
+                        {% elif training.training_type == 'workshop' %}
+                        <span class="badge bg-soft-warning text-warning">Workshop</span>
+                        {% elif training.training_type == 'seminar' %}
+                        <span class="badge bg-soft-success text-success">Seminar</span>
+                        {% elif training.training_type == 'webinar' %}
+                        <span class="badge bg-soft-info text-info">Webinar</span>
+                        {% elif training.training_type == 'on_the_job' %}
+                        <span class="badge bg-soft-dark text-dark">On-the-Job</span>
+                        {% else %}
+                        <span class="badge bg-soft-secondary text-secondary">{{ training.get_training_type_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        {% if training.status == 'draft' %}
+                        <span class="badge bg-soft-secondary text-secondary">Draft</span>
+                        {% elif training.status == 'published' %}
+                        <span class="badge bg-soft-success text-success">Published</span>
+                        {% elif training.status == 'archived' %}
+                        <span class="badge bg-soft-dark text-dark">Archived</span>
+                        {% elif training.status == 'scheduled' %}
+                        <span class="badge bg-soft-primary text-primary">Scheduled</span>
+                        {% elif training.status == 'in_progress' %}
+                        <span class="badge bg-soft-warning text-warning">In Progress</span>
+                        {% elif training.status == 'completed' %}
+                        <span class="badge bg-soft-success text-success">Completed</span>
+                        {% elif training.status == 'cancelled' %}
+                        <span class="badge bg-soft-danger text-danger">Cancelled</span>
+                        {% else %}
+                        <span class="badge bg-soft-secondary text-secondary">{{ training.get_status_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Category</small>
+                    <div class="fw-medium">{{ training.category|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Duration</small>
+                    <div class="fw-medium">{{ training.duration_hours|default:"-" }} hours</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Max Participants</small>
+                    <div class="fw-medium">{{ training.max_participants|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Cost</small>
+                    <div class="fw-medium">
+                        {% if training.cost_per_person %}
+                        {{ training.currency|default:"USD" }} {{ training.cost_per_person }}
+                        {% else %}-{% endif %}
+                    </div>
+                </div>
+                {% if training.instructor_name %}
+                <div class="mb-3">
+                    <small class="text-muted">Instructor</small>
+                    <div class="fw-medium">{{ training.instructor_name }}</div>
+                    {% if training.instructor_email %}
+                    <small><a href="mailto:{{ training.instructor_email }}">{{ training.instructor_email }}</a></small>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if training.vendor %}
+                <div class="mb-0">
+                    <small class="text-muted">Vendor</small>
+                    <div class="fw-medium">{{ training.vendor }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sessions Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Sessions</h5>
+                <a href="{% url 'training:session_create' %}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> Add Session
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Venue / Link</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for session in sessions %}
+                            <tr>
+                                <td class="fw-medium">
+                                    <a href="{% url 'training:session_detail' session.pk %}">{{ session.title }}</a>
+                                </td>
+                                <td>{{ session.session_date|date:"M d, Y" }}</td>
+                                <td>{{ session.start_time|time:"h:i A" }}{% if session.end_time %} - {{ session.end_time|time:"h:i A" }}{% endif %}</td>
+                                <td>
+                                    {% if session.venue %}{{ session.venue }}{% endif %}
+                                    {% if session.meeting_link %}
+                                    <a href="{{ session.meeting_link }}" target="_blank" class="ms-1"><i class="ri-links-line"></i></a>
+                                    {% endif %}
+                                    {% if not session.venue and not session.meeting_link %}-{% endif %}
+                                </td>
+                                <td>
+                                    {% if session.status == 'scheduled' %}
+                                    <span class="badge bg-soft-primary text-primary">Scheduled</span>
+                                    {% elif session.status == 'in_progress' %}
+                                    <span class="badge bg-soft-warning text-warning">In Progress</span>
+                                    {% elif session.status == 'completed' %}
+                                    <span class="badge bg-soft-success text-success">Completed</span>
+                                    {% elif session.status == 'cancelled' %}
+                                    <span class="badge bg-soft-danger text-danger">Cancelled</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ session.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'training:session_detail' session.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="View">
+                                        <i class="ri-eye-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No sessions scheduled yet.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nominations Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Nominations</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Nominated By</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for nomination in nominations %}
+                            <tr>
+                                <td class="fw-medium">{{ nomination.employee }}</td>
+                                <td>{{ nomination.nominated_by|default:"-" }}</td>
+                                <td>{{ nomination.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if nomination.status == 'pending' %}
+                                    <span class="badge bg-soft-secondary text-secondary">Pending</span>
+                                    {% elif nomination.status == 'approved' %}
+                                    <span class="badge bg-soft-success text-success">Approved</span>
+                                    {% elif nomination.status == 'rejected' %}
+                                    <span class="badge bg-soft-danger text-danger">Rejected</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ nomination.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">
+                                    No nominations yet.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

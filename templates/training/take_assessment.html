@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}{{ assessment.title }} - Preview{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div>
+        <h4>{{ assessment.title }}</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item">Training</li>
+                <li class="breadcrumb-item"><a href="{% url 'training:assessment_list' %}">Assessments</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'training:assessment_detail' assessment.pk %}">{{ assessment.title }}</a></li>
+                <li class="breadcrumb-item active">Preview</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="{% url 'training:assessment_detail' assessment.pk %}" class="btn btn-light">
+            <i class="ri-arrow-left-line me-1"></i> Back to Assessment
+        </a>
+    </div>
+</div>
+
+<!-- Assessment Info Banner -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center me-3">
+                        <i class="ri-questionnaire-line" style="font-size: 20px;"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">{{ assessment.title }}</h6>
+                        <small class="text-muted">{{ assessment.get_assessment_type_display }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 text-center">
+                <small class="text-muted d-block">Questions</small>
+                <span class="fw-medium">{{ questions|length }}</span>
+            </div>
+            <div class="col-md-2 text-center">
+                <small class="text-muted d-block">Passing Score</small>
+                <span class="fw-medium">{{ assessment.passing_score }}%</span>
+            </div>
+            <div class="col-md-2 text-center">
+                <small class="text-muted d-block">Time Limit</small>
+                <span class="fw-medium">{{ assessment.time_limit_minutes|default:"No Limit" }} {% if assessment.time_limit_minutes %}min{% endif %}</span>
+            </div>
+            <div class="col-md-2 text-center">
+                <small class="text-muted d-block">Total Points</small>
+                <span class="fw-medium">{{ total_points|default:"0" }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Questions -->
+{% for question in questions %}
+<div class="card mb-3">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h6 class="mb-0">
+            <span class="badge bg-primary rounded-circle me-2">{{ forloop.counter }}</span>
+            Question {{ forloop.counter }}
+        </h6>
+        <div>
+            <span class="badge bg-soft-info text-info">{{ question.get_question_type_display }}</span>
+            <span class="badge bg-soft-secondary text-secondary ms-1">{{ question.points }} pts</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <p class="fw-medium mb-3">{{ question.question_text }}</p>
+
+        <div class="list-group">
+            {% if question.option_a %}
+            <div class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-light text-dark me-3">A</span>
+                    <span>{{ question.option_a }}</span>
+                </div>
+            </div>
+            {% endif %}
+            {% if question.option_b %}
+            <div class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-light text-dark me-3">B</span>
+                    <span>{{ question.option_b }}</span>
+                </div>
+            </div>
+            {% endif %}
+            {% if question.option_c %}
+            <div class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-light text-dark me-3">C</span>
+                    <span>{{ question.option_c }}</span>
+                </div>
+            </div>
+            {% endif %}
+            {% if question.option_d %}
+            <div class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-light text-dark me-3">D</span>
+                    <span>{{ question.option_d }}</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <div class="text-muted">
+            <i class="ri-question-line" style="font-size: 48px; opacity: 0.3;"></i>
+            <p class="mt-2 mb-1">No questions in this assessment</p>
+            <p class="mb-0" style="font-size: 13px;">Add questions to the assessment before previewing.</p>
+            <a href="{% url 'training:question_create' assessment.pk %}" class="btn btn-sm btn-primary mt-2">
+                <i class="ri-add-line me-1"></i> Add Question
+            </a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% if questions %}
+<div class="text-center mt-4">
+    <p class="text-muted mb-2">This is a read-only preview of the assessment questions.</p>
+    <a href="{% url 'training:assessment_detail' assessment.pk %}" class="btn btn-light">
+        <i class="ri-arrow-left-line me-1"></i> Back to Assessment
+    </a>
+</div>
+{% endif %}
+{% endblock %}

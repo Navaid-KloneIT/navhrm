@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Nomination - {{ nomination.training }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Nomination Detail</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'training:nomination_list' %}">Nominations</a></li>
+            <li class="breadcrumb-item active">{{ nomination.training|truncatewords:5 }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Left Column: Nomination Details -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ nomination.training }}</h5>
+                {% if nomination.status == 'pending' %}
+                <span class="badge bg-soft-warning text-warning fs-6">Pending</span>
+                {% elif nomination.status == 'approved' %}
+                <span class="badge bg-soft-success text-success fs-6">Approved</span>
+                {% elif nomination.status == 'rejected' %}
+                <span class="badge bg-soft-danger text-danger fs-6">Rejected</span>
+                {% elif nomination.status == 'waitlisted' %}
+                <span class="badge bg-soft-info text-info fs-6">Waitlisted</span>
+                {% else %}
+                <span class="badge bg-soft-secondary text-secondary fs-6">{{ nomination.get_status_display }}</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <!-- Reason -->
+                <div class="mb-4">
+                    <h6 class="text-muted mb-2">Reason</h6>
+                    <div>{{ nomination.reason|linebreaksbr }}</div>
+                </div>
+
+                <!-- Rejection Reason (only if rejected) -->
+                {% if nomination.status == 'rejected' and nomination.rejection_reason %}
+                <div class="pt-3 border-top">
+                    <h6 class="text-muted mb-2">Rejection Reason</h6>
+                    <div class="alert alert-danger mb-0">
+                        {{ nomination.rejection_reason|linebreaksbr }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Approve / Reject Actions (only if pending) -->
+        {% if nomination.status == 'pending' %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- Approve -->
+                    <div class="col-md-6">
+                        <form method="post" action="{% url 'training:nomination_approve' nomination.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success w-100" onclick="return confirm('Are you sure you want to approve this nomination?')">
+                                <i class="ri-check-line me-1"></i> Approve Nomination
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Reject -->
+                    <div class="col-md-6">
+                        <form method="post" action="{% url 'training:nomination_reject' nomination.pk %}">
+                            {% csrf_token %}
+                            <div class="mb-2">
+                                <textarea name="rejection_reason"
+                                          class="form-control"
+                                          rows="2"
+                                          placeholder="Reason for rejection..."
+                                          required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to reject this nomination?')">
+                                <i class="ri-close-line me-1"></i> Reject Nomination
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column: Status Card -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        {% if nomination.status == 'pending' %}
+                        <span class="badge bg-soft-warning text-warning">Pending</span>
+                        {% elif nomination.status == 'approved' %}
+                        <span class="badge bg-soft-success text-success">Approved</span>
+                        {% elif nomination.status == 'rejected' %}
+                        <span class="badge bg-soft-danger text-danger">Rejected</span>
+                        {% elif nomination.status == 'waitlisted' %}
+                        <span class="badge bg-soft-info text-info">Waitlisted</span>
+                        {% else %}
+                        <span class="badge bg-soft-secondary text-secondary">{{ nomination.get_status_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Employee</small>
+                    <div class="fw-medium">{{ nomination.employee }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Nominated By</small>
+                    <div class="fw-medium">{{ nomination.nominated_by|default:"-" }}</div>
+                </div>
+                {% if nomination.approved_by %}
+                <div class="mb-3">
+                    <small class="text-muted">Approved By</small>
+                    <div class="fw-medium">{{ nomination.approved_by }}</div>
+                </div>
+                {% endif %}
+                {% if nomination.approved_date %}
+                <div class="mb-3">
+                    <small class="text-muted">Approved Date</small>
+                    <div class="fw-medium">{{ nomination.approved_date|date:"M d, Y" }}</div>
+                </div>
+                {% endif %}
+                <div class="mb-0">
+                    <small class="text-muted">Created</small>
+                    <div class="fw-medium">{{ nomination.created_at|date:"M d, Y h:i A" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Card -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-grid">
+                    <a href="{% url 'training:nomination_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to Nominations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

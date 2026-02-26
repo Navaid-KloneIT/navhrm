@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Certificate - {{ certificate.certificate_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Certificate Detail</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'training:certificate_list' %}">Certificates</a></li>
+            <li class="breadcrumb-item active">{{ certificate.certificate_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Certificate Card -->
+        <div class="card mb-4">
+            <div class="card-body p-4">
+                <!-- Formal Certificate Layout -->
+                <div class="text-center border rounded p-5" style="border-style: double !important; border-width: 4px !important;">
+                    <div class="mb-3">
+                        <i class="ri-award-fill text-warning" style="font-size: 48px;"></i>
+                    </div>
+                    <h6 class="text-muted text-uppercase mb-2" style="letter-spacing: 3px;">Certificate of Completion</h6>
+                    <h3 class="fw-bold mb-3">{{ certificate.certificate_number }}</h3>
+
+                    <p class="text-muted mb-1">This is to certify that</p>
+                    <h4 class="fw-bold text-primary mb-3">{{ certificate.employee }}</h4>
+
+                    <p class="text-muted mb-1">has successfully completed</p>
+                    <h5 class="fw-medium mb-4">{{ certificate.training|default:certificate.course_name }}</h5>
+
+                    <div class="row justify-content-center mb-4">
+                        <div class="col-md-4 text-center">
+                            <small class="text-muted d-block">Issue Date</small>
+                            <span class="fw-medium">{{ certificate.issue_date|date:"M d, Y" }}</span>
+                        </div>
+                        {% if certificate.expiry_date %}
+                        <div class="col-md-4 text-center">
+                            <small class="text-muted d-block">Expiry Date</small>
+                            <span class="fw-medium">{{ certificate.expiry_date|date:"M d, Y" }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        {% if certificate.status == 'active' %}
+                        <span class="badge bg-soft-success text-success fs-6">Active</span>
+                        {% elif certificate.status == 'expired' %}
+                        <span class="badge bg-soft-warning text-warning fs-6">Expired</span>
+                        {% elif certificate.status == 'revoked' %}
+                        <span class="badge bg-soft-danger text-danger fs-6">Revoked</span>
+                        {% else %}
+                        <span class="badge bg-soft-secondary text-secondary fs-6">{{ certificate.get_status_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificate Details Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Certificate Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Certificate Number</small>
+                        <div class="fw-medium">{{ certificate.certificate_number }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Employee</small>
+                        <div class="fw-medium">{{ certificate.employee }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Training / Course</small>
+                        <div class="fw-medium">{{ certificate.training|default:certificate.course_name }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Status</small>
+                        <div>
+                            {% if certificate.status == 'active' %}
+                            <span class="badge bg-soft-success text-success">Active</span>
+                            {% elif certificate.status == 'expired' %}
+                            <span class="badge bg-soft-warning text-warning">Expired</span>
+                            {% elif certificate.status == 'revoked' %}
+                            <span class="badge bg-soft-danger text-danger">Revoked</span>
+                            {% else %}
+                            <span class="badge bg-soft-secondary text-secondary">{{ certificate.get_status_display }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Issue Date</small>
+                        <div class="fw-medium">{{ certificate.issue_date|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Expiry Date</small>
+                        <div class="fw-medium">{{ certificate.expiry_date|date:"M d, Y"|default:"No Expiry" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-grid">
+                    <a href="{% url 'training:certificate_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to Certificates
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

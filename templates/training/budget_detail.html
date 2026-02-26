@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Budget - {{ budget.fiscal_year }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>Budget Detail</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'training:budget_list' %}">Budgets</a></li>
+                    <li class="breadcrumb-item active">{{ budget.fiscal_year }}</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'training:budget_edit' budget.pk %}" class="btn btn-soft-warning">
+            <i class="ri-pencil-line me-1"></i> Edit Budget
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column: Budget Details -->
+    <div class="col-lg-8">
+        <!-- Utilization Overview Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Budget Utilization</h5>
+            </div>
+            <div class="card-body">
+                <!-- Progress Bar -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Utilization</span>
+                        <span class="fw-medium">{{ budget.utilization_percentage|floatformat:1 }}%</span>
+                    </div>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar {% if budget.utilization_percentage >= 90 %}bg-danger{% elif budget.utilization_percentage >= 75 %}bg-warning{% elif budget.utilization_percentage >= 50 %}bg-info{% else %}bg-success{% endif %}"
+                             role="progressbar"
+                             style="width: {{ budget.utilization_percentage }}%;"
+                             aria-valuenow="{{ budget.utilization_percentage }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            {{ budget.utilization_percentage|floatformat:0 }}%
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Amount Cards -->
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 text-center">
+                            <small class="text-muted d-block mb-1">Allocated</small>
+                            <h4 class="mb-0 text-primary">{{ budget.currency|default:"USD" }} {{ budget.allocated_amount|floatformat:2 }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 text-center">
+                            <small class="text-muted d-block mb-1">Utilized</small>
+                            <h4 class="mb-0 text-warning">{{ budget.currency|default:"USD" }} {{ budget.utilized_amount|floatformat:2 }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 text-center">
+                            <small class="text-muted d-block mb-1">Remaining</small>
+                            <h4 class="mb-0 text-success">{{ budget.currency|default:"USD" }} {{ budget.remaining_amount|floatformat:2 }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description Card -->
+        {% if budget.description %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Description</h5>
+            </div>
+            <div class="card-body">
+                <div>{{ budget.description|linebreaksbr }}</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column: Status Card -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        {% if budget.status == 'planned' %}
+                        <span class="badge bg-soft-info text-info">Planned</span>
+                        {% elif budget.status == 'approved' %}
+                        <span class="badge bg-soft-primary text-primary">Approved</span>
+                        {% elif budget.status == 'active' %}
+                        <span class="badge bg-soft-success text-success">Active</span>
+                        {% elif budget.status == 'closed' %}
+                        <span class="badge bg-soft-secondary text-secondary">Closed</span>
+                        {% else %}
+                        <span class="badge bg-soft-secondary text-secondary">{{ budget.get_status_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Fiscal Year</small>
+                    <div class="fw-medium">{{ budget.fiscal_year }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Department</small>
+                    <div class="fw-medium">{{ budget.department|default:"All Departments" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Currency</small>
+                    <div class="fw-medium">{{ budget.currency|default:"USD" }}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Created</small>
+                    <div class="fw-medium">{{ budget.created_at|date:"M d, Y" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Card -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'training:budget_edit' budget.pk %}" class="btn btn-soft-warning">
+                        <i class="ri-pencil-line me-1"></i> Edit Budget
+                    </a>
+                    <a href="{% url 'training:budget_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to Budgets
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

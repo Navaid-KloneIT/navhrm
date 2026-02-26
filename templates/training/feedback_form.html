@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'training:feedback_list' %}">Training Feedback</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Training & Employee Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Training & Employee</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Training -->
+                <div class="col-md-6">
+                    <label for="{{ form.training.id_for_label }}" class="form-label">
+                        Training <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.training.html_name }}"
+                            id="{{ form.training.id_for_label }}"
+                            class="form-select {% if form.training.errors %}is-invalid{% endif %}">
+                        <option value="">Select Training</option>
+                        {% for choice in form.training.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.training.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.training.errors %}<div class="invalid-feedback">{{ form.training.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">
+                        Employee <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.employee.html_name }}"
+                            id="{{ form.employee.id_for_label }}"
+                            class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                        <option value="">Select Employee</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ratings Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Ratings</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Overall Rating -->
+                <div class="col-md-3">
+                    <label for="{{ form.overall_rating.id_for_label }}" class="form-label">
+                        Overall Rating <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.overall_rating.html_name }}"
+                            id="{{ form.overall_rating.id_for_label }}"
+                            class="form-select {% if form.overall_rating.errors %}is-invalid{% endif %}">
+                        <option value="">Select Rating</option>
+                        <option value="1" {% if form.overall_rating.value|stringformat:"s" == "1" %}selected{% endif %}>1 - Poor</option>
+                        <option value="2" {% if form.overall_rating.value|stringformat:"s" == "2" %}selected{% endif %}>2 - Fair</option>
+                        <option value="3" {% if form.overall_rating.value|stringformat:"s" == "3" %}selected{% endif %}>3 - Good</option>
+                        <option value="4" {% if form.overall_rating.value|stringformat:"s" == "4" %}selected{% endif %}>4 - Very Good</option>
+                        <option value="5" {% if form.overall_rating.value|stringformat:"s" == "5" %}selected{% endif %}>5 - Excellent</option>
+                    </select>
+                    {% if form.overall_rating.errors %}<div class="invalid-feedback">{{ form.overall_rating.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Content Rating -->
+                <div class="col-md-3">
+                    <label for="{{ form.content_rating.id_for_label }}" class="form-label">
+                        Content Rating <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.content_rating.html_name }}"
+                            id="{{ form.content_rating.id_for_label }}"
+                            class="form-select {% if form.content_rating.errors %}is-invalid{% endif %}">
+                        <option value="">Select Rating</option>
+                        <option value="1" {% if form.content_rating.value|stringformat:"s" == "1" %}selected{% endif %}>1 - Poor</option>
+                        <option value="2" {% if form.content_rating.value|stringformat:"s" == "2" %}selected{% endif %}>2 - Fair</option>
+                        <option value="3" {% if form.content_rating.value|stringformat:"s" == "3" %}selected{% endif %}>3 - Good</option>
+                        <option value="4" {% if form.content_rating.value|stringformat:"s" == "4" %}selected{% endif %}>4 - Very Good</option>
+                        <option value="5" {% if form.content_rating.value|stringformat:"s" == "5" %}selected{% endif %}>5 - Excellent</option>
+                    </select>
+                    {% if form.content_rating.errors %}<div class="invalid-feedback">{{ form.content_rating.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Instructor Rating -->
+                <div class="col-md-3">
+                    <label for="{{ form.instructor_rating.id_for_label }}" class="form-label">
+                        Instructor Rating <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.instructor_rating.html_name }}"
+                            id="{{ form.instructor_rating.id_for_label }}"
+                            class="form-select {% if form.instructor_rating.errors %}is-invalid{% endif %}">
+                        <option value="">Select Rating</option>
+                        <option value="1" {% if form.instructor_rating.value|stringformat:"s" == "1" %}selected{% endif %}>1 - Poor</option>
+                        <option value="2" {% if form.instructor_rating.value|stringformat:"s" == "2" %}selected{% endif %}>2 - Fair</option>
+                        <option value="3" {% if form.instructor_rating.value|stringformat:"s" == "3" %}selected{% endif %}>3 - Good</option>
+                        <option value="4" {% if form.instructor_rating.value|stringformat:"s" == "4" %}selected{% endif %}>4 - Very Good</option>
+                        <option value="5" {% if form.instructor_rating.value|stringformat:"s" == "5" %}selected{% endif %}>5 - Excellent</option>
+                    </select>
+                    {% if form.instructor_rating.errors %}<div class="invalid-feedback">{{ form.instructor_rating.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Relevance Rating -->
+                <div class="col-md-3">
+                    <label for="{{ form.relevance_rating.id_for_label }}" class="form-label">
+                        Relevance Rating <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.relevance_rating.html_name }}"
+                            id="{{ form.relevance_rating.id_for_label }}"
+                            class="form-select {% if form.relevance_rating.errors %}is-invalid{% endif %}">
+                        <option value="">Select Rating</option>
+                        <option value="1" {% if form.relevance_rating.value|stringformat:"s" == "1" %}selected{% endif %}>1 - Poor</option>
+                        <option value="2" {% if form.relevance_rating.value|stringformat:"s" == "2" %}selected{% endif %}>2 - Fair</option>
+                        <option value="3" {% if form.relevance_rating.value|stringformat:"s" == "3" %}selected{% endif %}>3 - Good</option>
+                        <option value="4" {% if form.relevance_rating.value|stringformat:"s" == "4" %}selected{% endif %}>4 - Very Good</option>
+                        <option value="5" {% if form.relevance_rating.value|stringformat:"s" == "5" %}selected{% endif %}>5 - Excellent</option>
+                    </select>
+                    {% if form.relevance_rating.errors %}<div class="invalid-feedback">{{ form.relevance_rating.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Comments</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Comments -->
+                <div class="col-12">
+                    <label for="{{ form.comments.id_for_label }}" class="form-label">Comments</label>
+                    <textarea name="{{ form.comments.html_name }}"
+                              id="{{ form.comments.id_for_label }}"
+                              class="form-control {% if form.comments.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Share your thoughts about the training...">{{ form.comments.value|default_if_none:'' }}</textarea>
+                    {% if form.comments.errors %}<div class="invalid-feedback">{{ form.comments.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Suggestions -->
+                <div class="col-12">
+                    <label for="{{ form.suggestions.id_for_label }}" class="form-label">Suggestions</label>
+                    <textarea name="{{ form.suggestions.html_name }}"
+                              id="{{ form.suggestions.id_for_label }}"
+                              class="form-control {% if form.suggestions.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Any suggestions for improvement...">{{ form.suggestions.value|default_if_none:'' }}</textarea>
+                    {% if form.suggestions.errors %}<div class="invalid-feedback">{{ form.suggestions.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Would Recommend -->
+                <div class="col-12">
+                    <div class="form-check">
+                        <input type="checkbox"
+                               name="{{ form.would_recommend.html_name }}"
+                               id="{{ form.would_recommend.id_for_label }}"
+                               class="form-check-input {% if form.would_recommend.errors %}is-invalid{% endif %}"
+                               {% if form.would_recommend.value %}checked{% endif %}>
+                        <label for="{{ form.would_recommend.id_for_label }}" class="form-check-label">
+                            I would recommend this training to others
+                        </label>
+                        {% if form.would_recommend.errors %}<div class="invalid-feedback">{{ form.would_recommend.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-send-plane-line me-1"></i> Submit Feedback
+        </button>
+        <a href="{% url 'training:feedback_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}

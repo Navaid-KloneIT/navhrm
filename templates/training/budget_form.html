@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'training:budget_list' %}">Budgets</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Budget Info Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Budget Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Department -->
+                <div class="col-md-6">
+                    <label for="{{ form.department.id_for_label }}" class="form-label">
+                        Department
+                    </label>
+                    <select name="{{ form.department.html_name }}"
+                            id="{{ form.department.id_for_label }}"
+                            class="form-select {% if form.department.errors %}is-invalid{% endif %}">
+                        <option value="">All Departments</option>
+                        {% for choice in form.department.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.department.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.department.errors %}<div class="invalid-feedback">{{ form.department.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Fiscal Year -->
+                <div class="col-md-3">
+                    <label for="{{ form.fiscal_year.id_for_label }}" class="form-label">
+                        Fiscal Year <span class="text-danger">*</span>
+                    </label>
+                    <input type="text"
+                           name="{{ form.fiscal_year.html_name }}"
+                           id="{{ form.fiscal_year.id_for_label }}"
+                           class="form-control {% if form.fiscal_year.errors %}is-invalid{% endif %}"
+                           value="{{ form.fiscal_year.value|default_if_none:'' }}"
+                           placeholder="e.g., 2025-2026">
+                    {% if form.fiscal_year.errors %}<div class="invalid-feedback">{{ form.fiscal_year.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-3">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                    <select name="{{ form.status.html_name }}"
+                            id="{{ form.status.id_for_label }}"
+                            class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Amount Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Amounts</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Allocated Amount -->
+                <div class="col-md-4">
+                    <label for="{{ form.allocated_amount.id_for_label }}" class="form-label">
+                        Allocated Amount <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="ri-money-dollar-circle-line"></i></span>
+                        <input type="number"
+                               name="{{ form.allocated_amount.html_name }}"
+                               id="{{ form.allocated_amount.id_for_label }}"
+                               class="form-control {% if form.allocated_amount.errors %}is-invalid{% endif %}"
+                               value="{{ form.allocated_amount.value|default_if_none:'' }}"
+                               step="0.01"
+                               placeholder="0.00">
+                        {% if form.allocated_amount.errors %}<div class="invalid-feedback">{{ form.allocated_amount.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <!-- Utilized Amount -->
+                <div class="col-md-4">
+                    <label for="{{ form.utilized_amount.id_for_label }}" class="form-label">
+                        Utilized Amount
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="ri-money-dollar-circle-line"></i></span>
+                        <input type="number"
+                               name="{{ form.utilized_amount.html_name }}"
+                               id="{{ form.utilized_amount.id_for_label }}"
+                               class="form-control {% if form.utilized_amount.errors %}is-invalid{% endif %}"
+                               value="{{ form.utilized_amount.value|default_if_none:'0' }}"
+                               step="0.01"
+                               placeholder="0.00">
+                        {% if form.utilized_amount.errors %}<div class="invalid-feedback">{{ form.utilized_amount.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <!-- Currency -->
+                <div class="col-md-4">
+                    <label for="{{ form.currency.id_for_label }}" class="form-label">
+                        Currency <span class="text-danger">*</span>
+                    </label>
+                    <input type="text"
+                           name="{{ form.currency.html_name }}"
+                           id="{{ form.currency.id_for_label }}"
+                           class="form-control {% if form.currency.errors %}is-invalid{% endif %}"
+                           value="{{ form.currency.value|default_if_none:'USD' }}"
+                           placeholder="e.g., USD">
+                    {% if form.currency.errors %}<div class="invalid-feedback">{{ form.currency.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Description -->
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea name="{{ form.description.html_name }}"
+                              id="{{ form.description.id_for_label }}"
+                              class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Budget description and notes...">{{ form.description.value|default_if_none:'' }}</textarea>
+                    {% if form.description.errors %}<div class="invalid-feedback">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Budget
+        </button>
+        <a href="{% url 'training:budget_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}

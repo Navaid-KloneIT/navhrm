@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Training Feedback - {{ feedback.training }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Training Feedback Detail</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'training:feedback_list' %}">Training Feedback</a></li>
+            <li class="breadcrumb-item active">{{ feedback.training|truncatewords:5 }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Left Column: Feedback Details -->
+    <div class="col-lg-8">
+        <!-- Ratings Card -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ feedback.training }}</h5>
+                {% if feedback.would_recommend %}
+                <span class="badge bg-soft-success text-success fs-6">Recommended</span>
+                {% else %}
+                <span class="badge bg-soft-danger text-danger fs-6">Not Recommended</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- Overall Rating -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 text-center">
+                            <small class="text-muted d-block mb-1">Overall Rating</small>
+                            <div class="text-warning mb-1">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= feedback.overall_rating %}
+                                    <i class="ri-star-fill fs-4"></i>
+                                    {% else %}
+                                    <i class="ri-star-line fs-4"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="fw-medium fs-5">{{ feedback.overall_rating }}/5</span>
+                        </div>
+                    </div>
+
+                    <!-- Content Rating -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 text-center">
+                            <small class="text-muted d-block mb-1">Content Rating</small>
+                            <div class="text-warning mb-1">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= feedback.content_rating %}
+                                    <i class="ri-star-fill fs-4"></i>
+                                    {% else %}
+                                    <i class="ri-star-line fs-4"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="fw-medium fs-5">{{ feedback.content_rating }}/5</span>
+                        </div>
+                    </div>
+
+                    <!-- Instructor Rating -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 text-center">
+                            <small class="text-muted d-block mb-1">Instructor Rating</small>
+                            <div class="text-warning mb-1">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= feedback.instructor_rating %}
+                                    <i class="ri-star-fill fs-4"></i>
+                                    {% else %}
+                                    <i class="ri-star-line fs-4"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="fw-medium fs-5">{{ feedback.instructor_rating }}/5</span>
+                        </div>
+                    </div>
+
+                    <!-- Relevance Rating -->
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 text-center">
+                            <small class="text-muted d-block mb-1">Relevance Rating</small>
+                            <div class="text-warning mb-1">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= feedback.relevance_rating %}
+                                    <i class="ri-star-fill fs-4"></i>
+                                    {% else %}
+                                    <i class="ri-star-line fs-4"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="fw-medium fs-5">{{ feedback.relevance_rating }}/5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comments Card -->
+        {% if feedback.comments %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Comments</h5>
+            </div>
+            <div class="card-body">
+                <div>{{ feedback.comments|linebreaksbr }}</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Suggestions Card -->
+        {% if feedback.suggestions %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Suggestions</h5>
+            </div>
+            <div class="card-body">
+                <div>{{ feedback.suggestions|linebreaksbr }}</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column: Info Card -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Employee</small>
+                    <div class="fw-medium">{{ feedback.employee }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Training</small>
+                    <div class="fw-medium">{{ feedback.training }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Would Recommend</small>
+                    <div>
+                        {% if feedback.would_recommend %}
+                        <span class="badge bg-soft-success text-success">Yes</span>
+                        {% else %}
+                        <span class="badge bg-soft-danger text-danger">No</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Submitted</small>
+                    <div class="fw-medium">{{ feedback.created_at|date:"M d, Y h:i A" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Card -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-grid">
+                    <a href="{% url 'training:feedback_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to Feedback
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

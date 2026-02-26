@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Training</li>
+            <li class="breadcrumb-item"><a href="{% url 'training:assessment_list' %}">Assessments</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Assessment Info -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Assessment Info</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="{{ form.title.id_for_label }}" name="{{ form.title.html_name }}" value="{{ form.title.value|default_if_none:'' }}" placeholder="e.g., Python Basics Quiz">
+                    {% for error in form.title.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.course.id_for_label }}" class="form-label">Course</label>
+                    <select class="form-select {% if form.course.errors %}is-invalid{% endif %}" id="{{ form.course.id_for_label }}" name="{{ form.course.html_name }}">
+                        <option value="">-- No Course (Standalone) --</option>
+                        {% for choice in form.course.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.course.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.course.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="3" placeholder="Describe this assessment...">{{ form.description.value|default_if_none:'' }}</textarea>
+                    {% for error in form.description.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.assessment_type.id_for_label }}" class="form-label">Assessment Type <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.assessment_type.errors %}is-invalid{% endif %}" id="{{ form.assessment_type.id_for_label }}" name="{{ form.assessment_type.html_name }}">
+                        <option value="">-- Select Type --</option>
+                        {% for value, label in form.assessment_type.field.choices %}
+                        <option value="{{ value }}" {% if form.assessment_type.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.assessment_type.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.passing_score.id_for_label }}" class="form-label">Passing Score (%) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.passing_score.errors %}is-invalid{% endif %}" id="{{ form.passing_score.id_for_label }}" name="{{ form.passing_score.html_name }}" value="{{ form.passing_score.value|default_if_none:'70' }}" min="0" max="100">
+                    {% for error in form.passing_score.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.time_limit_minutes.id_for_label }}" class="form-label">Time Limit (Minutes)</label>
+                    <input type="number" class="form-control {% if form.time_limit_minutes.errors %}is-invalid{% endif %}" id="{{ form.time_limit_minutes.id_for_label }}" name="{{ form.time_limit_minutes.html_name }}" value="{{ form.time_limit_minutes.value|default_if_none:'' }}" min="0" placeholder="e.g., 60">
+                    {% for error in form.time_limit_minutes.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.max_attempts.id_for_label }}" class="form-label">Max Attempts</label>
+                    <input type="number" class="form-control {% if form.max_attempts.errors %}is-invalid{% endif %}" id="{{ form.max_attempts.id_for_label }}" name="{{ form.max_attempts.html_name }}" value="{{ form.max_attempts.value|default_if_none:'' }}" min="1" placeholder="e.g., 3">
+                    {% for error in form.max_attempts.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input {% if form.is_published.errors %}is-invalid{% endif %}" id="{{ form.is_published.id_for_label }}" name="{{ form.is_published.html_name }}" {% if form.is_published.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_published.id_for_label }}">Published</label>
+                        {% for error in form.is_published.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save
+        </button>
+        <a href="{% url 'training:assessment_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
