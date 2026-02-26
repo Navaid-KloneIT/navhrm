@@ -103,17 +103,9 @@
                                 <td>{{ enrollment.score|default:"-" }}</td>
                                 <td>{{ enrollment.enrolled_date|date:"d M Y" }}</td>
                                 <td>
-                                    <div class="d-flex gap-1">
-                                        <a href="{% url 'training:enrollment_edit' enrollment.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
-                                            <i class="ri-pencil-line"></i>
-                                        </a>
-                                        <form method="post" action="{% url 'training:enrollment_delete' enrollment.pk %}" class="d-inline">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to remove this enrollment?')">
-                                                <i class="ri-delete-bin-line"></i>
-                                            </button>
-                                        </form>
-                                    </div>
+                                    <a href="{% url 'training:course_detail' enrollment.course.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="View Course">
+                                        <i class="ri-eye-line"></i>
+                                    </a>
                                 </td>
                             </tr>
                             {% empty %}
