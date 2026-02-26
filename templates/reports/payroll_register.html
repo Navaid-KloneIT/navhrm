@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% load report_tags %}
+
+{% block title %}Payroll Register{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Payroll Register</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'reports:reports_dashboard' %}">Reports</a></li>
+            <li class="breadcrumb-item active">Payroll Register</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Month</label>
+                        {{ form.month }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Year</label>
+                        {{ form.year }}
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-filter-3-line me-1"></i> Apply
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if period %}
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Employee Count</p>
+                        <h3 class="stats-value mb-0">{{ employee_count }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-primary text-primary">
+                        <i class="ri-team-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">{{ selected_month }} {{ selected_year }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Gross</p>
+                        <h3 class="stats-value mb-0">{{ total_gross|indian_number }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-success text-success">
+                        <i class="ri-money-dollar-circle-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">{{ selected_month }} {{ selected_year }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Deductions</p>
+                        <h3 class="stats-value mb-0">{{ total_deductions|indian_number }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-danger text-danger">
+                        <i class="ri-subtract-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">{{ selected_month }} {{ selected_year }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Net Pay</p>
+                        <h3 class="stats-value mb-0">{{ total_net|indian_number }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-info text-info">
+                        <i class="ri-wallet-3-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">{{ selected_month }} {{ selected_year }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payroll Register Table -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0">
+                    <i class="ri-file-list-3-line me-1"></i> Payroll Register - {{ selected_month }} {{ selected_year }}
+                </h5>
+                <span class="badge bg-soft-primary text-primary">{{ entries|length }} Entries</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th class="text-end">Gross</th>
+                                <th class="text-end">Deductions</th>
+                                <th class="text-end">Net Pay</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in entries %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <span class="text-muted">{{ entry.employee.employee_id }}</span>
+                                </td>
+                                <td>
+                                    <span class="fw-medium">{{ entry.employee.first_name }} {{ entry.employee.last_name }}</span>
+                                </td>
+                                <td>{{ entry.employee.department }}</td>
+                                <td class="text-end">{{ entry.gross_earnings|indian_number }}</td>
+                                <td class="text-end">{{ entry.total_deductions|indian_number }}</td>
+                                <td class="text-end">
+                                    <span class="fw-semibold">{{ entry.net_pay|indian_number }}</span>
+                                </td>
+                                <td class="text-center">
+                                    {% if entry.get_status_display == "Paid" or entry.get_status_display == "paid" %}
+                                    <span class="badge bg-soft-success text-success">{{ entry.get_status_display }}</span>
+                                    {% elif entry.get_status_display == "Draft" or entry.get_status_display == "draft" %}
+                                    <span class="badge bg-soft-warning text-warning">{{ entry.get_status_display }}</span>
+                                    {% elif entry.get_status_display == "Processing" or entry.get_status_display == "processing" %}
+                                    <span class="badge bg-soft-info text-info">{{ entry.get_status_display }}</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ entry.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-4 text-muted">
+                                    <i class="ri-inbox-line fs-3 d-block mb-2"></i>
+                                    No payroll entries found for this period.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% if entries %}
+                        <tfoot class="table-light">
+                            <tr class="fw-semibold">
+                                <td colspan="4" class="text-end">Totals:</td>
+                                <td class="text-end">{{ total_gross|indian_number }}</td>
+                                <td class="text-end">{{ total_deductions|indian_number }}</td>
+                                <td class="text-end">{{ total_net|indian_number }}</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- No Period Selected -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="ri-calendar-line text-muted" style="font-size: 48px;"></i>
+                <h5 class="mt-3 text-muted">No payroll data found for selected period</h5>
+                <p class="text-muted mb-0">Please select a month and year to view the payroll register.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
