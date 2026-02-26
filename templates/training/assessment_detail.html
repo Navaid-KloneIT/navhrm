@@ -107,17 +107,9 @@
                         </td>
                         <td class="text-center">{{ question.points }}</td>
                         <td>
-                            <div class="d-flex gap-1">
-                                <a href="{% url 'training:question_edit' assessment.pk question.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
-                                    <i class="ri-pencil-line"></i>
-                                </a>
-                                <form method="post" action="{% url 'training:question_delete' assessment.pk question.pk %}" class="d-inline">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this question?')">
-                                        <i class="ri-delete-bin-line"></i>
-                                    </button>
-                                </form>
-                            </div>
+                            <a href="{% url 'training:question_edit' question.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                <i class="ri-pencil-line"></i>
+                            </a>
                         </td>
                     </tr>
                     {% empty %}
