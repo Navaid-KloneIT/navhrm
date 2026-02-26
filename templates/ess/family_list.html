@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Family Members{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>Family Members</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'ess:my_profile' %}">My Profile</a></li>
+                    <li class="breadcrumb-item active">Family Members</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'ess:family_create' %}" class="btn btn-primary">
+            <i class="ri-add-line me-1"></i> Add Family Member
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Family Members</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Relationship</th>
+                                <th>Date of Birth</th>
+                                <th>Gender</th>
+                                <th>Dependent</th>
+                                <th>Nominee</th>
+                                <th>Insurance</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in members %}
+                            <tr>
+                                <td class="fw-medium">{{ member.name }}</td>
+                                <td>{{ member.get_relationship_display }}</td>
+                                <td>{{ member.date_of_birth|date:"M d, Y"|default:"-" }}</td>
+                                <td>{{ member.get_gender_display|default:"-" }}</td>
+                                <td>
+                                    {% if member.is_dependent %}
+                                    <span class="badge bg-soft-success text-success">Yes</span>
+                                    {% else %}
+                                    <span class="text-muted">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if member.is_nominee %}
+                                    <span class="badge bg-soft-success text-success">{{ member.nominee_percentage }}%</span>
+                                    {% else %}
+                                    <span class="text-muted">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if member.covered_under_insurance %}
+                                    <span class="badge bg-soft-success text-success">Covered</span>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'ess:family_edit' member.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'ess:family_delete' member.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this family member?')">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-group-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No family members found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            Add your family members for records and insurance purposes.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
