@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Suggestion - {{ suggestion.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Suggestion Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:suggestion_list' %}">Suggestions</a></li>
+            <li class="breadcrumb-item active">{{ suggestion.title|truncatewords:5 }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Suggestion Content -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ suggestion.title }}</h5>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-soft-info text-info">{{ suggestion.get_category_display }}</span>
+                    {% if suggestion.status == 'submitted' %}
+                    <span class="badge bg-soft-info text-info">Submitted</span>
+                    {% elif suggestion.status == 'under_review' %}
+                    <span class="badge bg-soft-warning text-warning">Under Review</span>
+                    {% elif suggestion.status == 'accepted' %}
+                    <span class="badge bg-soft-success text-success">Accepted</span>
+                    {% elif suggestion.status == 'implemented' %}
+                    <span class="badge bg-soft-primary text-primary">Implemented</span>
+                    {% elif suggestion.status == 'rejected' %}
+                    <span class="badge bg-soft-danger text-danger">Rejected</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    {{ suggestion.description|linebreaks }}
+                </div>
+
+                {% if suggestion.attachment %}
+                <div class="mt-3 pt-3 border-top">
+                    <small class="text-muted d-block mb-2">Attachment</small>
+                    <a href="{{ suggestion.attachment.url }}" class="btn btn-sm btn-soft-primary" download>
+                        <i class="ri-download-line me-1"></i> Download Attachment
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Admin Response -->
+        {% if suggestion.admin_response %}
+        <div class="card mb-4">
+            <div class="card-header bg-soft-info">
+                <h5 class="mb-0"><i class="ri-admin-line me-1"></i> Admin Response</h5>
+            </div>
+            <div class="card-body">
+                {{ suggestion.admin_response|linebreaks }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        {% if suggestion.status == 'submitted' %}
+                        <span class="badge bg-soft-info text-info">Submitted</span>
+                        {% elif suggestion.status == 'under_review' %}
+                        <span class="badge bg-soft-warning text-warning">Under Review</span>
+                        {% elif suggestion.status == 'accepted' %}
+                        <span class="badge bg-soft-success text-success">Accepted</span>
+                        {% elif suggestion.status == 'implemented' %}
+                        <span class="badge bg-soft-primary text-primary">Implemented</span>
+                        {% elif suggestion.status == 'rejected' %}
+                        <span class="badge bg-soft-danger text-danger">Rejected</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Category</small>
+                    <div><span class="badge bg-soft-info text-info">{{ suggestion.get_category_display }}</span></div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Upvotes</small>
+                    <div class="fw-medium">
+                        <i class="ri-thumb-up-line me-1 text-primary"></i>{{ suggestion.upvotes }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Submitted</small>
+                    <div class="fw-medium">{{ suggestion.created_at|date:"M d, Y" }}</div>
+                </div>
+                {% if suggestion.is_anonymous %}
+                <div>
+                    <span class="badge bg-soft-secondary text-secondary">
+                        <i class="ri-eye-off-line me-1"></i>Anonymous Submission
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'ess:suggestion_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to Suggestions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
