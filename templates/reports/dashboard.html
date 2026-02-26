@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% load report_tags %}
+
+{% block title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Reports & Analytics</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Reports</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Quick Stat Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Employees</p>
+                        <h3 class="stats-value mb-0">{{ total_employees }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-primary text-primary">
+                        <i class="ri-team-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Attrition Rate</p>
+                        <h3 class="stats-value mb-0">{{ attrition_rate }}%</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-danger text-danger">
+                        <i class="ri-user-unfollow-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Open Positions</p>
+                        <h3 class="stats-value mb-0">{{ open_positions }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-warning text-warning">
+                        <i class="ri-briefcase-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Pending Leaves</p>
+                        <h3 class="stats-value mb-0">{{ pending_leaves }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-info text-info">
+                        <i class="ri-calendar-event-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Category Cards -->
+<div class="row g-4 mb-4">
+    <!-- HR Reports -->
+    <div class="col-xl-4 col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                        <i class="ri-team-line" style="font-size: 22px;"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">
+                            <a href="{% url 'reports:hr_headcount' %}" class="text-body text-decoration-none">HR Reports</a>
+                        </h5>
+                        <small class="text-muted">Workforce analytics & insights</small>
+                    </div>
+                </div>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <a href="{% url 'reports:hr_headcount' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Headcount Report
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'reports:hr_attrition' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Attrition Report
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'reports:hr_diversity' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Diversity Report
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'reports:hr_cost' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Cost Report
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'reports:hr_hiring' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Hiring Report
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Reports -->
+    <div class="col-xl-4 col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-soft-success text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                        <i class="ri-calendar-check-line" style="font-size: 22px;"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">
+                            <a href="{% url 'reports:attendance_summary' %}" class="text-body text-decoration-none">Attendance Reports</a>
+                        </h5>
+                        <small class="text-muted">Time tracking & attendance</small>
+                    </div>
+                </div>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <a href="{% url 'reports:attendance_summary' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Attendance Summary
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'reports:attendance_lateness' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Lateness Report
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'reports:attendance_absenteeism' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Absenteeism Report
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'reports:attendance_overtime' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Overtime Report
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'reports:attendance_utilization' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Utilization Report
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leave Reports -->
+    <div class="col-xl-4 col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-soft-warning text-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                        <i class="ri-calendar-event-line" style="font-size: 22px;"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">
+                            <a href="{% url 'reports:leave_register' %}" class="text-body text-decoration-none">Leave Reports</a>
+                        </h5>
+                        <small class="text-muted">Leave balances & trends</small>
+                    </div>
+                </div>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <a href="{% url 'reports:leave_register' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Leave Register
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'reports:leave_liability' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Leave Liability
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'reports:leave_compoff' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Comp-Off Report
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'reports:leave_trend' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Leave Trend
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payroll Reports -->
+    <div class="col-xl-4 col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-soft-info text-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                        <i class="ri-money-dollar-circle-line" style="font-size: 22px;"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">
+                            <a href="{% url 'reports:payroll_register' %}" class="text-body text-decoration-none">Payroll Reports</a>
+                        </h5>
+                        <small class="text-muted">Salary & compensation data</small>
+                    </div>
+                </div>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <a href="{% url 'reports:payroll_register' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Salary Register
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'reports:payroll_tax' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Tax Report
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'reports:payroll_statutory' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Statutory Report
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'reports:payroll_cost' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Payroll Cost
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Dashboard -->
+    <div class="col-xl-4 col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-soft-danger text-danger rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                        <i class="ri-line-chart-line" style="font-size: 22px;"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">
+                            <a href="{% url 'reports:analytics_dashboard' %}" class="text-body text-decoration-none">Analytics Dashboard</a>
+                        </h5>
+                        <small class="text-muted">Executive overview & KPIs</small>
+                    </div>
+                </div>
+                <ul class="list-unstyled mb-0">
+                    <li>
+                        <a href="{% url 'reports:analytics_dashboard' %}" class="text-decoration-none">
+                            <i class="ri-arrow-right-s-line me-1 text-muted"></i> Executive Dashboard
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
