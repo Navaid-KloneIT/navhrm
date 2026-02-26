@@ -647,6 +647,150 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Reports & Analytics <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- HR Reports -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'reports' and 'hr_' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-team-line"></i>
+                    <span class="menu-text">HR Reports</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'reports' and 'hr_' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:hr_headcount' %}" class="menu-link {% if request.resolver_match.url_name == 'hr_headcount' %}active{% endif %}">
+                            <span class="menu-text">Headcount</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:hr_attrition' %}" class="menu-link {% if request.resolver_match.url_name == 'hr_attrition' %}active{% endif %}">
+                            <span class="menu-text">Attrition</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:hr_diversity' %}" class="menu-link {% if request.resolver_match.url_name == 'hr_diversity' %}active{% endif %}">
+                            <span class="menu-text">Diversity</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:hr_cost' %}" class="menu-link {% if request.resolver_match.url_name == 'hr_cost' %}active{% endif %}">
+                            <span class="menu-text">Cost Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:hr_hiring' %}" class="menu-link {% if request.resolver_match.url_name == 'hr_hiring' %}active{% endif %}">
+                            <span class="menu-text">Hiring Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Attendance Reports -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'reports' and 'attendance_' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-calendar-check-line"></i>
+                    <span class="menu-text">Attendance Reports</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'reports' and 'attendance_' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:attendance_summary' %}" class="menu-link {% if request.resolver_match.url_name == 'attendance_summary' and request.resolver_match.app_name == 'reports' %}active{% endif %}">
+                            <span class="menu-text">Attendance Summary</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:attendance_lateness' %}" class="menu-link {% if request.resolver_match.url_name == 'attendance_lateness' %}active{% endif %}">
+                            <span class="menu-text">Late/Early Departure</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:attendance_absenteeism' %}" class="menu-link {% if request.resolver_match.url_name == 'attendance_absenteeism' %}active{% endif %}">
+                            <span class="menu-text">Absenteeism</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:attendance_overtime' %}" class="menu-link {% if request.resolver_match.url_name == 'attendance_overtime' %}active{% endif %}">
+                            <span class="menu-text">Overtime</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:attendance_utilization' %}" class="menu-link {% if request.resolver_match.url_name == 'attendance_utilization' %}active{% endif %}">
+                            <span class="menu-text">Utilization</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Leave Reports -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'reports' and 'leave_' in request.resolver_match.url_name or request.resolver_match.app_name == 'reports' and 'leave_' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-calendar-event-line"></i>
+                    <span class="menu-text">Leave Reports</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'reports' and 'leave_' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:leave_register' %}" class="menu-link {% if request.resolver_match.url_name == 'leave_register' and request.resolver_match.app_name == 'reports' %}active{% endif %}">
+                            <span class="menu-text">Leave Register</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:leave_liability' %}" class="menu-link {% if request.resolver_match.url_name == 'leave_liability' %}active{% endif %}">
+                            <span class="menu-text">Leave Liability</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:leave_compoff' %}" class="menu-link {% if request.resolver_match.url_name == 'leave_compoff' %}active{% endif %}">
+                            <span class="menu-text">Comp-off</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:leave_trend' %}" class="menu-link {% if request.resolver_match.url_name == 'leave_trend' %}active{% endif %}">
+                            <span class="menu-text">Leave Trend</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Payroll Reports -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'reports' and 'payroll_' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-money-dollar-circle-line"></i>
+                    <span class="menu-text">Payroll Reports</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'reports' and 'payroll_' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:payroll_register' %}" class="menu-link {% if request.resolver_match.url_name == 'payroll_register' and request.resolver_match.app_name == 'reports' %}active{% endif %}">
+                            <span class="menu-text">Salary Register</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:payroll_tax' %}" class="menu-link {% if request.resolver_match.url_name == 'payroll_tax' %}active{% endif %}">
+                            <span class="menu-text">Tax Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:payroll_statutory' %}" class="menu-link {% if request.resolver_match.url_name == 'payroll_statutory' %}active{% endif %}">
+                            <span class="menu-text">Statutory Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'reports:payroll_cost' %}" class="menu-link {% if request.resolver_match.url_name == 'payroll_cost' %}active{% endif %}">
+                            <span class="menu-text">Cost Analysis</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Analytics -->
+            <li class="nav-item {% if request.resolver_match.url_name == 'analytics_dashboard' or request.resolver_match.url_name == 'reports_dashboard' %}open{% endif %}">
+                <a href="{% url 'reports:analytics_dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'analytics_dashboard' %}active{% endif %}">
+                    <i class="ri-line-chart-line"></i>
+                    <span class="menu-text">Analytics Dashboard</span>
+                </a>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Payroll <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Salary Structure -->
