@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}{{ cycle.name }} - Review Cycle{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Review Cycle Detail</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Performance</li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:cycle_list' %}">Review Cycles</a></li>
+            <li class="breadcrumb-item active">{{ cycle.name }}</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Cycle Info -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Cycle Details</h5>
+        <div>
+            {% if cycle.status == 'draft' or cycle.status == 'pending' %}
+            <span class="badge bg-soft-secondary me-2">{{ cycle.get_status_display }}</span>
+            {% elif cycle.status == 'active' or cycle.status == 'self_assessment' or cycle.status == 'manager_review' or cycle.status == 'peer_review' %}
+            <span class="badge bg-soft-success me-2">{{ cycle.get_status_display }}</span>
+            {% elif cycle.status == 'completed' or cycle.status == 'calibration' %}
+            <span class="badge bg-soft-primary me-2">{{ cycle.get_status_display }}</span>
+            {% elif cycle.status == 'cancelled' %}
+            <span class="badge bg-soft-danger me-2">{{ cycle.get_status_display }}</span>
+            {% else %}
+            <span class="badge bg-soft-secondary me-2">{{ cycle.get_status_display }}</span>
+            {% endif %}
+            <a href="{% url 'performance:cycle_edit' cycle.pk %}" class="btn btn-sm btn-soft-warning">
+                <i class="ri-pencil-line me-1"></i> Edit
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label text-muted">Name</label>
+                <p class="mb-0 fw-medium">{{ cycle.name }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Type</label>
+                <p class="mb-0 fw-medium">{{ cycle.get_cycle_type_display }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Period</label>
+                <p class="mb-0 fw-medium">{{ cycle.period|default:"-" }}</p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Start Date</label>
+                <p class="mb-0 fw-medium">{{ cycle.start_date|date:"d M Y" }}</p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">End Date</label>
+                <p class="mb-0 fw-medium">{{ cycle.end_date|date:"d M Y" }}</p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Self Assessment Deadline</label>
+                <p class="mb-0 fw-medium">{{ cycle.self_assessment_deadline|date:"d M Y"|default:"-" }}</p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Manager Review Deadline</label>
+                <p class="mb-0 fw-medium">{{ cycle.manager_review_deadline|date:"d M Y"|default:"-" }}</p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Peer Review Deadline</label>
+                <p class="mb-0 fw-medium">{{ cycle.peer_review_deadline|date:"d M Y"|default:"-" }}</p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Calibration Deadline</label>
+                <p class="mb-0 fw-medium">{{ cycle.calibration_deadline|date:"d M Y"|default:"-" }}</p>
+            </div>
+            {% if cycle.description %}
+            <div class="col-12">
+                <label class="form-label text-muted">Description</label>
+                <p class="mb-0">{{ cycle.description }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Reviews Table -->
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Reviews in this Cycle</h5>
+        <a href="{% url 'performance:review_create' %}" class="btn btn-sm btn-primary">
+            <i class="ri-add-line me-1"></i> Add Review
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Reviewer</th>
+                        <th>Status</th>
+                        <th class="text-center">Self Rating</th>
+                        <th class="text-center">Manager Rating</th>
+                        <th class="text-center">Final Rating</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in reviews %}
+                    <tr>
+                        <td class="fw-medium">{{ review.employee }}</td>
+                        <td>{{ review.reviewer|default:"-" }}</td>
+                        <td>
+                            {% if review.status == 'pending' or review.status == 'self_assessment' %}
+                            <span class="badge bg-soft-secondary">{{ review.get_status_display }}</span>
+                            {% elif review.status == 'manager_review' or review.status == 'peer_review' %}
+                            <span class="badge bg-soft-success">{{ review.get_status_display }}</span>
+                            {% elif review.status == 'completed' %}
+                            <span class="badge bg-soft-primary">{{ review.get_status_display }}</span>
+                            {% elif review.status == 'calibration' %}
+                            <span class="badge bg-soft-primary">{{ review.get_status_display }}</span>
+                            {% else %}
+                            <span class="badge bg-soft-secondary">{{ review.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if review.self_rating %}
+                            {% for i in "12345" %}
+                            {% if forloop.counter <= review.self_rating %}
+                            <i class="ri-star-fill text-warning"></i>
+                            {% else %}
+                            <i class="ri-star-line text-muted"></i>
+                            {% endif %}
+                            {% endfor %}
+                            <small class="text-muted ms-1">({{ review.self_rating }})</small>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if review.manager_rating %}
+                            {% for i in "12345" %}
+                            {% if forloop.counter <= review.manager_rating %}
+                            <i class="ri-star-fill text-warning"></i>
+                            {% else %}
+                            <i class="ri-star-line text-muted"></i>
+                            {% endif %}
+                            {% endfor %}
+                            <small class="text-muted ms-1">({{ review.manager_rating }})</small>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if review.final_rating %}
+                            {% for i in "12345" %}
+                            {% if forloop.counter <= review.final_rating %}
+                            <i class="ri-star-fill text-warning"></i>
+                            {% else %}
+                            <i class="ri-star-line text-muted"></i>
+                            {% endif %}
+                            {% endfor %}
+                            <small class="text-muted ms-1">({{ review.final_rating }})</small>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'performance:review_detail' review.pk %}" class="btn btn-sm btn-soft-info" title="View">
+                                <i class="ri-eye-line"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                <p class="mt-2 mb-1">No reviews in this cycle yet</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
