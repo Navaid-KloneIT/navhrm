@@ -7,7 +7,7 @@
     <h4>Announcements</h4>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
             <li class="breadcrumb-item active">Announcements</li>
         </ol>
     </nav>
@@ -18,14 +18,11 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <form method="GET" action="{% url 'ess:announcement_list' %}">
+                <form method="GET">
                     <div class="row g-3 align-items-end">
-                        <div class="col-md-5">
+                        <div class="col-md-3">
                             <label class="form-label">Search</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="ri-search-line"></i></span>
-                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search announcements...">
-                            </div>
+                            <input type="text" class="form-control" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Search announcements...">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Category</label>
@@ -41,9 +38,9 @@
                                 <i class="ri-filter-3-line me-1"></i> Filter
                             </button>
                         </div>
-                        <div class="col-md-2">
-                            <a href="{% url 'ess:announcement_list' %}" class="btn btn-light w-100">
-                                <i class="ri-refresh-line me-1"></i> Reset
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'ess:announcement_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> Post Announcement
                             </a>
                         </div>
                     </div>
@@ -78,9 +75,9 @@
                         <p class="text-muted mb-2">{{ announcement.content|truncatewords:40 }}</p>
                         <div class="d-flex align-items-center gap-3 text-muted" style="font-size: 13px;">
                             <span><i class="ri-user-line me-1"></i>{{ announcement.published_by }}</span>
-                            <span><i class="ri-calendar-line me-1"></i>{{ announcement.publish_date|date:"M d, Y" }}</span>
+                            <span><i class="ri-calendar-line me-1"></i>{{ announcement.publish_date|date:"d M Y" }}</span>
                             {% if announcement.expiry_date %}
-                            <span><i class="ri-time-line me-1"></i>Expires: {{ announcement.expiry_date|date:"M d, Y" }}</span>
+                            <span><i class="ri-time-line me-1"></i>Expires: {{ announcement.expiry_date|date:"d M Y" }}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -114,9 +111,9 @@
         <div class="card">
             <div class="card-footer">
                 <nav><ul class="pagination justify-content-center mb-0">
-                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>{% endif %}
-                    {% for num in page_obj.paginator.page_range %}{% if page_obj.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}<li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a></li>{% endif %}{% endfor %}
-                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>{% endif %}
+                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>{% endif %}
+                    {% for num in page_obj.paginator.page_range %}{% if page_obj.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}<li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">{{ num }}</a></li>{% endif %}{% endfor %}
+                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>{% endif %}
                 </ul></nav>
             </div>
         </div>
