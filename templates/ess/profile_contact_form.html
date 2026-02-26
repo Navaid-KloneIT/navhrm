@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Contact Details{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Edit Contact Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:my_profile' %}">My Profile</a></li>
+            <li class="breadcrumb-item active">Edit Contact Details</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Contact Information -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Contact Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Phone -->
+                <div class="col-md-4">
+                    <label for="{{ form.phone.id_for_label }}" class="form-label">Phone <span class="text-danger">*</span></label>
+                    <input type="text" name="{{ form.phone.html_name }}" id="{{ form.phone.id_for_label }}"
+                           class="form-control {% if form.phone.errors %}is-invalid{% endif %}"
+                           value="{{ form.phone.value|default_if_none:'' }}" placeholder="Phone number...">
+                    {% if form.phone.errors %}<div class="invalid-feedback">{{ form.phone.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-4">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" name="{{ form.email.html_name }}" id="{{ form.email.id_for_label }}"
+                           class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                           value="{{ form.email.value|default_if_none:'' }}" placeholder="Email address...">
+                    {% if form.email.errors %}<div class="invalid-feedback">{{ form.email.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Personal Email -->
+                <div class="col-md-4">
+                    <label for="{{ form.personal_email.id_for_label }}" class="form-label">Personal Email</label>
+                    <input type="email" name="{{ form.personal_email.html_name }}" id="{{ form.personal_email.id_for_label }}"
+                           class="form-control {% if form.personal_email.errors %}is-invalid{% endif %}"
+                           value="{{ form.personal_email.value|default_if_none:'' }}" placeholder="Personal email...">
+                    {% if form.personal_email.errors %}<div class="invalid-feedback">{{ form.personal_email.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Address</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Address Line 1 -->
+                <div class="col-md-6">
+                    <label for="{{ form.address_line1.id_for_label }}" class="form-label">Address Line 1</label>
+                    <input type="text" name="{{ form.address_line1.html_name }}" id="{{ form.address_line1.id_for_label }}"
+                           class="form-control {% if form.address_line1.errors %}is-invalid{% endif %}"
+                           value="{{ form.address_line1.value|default_if_none:'' }}" placeholder="Street address...">
+                    {% if form.address_line1.errors %}<div class="invalid-feedback">{{ form.address_line1.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Address Line 2 -->
+                <div class="col-md-6">
+                    <label for="{{ form.address_line2.id_for_label }}" class="form-label">Address Line 2</label>
+                    <input type="text" name="{{ form.address_line2.html_name }}" id="{{ form.address_line2.id_for_label }}"
+                           class="form-control {% if form.address_line2.errors %}is-invalid{% endif %}"
+                           value="{{ form.address_line2.value|default_if_none:'' }}" placeholder="Apartment, suite, etc...">
+                    {% if form.address_line2.errors %}<div class="invalid-feedback">{{ form.address_line2.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- City -->
+                <div class="col-md-3">
+                    <label for="{{ form.city.id_for_label }}" class="form-label">City</label>
+                    <input type="text" name="{{ form.city.html_name }}" id="{{ form.city.id_for_label }}"
+                           class="form-control {% if form.city.errors %}is-invalid{% endif %}"
+                           value="{{ form.city.value|default_if_none:'' }}" placeholder="City...">
+                    {% if form.city.errors %}<div class="invalid-feedback">{{ form.city.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- State -->
+                <div class="col-md-3">
+                    <label for="{{ form.state.id_for_label }}" class="form-label">State</label>
+                    <input type="text" name="{{ form.state.html_name }}" id="{{ form.state.id_for_label }}"
+                           class="form-control {% if form.state.errors %}is-invalid{% endif %}"
+                           value="{{ form.state.value|default_if_none:'' }}" placeholder="State...">
+                    {% if form.state.errors %}<div class="invalid-feedback">{{ form.state.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Country -->
+                <div class="col-md-3">
+                    <label for="{{ form.country.id_for_label }}" class="form-label">Country</label>
+                    <input type="text" name="{{ form.country.html_name }}" id="{{ form.country.id_for_label }}"
+                           class="form-control {% if form.country.errors %}is-invalid{% endif %}"
+                           value="{{ form.country.value|default_if_none:'' }}" placeholder="Country...">
+                    {% if form.country.errors %}<div class="invalid-feedback">{{ form.country.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- ZIP Code -->
+                <div class="col-md-3">
+                    <label for="{{ form.zip_code.id_for_label }}" class="form-label">ZIP Code</label>
+                    <input type="text" name="{{ form.zip_code.html_name }}" id="{{ form.zip_code.id_for_label }}"
+                           class="form-control {% if form.zip_code.errors %}is-invalid{% endif %}"
+                           value="{{ form.zip_code.value|default_if_none:'' }}" placeholder="ZIP / Postal code...">
+                    {% if form.zip_code.errors %}<div class="invalid-feedback">{{ form.zip_code.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Changes
+        </button>
+        <a href="{% url 'ess:my_profile' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
