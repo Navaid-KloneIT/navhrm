@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Employee Self Service</li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:asset_request_list' %}">Asset Requests</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Asset Request</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="{{ form.asset_type.id_for_label }}" class="form-label">
+                        Asset Type <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.asset_type.html_name }}"
+                            id="{{ form.asset_type.id_for_label }}"
+                            class="form-select {% if form.asset_type.errors %}is-invalid{% endif %}">
+                        <option value="">Select Asset Type</option>
+                        {% for value, label in form.asset_type.field.choices %}
+                        {% if value %}
+                        <option value="{{ value }}" {% if form.asset_type.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.asset_type.errors %}<div class="invalid-feedback">{{ form.asset_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.asset_name.id_for_label }}" class="form-label">
+                        Asset Name <span class="text-danger">*</span>
+                    </label>
+                    <input type="text"
+                           name="{{ form.asset_name.html_name }}"
+                           id="{{ form.asset_name.id_for_label }}"
+                           class="form-control {% if form.asset_name.errors %}is-invalid{% endif %}"
+                           value="{{ form.asset_name.value|default:'' }}"
+                           placeholder="e.g., Dell Latitude 5540, Ergonomic Chair, etc.">
+                    {% if form.asset_name.errors %}<div class="invalid-feedback">{{ form.asset_name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.quantity.id_for_label }}" class="form-label">
+                        Quantity <span class="text-danger">*</span>
+                    </label>
+                    <input type="number"
+                           name="{{ form.quantity.html_name }}"
+                           id="{{ form.quantity.id_for_label }}"
+                           class="form-control {% if form.quantity.errors %}is-invalid{% endif %}"
+                           value="{{ form.quantity.value|default:'1' }}"
+                           min="1">
+                    {% if form.quantity.errors %}<div class="invalid-feedback">{{ form.quantity.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.priority.id_for_label }}" class="form-label">
+                        Priority <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.priority.html_name }}"
+                            id="{{ form.priority.id_for_label }}"
+                            class="form-select {% if form.priority.errors %}is-invalid{% endif %}">
+                        <option value="">Select Priority</option>
+                        {% for value, label in form.priority.field.choices %}
+                        {% if value %}
+                        <option value="{{ value }}" {% if form.priority.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.priority.errors %}<div class="invalid-feedback">{{ form.priority.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.expected_date.id_for_label }}" class="form-label">
+                        Expected Date
+                    </label>
+                    <input type="date"
+                           name="{{ form.expected_date.html_name }}"
+                           id="{{ form.expected_date.id_for_label }}"
+                           class="form-control {% if form.expected_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.expected_date.value|default:'' }}">
+                    {% if form.expected_date.errors %}<div class="invalid-feedback">{{ form.expected_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label for="{{ form.reason.id_for_label }}" class="form-label">
+                        Reason <span class="text-danger">*</span>
+                    </label>
+                    <textarea name="{{ form.reason.html_name }}"
+                              id="{{ form.reason.id_for_label }}"
+                              class="form-control {% if form.reason.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Please provide the reason for your asset request...">{{ form.reason.value|default:'' }}</textarea>
+                    {% if form.reason.errors %}<div class="invalid-feedback">{{ form.reason.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">
+                        Additional Notes
+                    </label>
+                    <textarea name="{{ form.notes.html_name }}"
+                              id="{{ form.notes.id_for_label }}"
+                              class="form-control {% if form.notes.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Any additional notes or specifications...">{{ form.notes.value|default:'' }}</textarea>
+                    {% if form.notes.errors %}<div class="invalid-feedback">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-send-plane-line me-1"></i> Submit Request
+                </button>
+                <a href="{% url 'ess:asset_request_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
