@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'apps.payroll',
     'apps.performance',
     'apps.training',
+    'apps.ess',
 ]
 
 MIDDLEWARE = [
