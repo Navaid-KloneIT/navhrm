@@ -17,6 +17,7 @@ urlpatterns = [
     path('payroll/', include('apps.payroll.urls')),
     path('performance/', include('apps.performance.urls')),
     path('training/', include('apps.training.urls')),
+    path('ess/', include('apps.ess.urls')),
 ]
 
 if settings.DEBUG:
