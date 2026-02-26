@@ -1,27 +1,67 @@
 {% extends "base.html" %}
 
-{% block title %}Suggestions{% endblock %}
+{% block title %}Suggestion Box{% endblock %}
 
 {% block content %}
 <div class="page-title-box">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h4>Suggestion Box</h4>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
-                    <li class="breadcrumb-item active">Suggestions</li>
-                </ol>
-            </nav>
+    <h4>Suggestion Box</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Suggestions</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET">
+                    <input type="hidden" name="tab" value="{{ current_tab }}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Search by title...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" name="category">
+                                <option value="">All Categories</option>
+                                {% for value, label in category_choices %}
+                                <option value="{{ value }}" {% if request.GET.category == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'ess:suggestion_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> Submit Suggestion
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-        <a href="{% url 'ess:suggestion_create' %}" class="btn btn-primary">
-            <i class="ri-add-line me-1"></i> Submit Suggestion
-        </a>
     </div>
 </div>
 
 <!-- Tabs -->
-<div class="row mb-4">
+<div class="row mb-3">
     <div class="col-12">
         <ul class="nav nav-tabs">
             <li class="nav-item">
@@ -38,11 +78,11 @@
     </div>
 </div>
 
-<!-- Suggestions Table -->
+<!-- Table -->
 <div class="row">
     <div class="col-12">
         <div class="card table-card">
-            <div class="card-header">
+            <div class="card-header d-flex align-items-center justify-content-between">
                 <h5 class="mb-0">{% if current_tab == 'mine' %}My Suggestions{% else %}Public Suggestions{% endif %}</h5>
             </div>
             <div class="card-body p-0">
@@ -86,7 +126,7 @@
                                         <i class="ri-thumb-up-line me-1"></i>{{ suggestion.upvotes }}
                                     </span>
                                 </td>
-                                <td>{{ suggestion.created_at|date:"M d, Y" }}</td>
+                                <td>{{ suggestion.created_at|date:"d M Y" }}</td>
                                 <td>
                                     <a href="{% url 'ess:suggestion_detail' suggestion.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="View Details">
                                         <i class="ri-eye-line"></i>
@@ -100,7 +140,9 @@
                                         <i class="ri-lightbulb-line" style="font-size: 48px; opacity: 0.3;"></i>
                                         <p class="mt-2 mb-1">No suggestions found</p>
                                         <p class="mb-0" style="font-size: 13px;">
-                                            {% if current_tab == 'mine' %}
+                                            {% if request.GET.search or request.GET.category or request.GET.status %}
+                                                Try adjusting your filter criteria.
+                                            {% elif current_tab == 'mine' %}
                                                 You have not submitted any suggestions yet.
                                             {% else %}
                                                 No public suggestions available.
@@ -118,9 +160,9 @@
             {% if page_obj.has_other_pages %}
             <div class="card-footer">
                 <nav><ul class="pagination justify-content-center mb-0">
-                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.tab %}&tab={{ request.GET.tab }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>{% endif %}
-                    {% for num in page_obj.paginator.page_range %}{% if page_obj.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}<li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.tab %}&tab={{ request.GET.tab }}{% endif %}">{{ num }}</a></li>{% endif %}{% endfor %}
-                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.tab %}&tab={{ request.GET.tab }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>{% endif %}
+                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&tab={{ current_tab }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>{% endif %}
+                    {% for num in page_obj.paginator.page_range %}{% if page_obj.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}<li class="page-item"><a class="page-link" href="?page={{ num }}&tab={{ current_tab }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a></li>{% endif %}{% endfor %}
+                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&tab={{ current_tab }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>{% endif %}
                 </ul></nav>
             </div>
             {% endif %}
