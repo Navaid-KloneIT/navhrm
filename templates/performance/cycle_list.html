@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Review Cycles{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Review Cycles</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Performance</li>
+            <li class="breadcrumb-item active">Review Cycles</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Search by name...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="cycle_type">
+                                <option value="">All Types</option>
+                                {% for value, label in cycle_type_choices %}
+                                <option value="{{ value }}" {% if request.GET.cycle_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'performance:cycle_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> New Cycle
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Review Cycles</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Period</th>
+                                <th>Status</th>
+                                <th class="text-center">Reviews</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cycle in cycles %}
+                            <tr>
+                                <td class="fw-medium">
+                                    <a href="{% url 'performance:cycle_detail' cycle.pk %}">{{ cycle.name }}</a>
+                                </td>
+                                <td>{{ cycle.get_cycle_type_display }}</td>
+                                <td>{{ cycle.period|default:"-" }}</td>
+                                <td>
+                                    {% if cycle.status == 'draft' or cycle.status == 'pending' %}
+                                    <span class="badge bg-soft-secondary">{{ cycle.get_status_display }}</span>
+                                    {% elif cycle.status == 'active' or cycle.status == 'self_assessment' or cycle.status == 'manager_review' or cycle.status == 'peer_review' %}
+                                    <span class="badge bg-soft-success">{{ cycle.get_status_display }}</span>
+                                    {% elif cycle.status == 'completed' or cycle.status == 'calibration' %}
+                                    <span class="badge bg-soft-primary">{{ cycle.get_status_display }}</span>
+                                    {% elif cycle.status == 'cancelled' %}
+                                    <span class="badge bg-soft-danger">{{ cycle.get_status_display }}</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary">{{ cycle.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ cycle.review_count|default:"0" }}</td>
+                                <td>{{ cycle.start_date|date:"d M Y" }}</td>
+                                <td>{{ cycle.end_date|date:"d M Y" }}</td>
+                                <td>
+                                    <a href="{% url 'performance:cycle_detail' cycle.pk %}" class="btn btn-sm btn-soft-info me-1" title="View">
+                                        <i class="ri-eye-line"></i>
+                                    </a>
+                                    <a href="{% url 'performance:cycle_edit' cycle.pk %}" class="btn btn-sm btn-soft-warning me-1" title="Edit">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                    <a href="{% url 'performance:cycle_delete' cycle.pk %}" class="btn btn-sm btn-soft-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this cycle?');">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No review cycles found</p>
+                                        <a href="{% url 'performance:cycle_create' %}" class="btn btn-sm btn-primary mt-2">
+                                            <i class="ri-add-line me-1"></i> Create First Cycle
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
