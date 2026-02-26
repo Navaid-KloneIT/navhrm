@@ -201,8 +201,25 @@ class EmergencyContactListView(EmployeeSelfServiceMixin, ListView):
     context_object_name = 'contacts'
 
     def get_queryset(self):
-        return EmergencyContact.objects.filter(
+        qs = EmergencyContact.objects.filter(
             tenant=self.request.tenant, employee=self.employee)
+        search = self.request.GET.get('search', '').strip()
+        relationship = self.request.GET.get('relationship', '')
+        primary = self.request.GET.get('primary', '')
+        if search:
+            qs = qs.filter(Q(name__icontains=search) | Q(phone__icontains=search))
+        if relationship:
+            qs = qs.filter(relationship=relationship)
+        if primary == 'yes':
+            qs = qs.filter(is_primary=True)
+        elif primary == 'no':
+            qs = qs.filter(is_primary=False)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['relationship_choices'] = EmergencyContact.RELATIONSHIP_CHOICES
+        return ctx
 
 
 class EmergencyContactCreateView(EmployeeSelfServiceMixin, View):
@@ -263,8 +280,25 @@ class FamilyMemberListView(EmployeeSelfServiceMixin, ListView):
     context_object_name = 'members'
 
     def get_queryset(self):
-        return FamilyMember.objects.filter(
+        qs = FamilyMember.objects.filter(
             tenant=self.request.tenant, employee=self.employee)
+        search = self.request.GET.get('search', '').strip()
+        relationship = self.request.GET.get('relationship', '')
+        dependent = self.request.GET.get('dependent', '')
+        if search:
+            qs = qs.filter(Q(name__icontains=search) | Q(occupation__icontains=search))
+        if relationship:
+            qs = qs.filter(relationship=relationship)
+        if dependent == 'yes':
+            qs = qs.filter(is_dependent=True)
+        elif dependent == 'no':
+            qs = qs.filter(is_dependent=False)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['relationship_choices'] = FamilyMember.RELATIONSHIP_CHOICES
+        return ctx
 
 
 class FamilyMemberCreateView(EmployeeSelfServiceMixin, View):
@@ -325,8 +359,25 @@ class MyDocumentsView(EmployeeSelfServiceMixin, ListView):
     context_object_name = 'documents'
 
     def get_queryset(self):
-        return EmployeeDocument.objects.filter(
+        qs = EmployeeDocument.objects.filter(
             tenant=self.request.tenant, employee=self.employee)
+        search = self.request.GET.get('search', '').strip()
+        doc_type = self.request.GET.get('type', '')
+        status = self.request.GET.get('status', '')
+        if search:
+            qs = qs.filter(Q(name__icontains=search) | Q(document_number__icontains=search))
+        if doc_type:
+            qs = qs.filter(document_type=doc_type)
+        if status == 'verified':
+            qs = qs.filter(is_verified=True)
+        elif status == 'pending':
+            qs = qs.filter(is_verified=False)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['document_type_choices'] = EmployeeDocument.DOCUMENT_TYPES
+        return ctx
 
 
 # ===========================================================================
