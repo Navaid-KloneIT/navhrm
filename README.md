@@ -37,6 +37,11 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Continuous Feedback** - Real-time feedback (kudos/constructive/general), anonymous feedback option (sender hidden in UI, stored for audit), public/private/anonymous visibility controls, 1:1 meeting scheduling with date/time/location/duration, meeting notes (shared + separate manager/employee notes), meeting action items with assignment and due date tracking, given/received feedback tabs
 - **Performance Improvement** - PIP management with defined goals and support plans, PIP checkpoints with status tracking (pending/on_track/needs_improvement/met/not_met), PIP outcome tracking (success/failure/extended/cancelled), warning letters (verbal/written/final) with acknowledgement and appeal workflow, coaching notes with session tracking, action items, and follow-up scheduling
 
+### Training & Development Module
+- **Training Management** - Training categories, training catalog (classroom/virtual/external), training sessions with scheduling, venue and instructor management, external vendor management with cost tracking, training calendar view
+- **Learning Management (LMS)** - Course management with content types (video/document/SCORM/blended), course content ordering, role-based learning paths with ordered course sequences, assessments (quizzes/tests/certification exams) with multiple question types, gamification with badges and points, course enrollment with progress tracking (completion status, time spent, scores)
+- **Training Administration** - Employee nomination with approval/rejection workflow, session attendance tracking (present/absent/late/excused), post-training feedback with multi-criteria ratings (overall/content/instructor/relevance), auto-generated completion certificates with expiry tracking, department-wise training budget allocation and utilization tracking
+
 ### Recruitment Module
 - **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
 - **Job Templates** - Pre-defined job description templates for quick requisition creation
@@ -119,6 +124,7 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
    python manage.py seed_payroll
    python manage.py seed_payout
    python manage.py seed_performance
+   python manage.py seed_training
    ```
 
 8. **Run the development server**
@@ -157,7 +163,8 @@ navhrm/
 │   ├── recruitment/       # Job requisitions, candidates, interviews, offers
 │   ├── attendance/        # Attendance, leave, time tracking, holidays
 │   ├── payroll/           # Salary structure, payroll, statutory, tax, payout
-│   └── performance/       # Goals, reviews, feedback, PIP, warnings, coaching
+│   ├── performance/       # Goals, reviews, feedback, PIP, warnings, coaching
+│   └── training/          # Training management, LMS, administration
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS
@@ -175,7 +182,8 @@ navhrm/
 │   ├── recruitment/       # Recruitment templates + public career page
 │   ├── attendance/        # Attendance & leave module templates
 │   ├── payroll/           # Payroll module templates (44 files)
-│   └── performance/       # Performance management templates (33 files)
+│   ├── performance/       # Performance management templates (33 files)
+│   └── training/          # Training & development templates (35 files)
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
