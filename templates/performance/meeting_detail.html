@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Meeting - {{ meeting.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>Meeting Detail</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'performance:meeting_list' %}">1:1 Meetings</a></li>
+                    <li class="breadcrumb-item active">{{ meeting.title|truncatewords:5 }}</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'performance:meeting_edit' meeting.pk %}" class="btn btn-soft-warning">
+            <i class="ri-pencil-line me-1"></i> Edit Meeting
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column: Notes -->
+    <div class="col-lg-8">
+        <!-- Meeting Notes -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Meeting Notes</h5>
+            </div>
+            <div class="card-body">
+                {% if meeting.notes %}
+                    {{ meeting.notes|linebreaksbr }}
+                {% else %}
+                    <p class="text-muted mb-0">No meeting notes recorded.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Manager Notes -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Manager Notes</h5>
+            </div>
+            <div class="card-body">
+                {% if meeting.manager_notes %}
+                    {{ meeting.manager_notes|linebreaksbr }}
+                {% else %}
+                    <p class="text-muted mb-0">No manager notes recorded.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Employee Notes -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Employee Notes</h5>
+            </div>
+            <div class="card-body">
+                {% if meeting.employee_notes %}
+                    {{ meeting.employee_notes|linebreaksbr }}
+                {% else %}
+                    <p class="text-muted mb-0">No employee notes recorded.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Info -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Meeting Info</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        {% if meeting.status == 'scheduled' %}
+                        <span class="badge bg-soft-primary text-primary">Scheduled</span>
+                        {% elif meeting.status == 'completed' %}
+                        <span class="badge bg-soft-success text-success">Completed</span>
+                        {% elif meeting.status == 'cancelled' %}
+                        <span class="badge bg-soft-danger text-danger">Cancelled</span>
+                        {% elif meeting.status == 'rescheduled' %}
+                        <span class="badge bg-soft-warning text-warning">Rescheduled</span>
+                        {% else %}
+                        <span class="badge bg-soft-secondary text-secondary">{{ meeting.get_status_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Date</small>
+                    <div class="fw-medium">{{ meeting.scheduled_date|date:"M d, Y" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Time</small>
+                    <div class="fw-medium">{{ meeting.scheduled_time|time:"h:i A" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Duration</small>
+                    <div class="fw-medium">{{ meeting.duration_minutes }} minutes</div>
+                </div>
+                {% if meeting.location %}
+                <div class="mb-3">
+                    <small class="text-muted">Location</small>
+                    <div class="fw-medium">{{ meeting.location }}</div>
+                </div>
+                {% endif %}
+                <div class="mb-3">
+                    <small class="text-muted">Manager</small>
+                    <div class="fw-medium">{{ meeting.manager }}</div>
+                </div>
+                <div>
+                    <small class="text-muted">Employee</small>
+                    <div class="fw-medium">{{ meeting.employee }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Items -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Action Items</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Assigned To</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in action_items %}
+                            <tr>
+                                <td class="fw-medium">{{ item.description }}</td>
+                                <td>{{ item.assigned_to }}</td>
+                                <td>{{ item.due_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    {% if item.status == 'pending' %}
+                                    <span class="badge bg-soft-secondary text-secondary">Pending</span>
+                                    {% elif item.status == 'in_progress' %}
+                                    <span class="badge bg-soft-primary text-primary">In Progress</span>
+                                    {% elif item.status == 'completed' %}
+                                    <span class="badge bg-soft-success text-success">Completed</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ item.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'performance:action_item_edit' item.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    No action items yet. Add one below.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Add Action Item Form -->
+            <div class="card-footer">
+                <h6 class="mb-3">Add Action Item</h6>
+                <form method="post" action="{% url 'performance:action_item_create' meeting.pk %}" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3 align-items-end">
+                        <!-- Description -->
+                        <div class="col-md-4">
+                            <label for="{{ action_form.description.id_for_label }}" class="form-label">Description</label>
+                            <input type="text"
+                                   name="{{ action_form.description.html_name }}"
+                                   id="{{ action_form.description.id_for_label }}"
+                                   class="form-control {% if action_form.description.errors %}is-invalid{% endif %}"
+                                   value="{{ action_form.description.value|default_if_none:'' }}"
+                                   placeholder="What needs to be done...">
+                            {% if action_form.description.errors %}<div class="invalid-feedback">{{ action_form.description.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Assigned To -->
+                        <div class="col-md-3">
+                            <label for="{{ action_form.assigned_to.id_for_label }}" class="form-label">Assigned To</label>
+                            <select name="{{ action_form.assigned_to.html_name }}"
+                                    id="{{ action_form.assigned_to.id_for_label }}"
+                                    class="form-select {% if action_form.assigned_to.errors %}is-invalid{% endif %}">
+                                <option value="">Select Employee</option>
+                                {% for choice in action_form.assigned_to.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if action_form.assigned_to.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if action_form.assigned_to.errors %}<div class="invalid-feedback">{{ action_form.assigned_to.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Due Date -->
+                        <div class="col-md-2">
+                            <label for="{{ action_form.due_date.id_for_label }}" class="form-label">Due Date</label>
+                            <input type="date"
+                                   name="{{ action_form.due_date.html_name }}"
+                                   id="{{ action_form.due_date.id_for_label }}"
+                                   class="form-control {% if action_form.due_date.errors %}is-invalid{% endif %}"
+                                   value="{{ action_form.due_date.value|default_if_none:'' }}">
+                            {% if action_form.due_date.errors %}<div class="invalid-feedback">{{ action_form.due_date.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-add-line me-1"></i> Add Item
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

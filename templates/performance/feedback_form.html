@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:feedback_list' %}">Feedback</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Recipient Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Recipient</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- To Employee -->
+                        <div class="col-md-6">
+                            <label for="{{ form.to_employee.id_for_label }}" class="form-label">
+                                To Employee <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.to_employee.html_name }}"
+                                    id="{{ form.to_employee.id_for_label }}"
+                                    class="form-select {% if form.to_employee.errors %}is-invalid{% endif %}">
+                                <option value="">Select Employee</option>
+                                {% for choice in form.to_employee.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if form.to_employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.to_employee.errors %}<div class="invalid-feedback">{{ form.to_employee.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Feedback Type -->
+                        <div class="col-md-3">
+                            <label for="{{ form.feedback_type.id_for_label }}" class="form-label">
+                                Feedback Type <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.feedback_type.html_name }}"
+                                    id="{{ form.feedback_type.id_for_label }}"
+                                    class="form-select {% if form.feedback_type.errors %}is-invalid{% endif %}">
+                                {% for value, label in form.feedback_type.field.choices %}
+                                <option value="{{ value }}" {% if form.feedback_type.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.feedback_type.errors %}<div class="invalid-feedback">{{ form.feedback_type.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Visibility -->
+                        <div class="col-md-3">
+                            <label for="{{ form.visibility.id_for_label }}" class="form-label">
+                                Visibility <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.visibility.html_name }}"
+                                    id="{{ form.visibility.id_for_label }}"
+                                    class="form-select {% if form.visibility.errors %}is-invalid{% endif %}">
+                                {% for value, label in form.visibility.field.choices %}
+                                <option value="{{ value }}" {% if form.visibility.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.visibility.errors %}<div class="invalid-feedback">{{ form.visibility.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Feedback</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- Subject -->
+                        <div class="col-12">
+                            <label for="{{ form.subject.id_for_label }}" class="form-label">
+                                Subject <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="{{ form.subject.html_name }}"
+                                   id="{{ form.subject.id_for_label }}"
+                                   class="form-control {% if form.subject.errors %}is-invalid{% endif %}"
+                                   value="{{ form.subject.value|default_if_none:'' }}"
+                                   placeholder="Enter feedback subject...">
+                            {% if form.subject.errors %}<div class="invalid-feedback">{{ form.subject.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Message -->
+                        <div class="col-12">
+                            <label for="{{ form.message.id_for_label }}" class="form-label">
+                                Message <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="{{ form.message.html_name }}"
+                                      id="{{ form.message.id_for_label }}"
+                                      class="form-control {% if form.message.errors %}is-invalid{% endif %}"
+                                      rows="5"
+                                      placeholder="Write your feedback message...">{{ form.message.value|default_if_none:'' }}</textarea>
+                            {% if form.message.errors %}<div class="invalid-feedback">{{ form.message.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anonymous Option -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="form-check">
+                        <input type="checkbox"
+                               name="{{ form.is_anonymous.html_name }}"
+                               id="{{ form.is_anonymous.id_for_label }}"
+                               class="form-check-input {% if form.is_anonymous.errors %}is-invalid{% endif %}"
+                               {% if form.is_anonymous.value %}checked{% endif %}>
+                        <label for="{{ form.is_anonymous.id_for_label }}" class="form-check-label">
+                            Send as anonymous feedback
+                        </label>
+                        <div class="form-text">Your name will not be shown to the recipient if checked.</div>
+                        {% if form.is_anonymous.errors %}<div class="invalid-feedback">{{ form.is_anonymous.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-send-plane-line me-1"></i> Send Feedback
+                </button>
+                <a href="{% url 'performance:feedback_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

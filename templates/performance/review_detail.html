@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% block title %}{{ review.employee }} - Performance Review{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Performance Review Detail</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Performance</li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:review_list' %}">Performance Reviews</a></li>
+            <li class="breadcrumb-item active">{{ review.employee }}</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Action Buttons -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex flex-wrap gap-2">
+            {% if review.status == 'pending' or review.status == 'self_assessment' %}
+            <a href="{% url 'performance:self_assessment' review.pk %}" class="btn btn-primary">
+                <i class="ri-edit-2-line me-1"></i> Self Assessment
+            </a>
+            {% endif %}
+            {% if review.status == 'self_assessment' or review.status == 'manager_review' %}
+            <a href="{% url 'performance:manager_review' review.pk %}" class="btn btn-success">
+                <i class="ri-user-star-line me-1"></i> Manager Review
+            </a>
+            {% endif %}
+            <a href="{% url 'performance:assign_peers' review.pk %}" class="btn btn-info">
+                <i class="ri-group-line me-1"></i> Assign Peers
+            </a>
+            {% if review.status == 'peer_review' or review.status == 'calibration' %}
+            <a href="{% url 'performance:calibrate' review.pk %}" class="btn btn-warning">
+                <i class="ri-scales-3-line me-1"></i> Calibrate
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column -->
+    <div class="col-lg-8">
+        <!-- Employee & Cycle Info -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Review Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Employee</label>
+                        <p class="mb-0 fw-medium">{{ review.employee }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Reviewer (Manager)</label>
+                        <p class="mb-0 fw-medium">{{ review.reviewer|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Review Cycle</label>
+                        <p class="mb-0 fw-medium">
+                            <a href="{% url 'performance:cycle_detail' review.cycle.pk %}">{{ review.cycle.name }}</a>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Cycle Type</label>
+                        <p class="mb-0 fw-medium">{{ review.cycle.get_cycle_type_display }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goal Ratings Table -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Goal Ratings</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Goal Title</th>
+                                <th class="text-center">Weight</th>
+                                <th class="text-center">Self Rating</th>
+                                <th class="text-center">Manager Rating</th>
+                                <th>Self Comments</th>
+                                <th>Manager Comments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for gr in goal_ratings %}
+                            <tr>
+                                <td class="fw-medium">{{ gr.goal.title }}</td>
+                                <td class="text-center">{{ gr.goal.weight }}%</td>
+                                <td class="text-center">
+                                    {% if gr.self_rating %}
+                                    {% for i in "12345" %}
+                                    {% if forloop.counter <= gr.self_rating %}
+                                    <i class="ri-star-fill text-warning"></i>
+                                    {% else %}
+                                    <i class="ri-star-line text-muted"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                                    <br><small class="text-muted">({{ gr.self_rating }})</small>
+                                    {% else %}-{% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if gr.manager_rating %}
+                                    {% for i in "12345" %}
+                                    {% if forloop.counter <= gr.manager_rating %}
+                                    <i class="ri-star-fill text-warning"></i>
+                                    {% else %}
+                                    <i class="ri-star-line text-muted"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                                    <br><small class="text-muted">({{ gr.manager_rating }})</small>
+                                    {% else %}-{% endif %}
+                                </td>
+                                <td><small>{{ gr.self_comments|default:"-"|truncatewords:15 }}</small></td>
+                                <td><small>{{ gr.manager_comments|default:"-"|truncatewords:15 }}</small></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No goal ratings yet</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comments Section -->
+        {% if review.self_comments or review.manager_comments or review.final_comments %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Comments</h5>
+            </div>
+            <div class="card-body">
+                {% if review.self_comments %}
+                <div class="mb-3">
+                    <label class="form-label text-muted">Self Assessment Comments</label>
+                    <p class="mb-0">{{ review.self_comments }}</p>
+                </div>
+                {% endif %}
+                {% if review.manager_comments %}
+                <div class="mb-3">
+                    <label class="form-label text-muted">Manager Comments</label>
+                    <p class="mb-0">{{ review.manager_comments }}</p>
+                </div>
+                {% endif %}
+                {% if review.final_comments %}
+                <div class="mb-3">
+                    <label class="form-label text-muted">Final Comments</label>
+                    <p class="mb-0">{{ review.final_comments }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Strengths & Areas of Improvement -->
+        {% if review.strengths or review.areas_of_improvement %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Development Areas</h5>
+            </div>
+            <div class="card-body">
+                {% if review.strengths %}
+                <div class="mb-3">
+                    <label class="form-label text-muted">Strengths</label>
+                    <p class="mb-0">{{ review.strengths }}</p>
+                </div>
+                {% endif %}
+                {% if review.areas_of_improvement %}
+                <div>
+                    <label class="form-label text-muted">Areas of Improvement</label>
+                    <p class="mb-0">{{ review.areas_of_improvement }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-4">
+        <!-- Status Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    {% if review.status == 'pending' or review.status == 'self_assessment' %}
+                    <span class="badge bg-soft-secondary fs-6">{{ review.get_status_display }}</span>
+                    {% elif review.status == 'manager_review' or review.status == 'peer_review' %}
+                    <span class="badge bg-soft-success fs-6">{{ review.get_status_display }}</span>
+                    {% elif review.status == 'completed' %}
+                    <span class="badge bg-soft-primary fs-6">{{ review.get_status_display }}</span>
+                    {% elif review.status == 'calibration' %}
+                    <span class="badge bg-soft-primary fs-6">{{ review.get_status_display }}</span>
+                    {% else %}
+                    <span class="badge bg-soft-secondary fs-6">{{ review.get_status_display }}</span>
+                    {% endif %}
+                </div>
+
+                <hr>
+
+                <!-- Self Rating -->
+                <div class="mb-3">
+                    <label class="form-label text-muted d-block">Self Rating</label>
+                    {% if review.self_rating %}
+                    <div>
+                        {% for i in "12345" %}
+                        {% if forloop.counter <= review.self_rating %}
+                        <i class="ri-star-fill text-warning fs-5"></i>
+                        {% else %}
+                        <i class="ri-star-line text-muted fs-5"></i>
+                        {% endif %}
+                        {% endfor %}
+                        <span class="ms-2 fw-medium">{{ review.self_rating }}/5.0</span>
+                    </div>
+                    {% else %}
+                    <span class="text-muted">Not yet rated</span>
+                    {% endif %}
+                </div>
+
+                <!-- Manager Rating -->
+                <div class="mb-3">
+                    <label class="form-label text-muted d-block">Manager Rating</label>
+                    {% if review.manager_rating %}
+                    <div>
+                        {% for i in "12345" %}
+                        {% if forloop.counter <= review.manager_rating %}
+                        <i class="ri-star-fill text-warning fs-5"></i>
+                        {% else %}
+                        <i class="ri-star-line text-muted fs-5"></i>
+                        {% endif %}
+                        {% endfor %}
+                        <span class="ms-2 fw-medium">{{ review.manager_rating }}/5.0</span>
+                    </div>
+                    {% else %}
+                    <span class="text-muted">Not yet rated</span>
+                    {% endif %}
+                </div>
+
+                <!-- Final Rating -->
+                <div class="mb-3">
+                    <label class="form-label text-muted d-block">Final Rating</label>
+                    {% if review.final_rating %}
+                    <div>
+                        {% for i in "12345" %}
+                        {% if forloop.counter <= review.final_rating %}
+                        <i class="ri-star-fill text-warning fs-5"></i>
+                        {% else %}
+                        <i class="ri-star-line text-muted fs-5"></i>
+                        {% endif %}
+                        {% endfor %}
+                        <span class="ms-2 fw-bold">{{ review.final_rating }}/5.0</span>
+                    </div>
+                    {% else %}
+                    <span class="text-muted">Not yet calibrated</span>
+                    {% endif %}
+                </div>
+
+                <hr>
+
+                <!-- Key Dates -->
+                <div class="mb-2">
+                    <label class="form-label text-muted">Submitted At</label>
+                    <p class="mb-0">{{ review.submitted_at|date:"d M Y H:i"|default:"-" }}</p>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label text-muted">Reviewed At</label>
+                    <p class="mb-0">{{ review.reviewed_at|date:"d M Y H:i"|default:"-" }}</p>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label text-muted">Calibrated At</label>
+                    <p class="mb-0">{{ review.calibrated_at|date:"d M Y H:i"|default:"-" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Peer Reviewers Card -->
+        <div class="card mb-4">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Peer Reviewers</h5>
+                <a href="{% url 'performance:assign_peers' review.pk %}" class="btn btn-sm btn-soft-primary">
+                    <i class="ri-add-line"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                {% if peer_reviewers %}
+                <ul class="list-group list-group-flush">
+                    {% for peer in peer_reviewers %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>{{ peer.reviewer }}</span>
+                        {% if peer.status == 'pending' %}
+                        <span class="badge bg-soft-secondary">{{ peer.get_status_display }}</span>
+                        {% elif peer.status == 'accepted' %}
+                        <span class="badge bg-soft-success">{{ peer.get_status_display }}</span>
+                        {% elif peer.status == 'completed' %}
+                        <span class="badge bg-soft-primary">{{ peer.get_status_display }}</span>
+                        {% elif peer.status == 'declined' %}
+                        <span class="badge bg-soft-danger">{{ peer.get_status_display }}</span>
+                        {% else %}
+                        <span class="badge bg-soft-secondary">{{ peer.get_status_display }}</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="text-center text-muted py-3">
+                    <i class="ri-group-line" style="font-size: 32px; opacity: 0.3;"></i>
+                    <p class="mt-2 mb-0 small">No peer reviewers assigned</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

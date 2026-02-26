@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:coaching_list' %}">Coaching Notes</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <h5 class="mb-3">Participants</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.employee.errors %}is-invalid{% endif %}" id="{{ form.employee.id_for_label }}" name="{{ form.employee.html_name }}">
+                        <option value="">-- Select Employee --</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.coach.id_for_label }}" class="form-label">Coach</label>
+                    <select class="form-select {% if form.coach.errors %}is-invalid{% endif %}" id="{{ form.coach.id_for_label }}" name="{{ form.coach.html_name }}">
+                        <option value="">-- Select Coach --</option>
+                        {% for choice in form.coach.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.coach.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.coach.errors %}<div class="invalid-feedback">{{ form.coach.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <h5 class="mt-4 mb-3">Session Details</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="{{ form.session_date.id_for_label }}" class="form-label">Session Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.session_date.errors %}is-invalid{% endif %}" id="{{ form.session_date.id_for_label }}" name="{{ form.session_date.html_name }}" value="{{ form.session_date.value|default_if_none:'' }}">
+                    {% if form.session_date.errors %}<div class="invalid-feedback">{{ form.session_date.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-8">
+                    <label for="{{ form.topic.id_for_label }}" class="form-label">Topic <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.topic.errors %}is-invalid{% endif %}" id="{{ form.topic.id_for_label }}" name="{{ form.topic.html_name }}" value="{{ form.topic.value|default_if_none:'' }}">
+                    {% if form.topic.errors %}<div class="invalid-feedback">{{ form.topic.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes <span class="text-danger">*</span></label>
+                    <textarea class="form-control {% if form.notes.errors %}is-invalid{% endif %}" id="{{ form.notes.id_for_label }}" name="{{ form.notes.html_name }}" rows="4">{{ form.notes.value|default_if_none:'' }}</textarea>
+                    {% if form.notes.errors %}<div class="invalid-feedback">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label for="{{ form.action_items.id_for_label }}" class="form-label">Action Items</label>
+                    <textarea class="form-control {% if form.action_items.errors %}is-invalid{% endif %}" id="{{ form.action_items.id_for_label }}" name="{{ form.action_items.html_name }}" rows="3">{{ form.action_items.value|default_if_none:'' }}</textarea>
+                    {% if form.action_items.errors %}<div class="invalid-feedback">{{ form.action_items.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.follow_up_date.id_for_label }}" class="form-label">Follow-up Date</label>
+                    <input type="date" class="form-control {% if form.follow_up_date.errors %}is-invalid{% endif %}" id="{{ form.follow_up_date.id_for_label }}" name="{{ form.follow_up_date.html_name }}" value="{{ form.follow_up_date.value|default_if_none:'' }}">
+                    {% if form.follow_up_date.errors %}<div class="invalid-feedback">{{ form.follow_up_date.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Save
+                </button>
+                <a href="{% url 'performance:coaching_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

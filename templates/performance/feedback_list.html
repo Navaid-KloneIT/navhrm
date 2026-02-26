@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Continuous Feedback{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Continuous Feedback</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Feedback</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link {% if current_tab == 'received' %}active{% endif %}" href="?tab=received">
+            <i class="ri-inbox-line me-1"></i> Received
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_tab == 'given' %}active{% endif %}" href="?tab=given">
+            <i class="ri-send-plane-line me-1"></i> Given
+        </a>
+    </li>
+</ul>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'performance:feedback_list' %}">
+                    <input type="hidden" name="tab" value="{{ current_tab }}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search feedback...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Feedback Type</label>
+                            <select class="form-select" name="feedback_type">
+                                <option value="">All Types</option>
+                                {% for value, label in feedback_type_choices %}
+                                <option value="{{ value }}" {% if request.GET.feedback_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-5 text-end">
+                            <a href="{% url 'performance:feedback_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> Give Feedback
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>{% if current_tab == 'received' %}Received{% else %}Given{% endif %} Feedback</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                {% if current_tab == 'received' %}
+                                <th>From</th>
+                                {% else %}
+                                <th>To</th>
+                                {% endif %}
+                                <th>Type</th>
+                                <th>Subject</th>
+                                <th>Visibility</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fb in feedbacks %}
+                            <tr>
+                                {% if current_tab == 'received' %}
+                                <td class="fw-medium">
+                                    {% if fb.is_anonymous %}
+                                        <span class="text-muted fst-italic">Anonymous</span>
+                                    {% else %}
+                                        {{ fb.from_employee }}
+                                    {% endif %}
+                                </td>
+                                {% else %}
+                                <td class="fw-medium">{{ fb.to_employee }}</td>
+                                {% endif %}
+                                <td>
+                                    {% if fb.feedback_type == 'kudos' %}
+                                    <span class="badge bg-soft-success text-success">Kudos</span>
+                                    {% elif fb.feedback_type == 'constructive' %}
+                                    <span class="badge bg-soft-warning text-warning">Constructive</span>
+                                    {% elif fb.feedback_type == 'general' %}
+                                    <span class="badge bg-soft-primary text-primary">General</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ fb.get_feedback_type_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'performance:feedback_detail' fb.pk %}" class="text-primary fw-medium">
+                                        {{ fb.subject|truncatewords:8 }}
+                                    </a>
+                                </td>
+                                <td>{{ fb.get_visibility_display|default:fb.visibility }}</td>
+                                <td>{{ fb.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'performance:feedback_detail' fb.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="View">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'performance:feedback_delete' fb.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this feedback?')">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-chat-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No feedback found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search or request.GET.feedback_type %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Feedback will appear here once shared.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Feedback list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.tab %}&tab={{ request.GET.tab }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.feedback_type %}&feedback_type={{ request.GET.feedback_type }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.tab %}&tab={{ request.GET.tab }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.feedback_type %}&feedback_type={{ request.GET.feedback_type }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.tab %}&tab={{ request.GET.tab }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.feedback_type %}&feedback_type={{ request.GET.feedback_type }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

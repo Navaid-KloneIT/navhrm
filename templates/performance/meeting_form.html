@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:meeting_list' %}">1:1 Meetings</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Participants Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Participants</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Manager -->
+                <div class="col-md-6">
+                    <label for="{{ form.manager.id_for_label }}" class="form-label">
+                        Manager <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.manager.html_name }}"
+                            id="{{ form.manager.id_for_label }}"
+                            class="form-select {% if form.manager.errors %}is-invalid{% endif %}">
+                        <option value="">Select Manager</option>
+                        {% for choice in form.manager.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.manager.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.manager.errors %}<div class="invalid-feedback">{{ form.manager.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">
+                        Employee <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.employee.html_name }}"
+                            id="{{ form.employee.id_for_label }}"
+                            class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                        <option value="">Select Employee</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Schedule</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Title -->
+                <div class="col-md-6">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">
+                        Title <span class="text-danger">*</span>
+                    </label>
+                    <input type="text"
+                           name="{{ form.title.html_name }}"
+                           id="{{ form.title.id_for_label }}"
+                           class="form-control {% if form.title.errors %}is-invalid{% endif %}"
+                           value="{{ form.title.value|default_if_none:'' }}"
+                           placeholder="Meeting title...">
+                    {% if form.title.errors %}<div class="invalid-feedback">{{ form.title.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Scheduled Date -->
+                <div class="col-md-3">
+                    <label for="{{ form.scheduled_date.id_for_label }}" class="form-label">
+                        Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           name="{{ form.scheduled_date.html_name }}"
+                           id="{{ form.scheduled_date.id_for_label }}"
+                           class="form-control {% if form.scheduled_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.scheduled_date.value|default_if_none:'' }}">
+                    {% if form.scheduled_date.errors %}<div class="invalid-feedback">{{ form.scheduled_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Scheduled Time -->
+                <div class="col-md-3">
+                    <label for="{{ form.scheduled_time.id_for_label }}" class="form-label">
+                        Time <span class="text-danger">*</span>
+                    </label>
+                    <input type="time"
+                           name="{{ form.scheduled_time.html_name }}"
+                           id="{{ form.scheduled_time.id_for_label }}"
+                           class="form-control {% if form.scheduled_time.errors %}is-invalid{% endif %}"
+                           value="{{ form.scheduled_time.value|default_if_none:'' }}">
+                    {% if form.scheduled_time.errors %}<div class="invalid-feedback">{{ form.scheduled_time.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Duration -->
+                <div class="col-md-4">
+                    <label for="{{ form.duration_minutes.id_for_label }}" class="form-label">
+                        Duration (minutes) <span class="text-danger">*</span>
+                    </label>
+                    <input type="number"
+                           name="{{ form.duration_minutes.html_name }}"
+                           id="{{ form.duration_minutes.id_for_label }}"
+                           class="form-control {% if form.duration_minutes.errors %}is-invalid{% endif %}"
+                           value="{{ form.duration_minutes.value|default_if_none:'' }}"
+                           min="5" step="5">
+                    {% if form.duration_minutes.errors %}<div class="invalid-feedback">{{ form.duration_minutes.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Location -->
+                <div class="col-md-4">
+                    <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
+                    <input type="text"
+                           name="{{ form.location.html_name }}"
+                           id="{{ form.location.id_for_label }}"
+                           class="form-control {% if form.location.errors %}is-invalid{% endif %}"
+                           value="{{ form.location.value|default_if_none:'' }}"
+                           placeholder="Meeting room / link...">
+                    {% if form.location.errors %}<div class="invalid-feedback">{{ form.location.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-4">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                    <select name="{{ form.status.html_name }}"
+                            id="{{ form.status.id_for_label }}"
+                            class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Notes</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Notes -->
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Meeting Notes</label>
+                    <textarea name="{{ form.notes.html_name }}"
+                              id="{{ form.notes.id_for_label }}"
+                              class="form-control {% if form.notes.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="General meeting notes...">{{ form.notes.value|default_if_none:'' }}</textarea>
+                    {% if form.notes.errors %}<div class="invalid-feedback">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Manager Notes -->
+                <div class="col-md-6">
+                    <label for="{{ form.manager_notes.id_for_label }}" class="form-label">Manager Notes</label>
+                    <textarea name="{{ form.manager_notes.html_name }}"
+                              id="{{ form.manager_notes.id_for_label }}"
+                              class="form-control {% if form.manager_notes.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Private manager notes...">{{ form.manager_notes.value|default_if_none:'' }}</textarea>
+                    {% if form.manager_notes.errors %}<div class="invalid-feedback">{{ form.manager_notes.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Employee Notes -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee_notes.id_for_label }}" class="form-label">Employee Notes</label>
+                    <textarea name="{{ form.employee_notes.html_name }}"
+                              id="{{ form.employee_notes.id_for_label }}"
+                              class="form-control {% if form.employee_notes.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Private employee notes...">{{ form.employee_notes.value|default_if_none:'' }}</textarea>
+                    {% if form.employee_notes.errors %}<div class="invalid-feedback">{{ form.employee_notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Meeting
+        </button>
+        <a href="{% url 'performance:meeting_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}

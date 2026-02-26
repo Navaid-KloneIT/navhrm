@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Calibration - {{ review.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Performance Calibration</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Performance</li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:review_list' %}">Performance Reviews</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:review_detail' review.pk %}">{{ review.employee }}</a></li>
+            <li class="breadcrumb-item active">Calibration</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Review Summary -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Review Summary</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label text-muted">Employee</label>
+                <p class="mb-0 fw-medium">{{ review.employee }}</p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Review Cycle</label>
+                <p class="mb-0 fw-medium">{{ review.cycle.name }}</p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Self Rating</label>
+                <p class="mb-0">
+                    {% if review.self_rating %}
+                    {% for i in "12345" %}
+                    {% if forloop.counter <= review.self_rating %}
+                    <i class="ri-star-fill text-warning"></i>
+                    {% else %}
+                    <i class="ri-star-line text-muted"></i>
+                    {% endif %}
+                    {% endfor %}
+                    <span class="ms-1 fw-medium">{{ review.self_rating }}/5.0</span>
+                    {% else %}
+                    <span class="text-muted">Not submitted</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Manager Rating</label>
+                <p class="mb-0">
+                    {% if review.manager_rating %}
+                    {% for i in "12345" %}
+                    {% if forloop.counter <= review.manager_rating %}
+                    <i class="ri-star-fill text-warning"></i>
+                    {% else %}
+                    <i class="ri-star-line text-muted"></i>
+                    {% endif %}
+                    {% endfor %}
+                    <span class="ms-1 fw-medium">{{ review.manager_rating }}/5.0</span>
+                    {% else %}
+                    <span class="text-muted">Not submitted</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Peer Feedback Summary -->
+        {% if review.peer_reviewers.exists %}
+        <hr>
+        <div class="row g-3">
+            <div class="col-12">
+                <label class="form-label text-muted">Peer Feedback Summary</label>
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Peer Reviewer</th>
+                                <th>Status</th>
+                                <th class="text-center">Rating</th>
+                                <th>Strengths</th>
+                                <th>Areas of Improvement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for peer in review.peer_reviewers.all %}
+                            <tr>
+                                <td>{{ peer.reviewer }}</td>
+                                <td>
+                                    {% if peer.status == 'pending' %}
+                                    <span class="badge bg-soft-secondary">{{ peer.get_status_display }}</span>
+                                    {% elif peer.status == 'completed' %}
+                                    <span class="badge bg-soft-primary">{{ peer.get_status_display }}</span>
+                                    {% elif peer.status == 'declined' %}
+                                    <span class="badge bg-soft-danger">{{ peer.get_status_display }}</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-success">{{ peer.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if peer.status == 'completed' and peer.feedback %}
+                                    {% for i in "12345" %}
+                                    {% if forloop.counter <= peer.feedback.rating %}
+                                    <i class="ri-star-fill text-warning"></i>
+                                    {% else %}
+                                    <i class="ri-star-line text-muted"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                                    <small class="text-muted">({{ peer.feedback.rating }})</small>
+                                    {% else %}-{% endif %}
+                                </td>
+                                <td>
+                                    {% if peer.status == 'completed' and peer.feedback %}
+                                    <small>{{ peer.feedback.strengths|truncatewords:10|default:"-" }}</small>
+                                    {% else %}-{% endif %}
+                                </td>
+                                <td>
+                                    {% if peer.status == 'completed' and peer.feedback %}
+                                    <small>{{ peer.feedback.areas_of_improvement|truncatewords:10|default:"-" }}</small>
+                                    {% else %}-{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Goal Ratings Breakdown -->
+{% if goal_ratings %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Goal Ratings Breakdown</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Goal Title</th>
+                        <th class="text-center">Weight</th>
+                        <th class="text-center">Self Rating</th>
+                        <th>Self Comments</th>
+                        <th class="text-center">Manager Rating</th>
+                        <th>Manager Comments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for gr in goal_ratings %}
+                    <tr>
+                        <td class="fw-medium">{{ gr.goal.title }}</td>
+                        <td class="text-center">{{ gr.goal.weight }}%</td>
+                        <td class="text-center">
+                            {% if gr.self_rating %}
+                            {% for i in "12345" %}
+                            {% if forloop.counter <= gr.self_rating %}
+                            <i class="ri-star-fill text-warning"></i>
+                            {% else %}
+                            <i class="ri-star-line text-muted"></i>
+                            {% endif %}
+                            {% endfor %}
+                            <br><small class="text-muted">({{ gr.self_rating }})</small>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td><small>{{ gr.self_comments|default:"-"|truncatewords:12 }}</small></td>
+                        <td class="text-center">
+                            {% if gr.manager_rating %}
+                            {% for i in "12345" %}
+                            {% if forloop.counter <= gr.manager_rating %}
+                            <i class="ri-star-fill text-warning"></i>
+                            {% else %}
+                            <i class="ri-star-line text-muted"></i>
+                            {% endif %}
+                            {% endfor %}
+                            <br><small class="text-muted">({{ gr.manager_rating }})</small>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td><small>{{ gr.manager_comments|default:"-"|truncatewords:12 }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Calibration Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Final Calibration</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="{{ form.final_rating.id_for_label }}" class="form-label">Final Rating <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.final_rating.errors %}is-invalid{% endif %}" id="{{ form.final_rating.id_for_label }}" name="{{ form.final_rating.html_name }}" value="{{ form.final_rating.value|default_if_none:'' }}" min="1" max="5" step="0.1" placeholder="1.0 - 5.0">
+                    {% for error in form.final_rating.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="ri-star-fill text-warning"></i> 1.0 = Needs Improvement |
+                            <i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i> 3.0 = Meets Expectations |
+                            <i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i> 5.0 = Exceptional
+                        </small>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <label for="{{ form.final_comments.id_for_label }}" class="form-label">Final Comments</label>
+                    <textarea class="form-control {% if form.final_comments.errors %}is-invalid{% endif %}" id="{{ form.final_comments.id_for_label }}" name="{{ form.final_comments.html_name }}" rows="4" placeholder="Provide final calibrated assessment and rationale...">{{ form.final_comments.value|default_if_none:'' }}</textarea>
+                    {% for error in form.final_comments.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Rating Comparison -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="alert alert-info mb-0">
+                        <div class="d-flex justify-content-around text-center">
+                            <div>
+                                <small class="text-muted d-block">Self Rating</small>
+                                <span class="fw-bold fs-5">{{ review.self_rating|default:"-" }}</span>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Manager Rating</small>
+                                <span class="fw-bold fs-5">{{ review.manager_rating|default:"-" }}</span>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Final Rating</small>
+                                <span class="fw-bold fs-5">{{ review.final_rating|default:"TBD" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-scales-3-line me-1"></i> Submit Calibration
+                </button>
+                <a href="{% url 'performance:review_detail' review.pk %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

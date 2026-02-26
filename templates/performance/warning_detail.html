@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}{{ warning.subject }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div>
+        <h4>{{ warning.subject }}</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'performance:warning_list' %}">Warning Letters</a></li>
+                <li class="breadcrumb-item active">{{ warning.subject }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'performance:warning_edit' warning.pk %}" class="btn btn-warning">
+            <i class="ri-pencil-line me-1"></i> Edit
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Warning Details</h5>
+            </div>
+            <div class="card-body">
+                <h6>Description</h6>
+                <p>{{ warning.description|linebreaks }}</p>
+
+                {% if warning.employee_response %}
+                <h6 class="mt-4">Employee Response</h6>
+                <p>{{ warning.employee_response|linebreaks }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="text-muted">Type:</span>
+                    {% if warning.warning_type == 'verbal' %}
+                    <span class="badge bg-soft-info text-info">Verbal Warning</span>
+                    {% elif warning.warning_type == 'written' %}
+                    <span class="badge bg-soft-warning text-warning">Written Warning</span>
+                    {% else %}
+                    <span class="badge bg-soft-danger text-danger">Final Warning</span>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted">Status:</span>
+                    {% if warning.status == 'acknowledged' %}
+                    <span class="badge bg-soft-success text-success">Acknowledged</span>
+                    {% elif warning.status == 'issued' %}
+                    <span class="badge bg-soft-primary text-primary">Issued</span>
+                    {% elif warning.status == 'draft' %}
+                    <span class="badge bg-soft-secondary text-secondary">Draft</span>
+                    {% elif warning.status == 'appealed' %}
+                    <span class="badge bg-soft-warning text-warning">Appealed</span>
+                    {% elif warning.status == 'resolved' %}
+                    <span class="badge bg-soft-success text-success">Resolved</span>
+                    {% else %}
+                    <span class="badge bg-soft-secondary text-secondary">{{ warning.get_status_display }}</span>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted">Employee:</span>
+                    <span>{{ warning.employee }}</span>
+                </div>
+                {% if warning.issued_by %}
+                <div class="mb-3">
+                    <span class="text-muted">Issued By:</span>
+                    <span>{{ warning.issued_by }}</span>
+                </div>
+                {% endif %}
+                <div class="mb-3">
+                    <span class="text-muted">Issue Date:</span>
+                    <span>{{ warning.issue_date|date:"M d, Y" }}</span>
+                </div>
+                {% if warning.acknowledged_date %}
+                <div class="mb-3">
+                    <span class="text-muted">Acknowledged Date:</span>
+                    <span>{{ warning.acknowledged_date|date:"M d, Y" }}</span>
+                </div>
+                {% endif %}
+                <div class="mb-0">
+                    <span class="text-muted">Created:</span>
+                    <span>{{ warning.created_at|date:"M d, Y" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

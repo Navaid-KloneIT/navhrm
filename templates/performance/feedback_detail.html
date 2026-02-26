@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback - {{ feedback.subject }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Feedback Detail</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:feedback_list' %}">Feedback</a></li>
+            <li class="breadcrumb-item active">{{ feedback.subject|truncatewords:5 }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Feedback Content -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ feedback.subject }}</h5>
+                {% if feedback.feedback_type == 'kudos' %}
+                <span class="badge bg-soft-success text-success fs-6">Kudos</span>
+                {% elif feedback.feedback_type == 'constructive' %}
+                <span class="badge bg-soft-warning text-warning fs-6">Constructive</span>
+                {% elif feedback.feedback_type == 'general' %}
+                <span class="badge bg-soft-primary text-primary fs-6">General</span>
+                {% else %}
+                <span class="badge bg-soft-secondary text-secondary fs-6">{{ feedback.get_feedback_type_display }}</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    {{ feedback.message|linebreaksbr }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Info Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">From</small>
+                    <div class="fw-medium">
+                        {% if feedback.is_anonymous %}
+                            <span class="text-muted fst-italic">Anonymous</span>
+                        {% else %}
+                            {{ feedback.from_employee }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">To</small>
+                    <div class="fw-medium">{{ feedback.to_employee }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Visibility</small>
+                    <div class="fw-medium">{{ feedback.get_visibility_display|default:feedback.visibility }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Date</small>
+                    <div class="fw-medium">{{ feedback.created_at|date:"M d, Y h:i A" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Card -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-grid">
+                    <a href="{% url 'performance:feedback_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to Feedback
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

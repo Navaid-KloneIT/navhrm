@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:pip_list' %}">PIPs</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Employee Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Employee</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">
+                        Employee <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.employee.html_name }}"
+                            id="{{ form.employee.id_for_label }}"
+                            class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                        <option value="">Select Employee</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Initiated By -->
+                <div class="col-md-6">
+                    <label for="{{ form.initiated_by.id_for_label }}" class="form-label">
+                        Initiated By <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.initiated_by.html_name }}"
+                            id="{{ form.initiated_by.id_for_label }}"
+                            class="form-select {% if form.initiated_by.errors %}is-invalid{% endif %}">
+                        <option value="">Select Initiator</option>
+                        {% for choice in form.initiated_by.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.initiated_by.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.initiated_by.errors %}<div class="invalid-feedback">{{ form.initiated_by.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIP Details Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">PIP Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Title -->
+                <div class="col-md-8">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">
+                        Title <span class="text-danger">*</span>
+                    </label>
+                    <input type="text"
+                           name="{{ form.title.html_name }}"
+                           id="{{ form.title.id_for_label }}"
+                           class="form-control {% if form.title.errors %}is-invalid{% endif %}"
+                           value="{{ form.title.value|default_if_none:'' }}"
+                           placeholder="PIP title...">
+                    {% if form.title.errors %}<div class="invalid-feedback">{{ form.title.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-4">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                    <select name="{{ form.status.html_name }}"
+                            id="{{ form.status.id_for_label }}"
+                            class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Start Date -->
+                <div class="col-md-4">
+                    <label for="{{ form.start_date.id_for_label }}" class="form-label">
+                        Start Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           name="{{ form.start_date.html_name }}"
+                           id="{{ form.start_date.id_for_label }}"
+                           class="form-control {% if form.start_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.start_date.value|default_if_none:'' }}">
+                    {% if form.start_date.errors %}<div class="invalid-feedback">{{ form.start_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- End Date -->
+                <div class="col-md-4">
+                    <label for="{{ form.end_date.id_for_label }}" class="form-label">
+                        End Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           name="{{ form.end_date.html_name }}"
+                           id="{{ form.end_date.id_for_label }}"
+                           class="form-control {% if form.end_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.end_date.value|default_if_none:'' }}">
+                    {% if form.end_date.errors %}<div class="invalid-feedback">{{ form.end_date.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plan Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Plan</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Reason -->
+                <div class="col-12">
+                    <label for="{{ form.reason.id_for_label }}" class="form-label">
+                        Reason <span class="text-danger">*</span>
+                    </label>
+                    <textarea name="{{ form.reason.html_name }}"
+                              id="{{ form.reason.id_for_label }}"
+                              class="form-control {% if form.reason.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Reason for the performance improvement plan...">{{ form.reason.value|default_if_none:'' }}</textarea>
+                    {% if form.reason.errors %}<div class="invalid-feedback">{{ form.reason.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Goals -->
+                <div class="col-12">
+                    <label for="{{ form.goals.id_for_label }}" class="form-label">
+                        Goals <span class="text-danger">*</span>
+                    </label>
+                    <textarea name="{{ form.goals.html_name }}"
+                              id="{{ form.goals.id_for_label }}"
+                              class="form-control {% if form.goals.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Specific goals the employee needs to achieve...">{{ form.goals.value|default_if_none:'' }}</textarea>
+                    {% if form.goals.errors %}<div class="invalid-feedback">{{ form.goals.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Support Provided -->
+                <div class="col-12">
+                    <label for="{{ form.support_provided.id_for_label }}" class="form-label">Support Provided</label>
+                    <textarea name="{{ form.support_provided.html_name }}"
+                              id="{{ form.support_provided.id_for_label }}"
+                              class="form-control {% if form.support_provided.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Resources and support being provided...">{{ form.support_provided.value|default_if_none:'' }}</textarea>
+                    {% if form.support_provided.errors %}<div class="invalid-feedback">{{ form.support_provided.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Outcome Notes -->
+                <div class="col-12">
+                    <label for="{{ form.outcome_notes.id_for_label }}" class="form-label">Outcome Notes</label>
+                    <textarea name="{{ form.outcome_notes.html_name }}"
+                              id="{{ form.outcome_notes.id_for_label }}"
+                              class="form-control {% if form.outcome_notes.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Notes on the outcome of the PIP...">{{ form.outcome_notes.value|default_if_none:'' }}</textarea>
+                    {% if form.outcome_notes.errors %}<div class="invalid-feedback">{{ form.outcome_notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save PIP
+        </button>
+        <a href="{% url 'performance:pip_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}

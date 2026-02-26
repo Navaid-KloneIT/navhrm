@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Peer Reviewers - {{ review.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Assign Peer Reviewers</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Performance</li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:review_list' %}">Performance Reviews</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:review_detail' review.pk %}">{{ review.employee }}</a></li>
+            <li class="breadcrumb-item active">Assign Peers</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Review Info -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label text-muted">Employee</label>
+                <p class="mb-0 fw-medium">{{ review.employee }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Review Cycle</label>
+                <p class="mb-0 fw-medium">{{ review.cycle.name }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Status</label>
+                <p class="mb-0">
+                    {% if review.status == 'pending' or review.status == 'self_assessment' %}
+                    <span class="badge bg-soft-secondary">{{ review.get_status_display }}</span>
+                    {% elif review.status == 'manager_review' or review.status == 'peer_review' %}
+                    <span class="badge bg-soft-success">{{ review.get_status_display }}</span>
+                    {% elif review.status == 'completed' %}
+                    <span class="badge bg-soft-primary">{{ review.get_status_display }}</span>
+                    {% else %}
+                    <span class="badge bg-soft-secondary">{{ review.get_status_display }}</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Add Peer Reviewer</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label for="{{ form.reviewer.id_for_label }}" class="form-label">Peer Reviewer <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.reviewer.errors %}is-invalid{% endif %}" id="{{ form.reviewer.id_for_label }}" name="{{ form.reviewer.html_name }}">
+                        <option value="">-- Select Peer Reviewer --</option>
+                        {% for choice in form.reviewer.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.reviewer.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.reviewer.errors %}<div class="invalid-feedback">{{ form.reviewer.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="ri-user-add-line me-1"></i> Assign Peer
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'performance:review_detail' review.pk %}" class="btn btn-light w-100">
+                        <i class="ri-arrow-left-line me-1"></i> Back to Review
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Existing Peer Reviewers -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Assigned Peer Reviewers</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Reviewer</th>
+                        <th>Status</th>
+                        <th>Assigned Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for peer in existing_peers %}
+                    <tr>
+                        <td class="fw-medium">{{ peer.reviewer }}</td>
+                        <td>
+                            {% if peer.status == 'pending' %}
+                            <span class="badge bg-soft-secondary">{{ peer.get_status_display }}</span>
+                            {% elif peer.status == 'accepted' %}
+                            <span class="badge bg-soft-success">{{ peer.get_status_display }}</span>
+                            {% elif peer.status == 'completed' %}
+                            <span class="badge bg-soft-primary">{{ peer.get_status_display }}</span>
+                            {% elif peer.status == 'declined' %}
+                            <span class="badge bg-soft-danger">{{ peer.get_status_display }}</span>
+                            {% else %}
+                            <span class="badge bg-soft-secondary">{{ peer.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ peer.created_at|date:"d M Y" }}</td>
+                        <td>
+                            {% if peer.status == 'completed' %}
+                            <span class="text-muted">
+                                <i class="ri-check-double-line text-success"></i> Feedback submitted
+                            </span>
+                            {% elif peer.status == 'pending' or peer.status == 'accepted' %}
+                            <a href="{% url 'performance:peer_feedback_create' peer.pk %}" class="btn btn-sm btn-soft-info" title="Submit Feedback">
+                                <i class="ri-feedback-line"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="ri-group-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                <p class="mt-2 mb-1">No peer reviewers assigned yet</p>
+                                <small>Use the form above to assign peer reviewers</small>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

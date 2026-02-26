@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}PIP - {{ pip.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>PIP Detail</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'performance:pip_list' %}">PIPs</a></li>
+                    <li class="breadcrumb-item active">{{ pip.title|truncatewords:5 }}</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'performance:pip_edit' pip.pk %}" class="btn btn-soft-warning">
+            <i class="ri-pencil-line me-1"></i> Edit PIP
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column: PIP Details -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">{{ pip.title }}</h5>
+            </div>
+            <div class="card-body">
+                <!-- Reason -->
+                <div class="mb-4">
+                    <h6 class="text-muted mb-2">Reason</h6>
+                    <div>{{ pip.reason|linebreaksbr }}</div>
+                </div>
+
+                <!-- Goals -->
+                <div class="mb-4 pt-3 border-top">
+                    <h6 class="text-muted mb-2">Goals</h6>
+                    <div>{{ pip.goals|linebreaksbr }}</div>
+                </div>
+
+                <!-- Support Provided -->
+                {% if pip.support_provided %}
+                <div class="mb-4 pt-3 border-top">
+                    <h6 class="text-muted mb-2">Support Provided</h6>
+                    <div>{{ pip.support_provided|linebreaksbr }}</div>
+                </div>
+                {% endif %}
+
+                <!-- Outcome Notes -->
+                {% if pip.outcome_notes %}
+                <div class="pt-3 border-top">
+                    <h6 class="text-muted mb-2">Outcome Notes</h6>
+                    <div>{{ pip.outcome_notes|linebreaksbr }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Status Card -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        {% if pip.status == 'draft' %}
+                        <span class="badge bg-soft-secondary text-secondary">Draft</span>
+                        {% elif pip.status == 'active' %}
+                        <span class="badge bg-soft-primary text-primary">Active</span>
+                        {% elif pip.status == 'extended' %}
+                        <span class="badge bg-soft-warning text-warning">Extended</span>
+                        {% elif pip.status == 'completed_success' %}
+                        <span class="badge bg-soft-success text-success">Completed - Success</span>
+                        {% elif pip.status == 'completed_failure' %}
+                        <span class="badge bg-soft-danger text-danger">Completed - Failure</span>
+                        {% elif pip.status == 'cancelled' %}
+                        <span class="badge bg-soft-dark text-dark">Cancelled</span>
+                        {% else %}
+                        <span class="badge bg-soft-secondary text-secondary">{{ pip.get_status_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Start Date</small>
+                    <div class="fw-medium">{{ pip.start_date|date:"M d, Y" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">End Date</small>
+                    <div class="fw-medium">{{ pip.end_date|date:"M d, Y" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Employee</small>
+                    <div class="fw-medium">{{ pip.employee }}</div>
+                </div>
+                <div>
+                    <small class="text-muted">Initiated By</small>
+                    <div class="fw-medium">{{ pip.initiated_by }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Checkpoints -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Checkpoints</h5>
+                <a href="{% url 'performance:pip_checkpoint_create' pip.pk %}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> Add Checkpoint
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Due Date</th>
+                                <th>Review Date</th>
+                                <th>Status</th>
+                                <th>Manager Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for checkpoint in checkpoints %}
+                            <tr>
+                                <td class="fw-medium">{{ checkpoint.title }}</td>
+                                <td>{{ checkpoint.due_date|date:"M d, Y" }}</td>
+                                <td>{{ checkpoint.review_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    {% if checkpoint.status == 'pending' %}
+                                    <span class="badge bg-soft-secondary text-secondary">Pending</span>
+                                    {% elif checkpoint.status == 'on_track' %}
+                                    <span class="badge bg-soft-success text-success">On Track</span>
+                                    {% elif checkpoint.status == 'behind' %}
+                                    <span class="badge bg-soft-warning text-warning">Behind</span>
+                                    {% elif checkpoint.status == 'met' %}
+                                    <span class="badge bg-soft-success text-success">Met</span>
+                                    {% elif checkpoint.status == 'not_met' %}
+                                    <span class="badge bg-soft-danger text-danger">Not Met</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ checkpoint.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ checkpoint.manager_notes|truncatewords:10|default:"-" }}</td>
+                                <td>
+                                    <a href="{% url 'performance:pip_checkpoint_edit' checkpoint.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No checkpoints have been added yet.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

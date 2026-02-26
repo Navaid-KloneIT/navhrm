@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Performance</li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:review_list' %}">Performance Reviews</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">{{ title }}</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <!-- Cycle -->
+                <div class="col-md-4">
+                    <label for="{{ form.cycle.id_for_label }}" class="form-label">Review Cycle <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.cycle.errors %}is-invalid{% endif %}" id="{{ form.cycle.id_for_label }}" name="{{ form.cycle.html_name }}">
+                        <option value="">-- Select Cycle --</option>
+                        {% for choice in form.cycle.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.cycle.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.cycle.errors %}<div class="invalid-feedback">{{ form.cycle.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Employee -->
+                <div class="col-md-4">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.employee.errors %}is-invalid{% endif %}" id="{{ form.employee.id_for_label }}" name="{{ form.employee.html_name }}">
+                        <option value="">-- Select Employee --</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Reviewer -->
+                <div class="col-md-4">
+                    <label for="{{ form.reviewer.id_for_label }}" class="form-label">Reviewer (Manager)</label>
+                    <select class="form-select {% if form.reviewer.errors %}is-invalid{% endif %}" id="{{ form.reviewer.id_for_label }}" name="{{ form.reviewer.html_name }}">
+                        <option value="">-- Select Reviewer --</option>
+                        {% for choice in form.reviewer.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.reviewer.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.reviewer.errors %}<div class="invalid-feedback">{{ form.reviewer.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Save
+                </button>
+                <a href="{% url 'performance:review_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

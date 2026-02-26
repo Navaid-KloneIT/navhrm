@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Self Assessment - {{ review.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Self Assessment</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Performance</li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:review_list' %}">Performance Reviews</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:review_detail' review.pk %}">{{ review.employee }}</a></li>
+            <li class="breadcrumb-item active">Self Assessment</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Review Info -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label text-muted">Employee</label>
+                <p class="mb-0 fw-medium">{{ review.employee }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Review Cycle</label>
+                <p class="mb-0 fw-medium">{{ review.cycle.name }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Status</label>
+                <p class="mb-0">
+                    {% if review.status == 'pending' or review.status == 'self_assessment' %}
+                    <span class="badge bg-soft-secondary">{{ review.get_status_display }}</span>
+                    {% elif review.status == 'manager_review' or review.status == 'peer_review' %}
+                    <span class="badge bg-soft-success">{{ review.get_status_display }}</span>
+                    {% elif review.status == 'completed' %}
+                    <span class="badge bg-soft-primary">{{ review.get_status_display }}</span>
+                    {% else %}
+                    <span class="badge bg-soft-secondary">{{ review.get_status_display }}</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="POST" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Goal Ratings -->
+    {% if goals %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Goal Self-Assessment</h5>
+        </div>
+        <div class="card-body">
+            {% for goal in goals %}
+            <div class="border rounded p-3 mb-3">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ goal.title }}</h6>
+                                {% if goal.description %}
+                                <small class="text-muted">{{ goal.description|truncatewords:30 }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-soft-primary">Weight: {{ goal.weight }}%</span>
+                                {% if goal.progress %}
+                                <br><small class="text-muted">Progress: {{ goal.progress }}%</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Self Rating <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" name="goal_self_rating_{{ goal.pk }}" min="1" max="5" step="0.1" placeholder="1.0 - 5.0" value="{% if goal_ratings %}{{ goal_ratings|default_if_none:'' }}{% endif %}">
+                        <small class="text-muted">Rate 1.0 (Needs Improvement) to 5.0 (Exceptional)</small>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label">Comments</label>
+                        <textarea class="form-control" name="goal_self_comment_{{ goal.pk }}" rows="2" placeholder="Describe your achievements and progress on this goal..."></textarea>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Overall Assessment -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Overall Self Assessment</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="{{ form.self_rating.id_for_label }}" class="form-label">Overall Self Rating <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.self_rating.errors %}is-invalid{% endif %}" id="{{ form.self_rating.id_for_label }}" name="{{ form.self_rating.html_name }}" value="{{ form.self_rating.value|default_if_none:'' }}" min="1" max="5" step="0.1" placeholder="1.0 - 5.0">
+                    {% for error in form.self_rating.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="ri-star-fill text-warning"></i> 1.0 = Needs Improvement |
+                            <i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i> 2.0 = Below Expectations |
+                            <i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i> 3.0 = Meets Expectations |
+                            <i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i> 4.0 = Exceeds Expectations |
+                            <i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i> 5.0 = Exceptional
+                        </small>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <label for="{{ form.self_comments.id_for_label }}" class="form-label">Self Assessment Comments</label>
+                    <textarea class="form-control {% if form.self_comments.errors %}is-invalid{% endif %}" id="{{ form.self_comments.id_for_label }}" name="{{ form.self_comments.html_name }}" rows="3" placeholder="Provide an overall assessment of your performance...">{{ form.self_comments.value|default_if_none:'' }}</textarea>
+                    {% for error in form.self_comments.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.strengths.id_for_label }}" class="form-label">Strengths</label>
+                    <textarea class="form-control {% if form.strengths.errors %}is-invalid{% endif %}" id="{{ form.strengths.id_for_label }}" name="{{ form.strengths.html_name }}" rows="3" placeholder="List your key strengths...">{{ form.strengths.value|default_if_none:'' }}</textarea>
+                    {% for error in form.strengths.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.areas_of_improvement.id_for_label }}" class="form-label">Areas of Improvement</label>
+                    <textarea class="form-control {% if form.areas_of_improvement.errors %}is-invalid{% endif %}" id="{{ form.areas_of_improvement.id_for_label }}" name="{{ form.areas_of_improvement.html_name }}" rows="3" placeholder="Identify areas where you can improve...">{{ form.areas_of_improvement.value|default_if_none:'' }}</textarea>
+                    {% for error in form.areas_of_improvement.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Submit Self Assessment
+        </button>
+        <a href="{% url 'performance:review_detail' review.pk %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}

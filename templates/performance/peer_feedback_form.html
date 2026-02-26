@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Peer Feedback - {{ review.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Peer Feedback</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Performance</li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:review_list' %}">Performance Reviews</a></li>
+            <li class="breadcrumb-item active">Peer Feedback</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Review Info -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label text-muted">Reviewing</label>
+                <p class="mb-0 fw-medium">{{ review.employee }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Review Cycle</label>
+                <p class="mb-0 fw-medium">{{ review.cycle.name }}</p>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted">Peer Reviewer</label>
+                <p class="mb-0 fw-medium">{{ peer_reviewer.reviewer }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Submit Peer Feedback</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <!-- Rating -->
+                <div class="col-md-4">
+                    <label for="{{ form.rating.id_for_label }}" class="form-label">Rating <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.rating.errors %}is-invalid{% endif %}" id="{{ form.rating.id_for_label }}" name="{{ form.rating.html_name }}" value="{{ form.rating.value|default_if_none:'' }}" min="1" max="5" step="0.1" placeholder="1.0 - 5.0">
+                    {% for error in form.rating.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="ri-star-fill text-warning"></i> 1.0 = Needs Improvement |
+                            <i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i> 3.0 = Meets Expectations |
+                            <i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i><i class="ri-star-fill text-warning"></i> 5.0 = Exceptional
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Strengths -->
+                <div class="col-md-4">
+                    <label for="{{ form.strengths.id_for_label }}" class="form-label">Strengths</label>
+                    <textarea class="form-control {% if form.strengths.errors %}is-invalid{% endif %}" id="{{ form.strengths.id_for_label }}" name="{{ form.strengths.html_name }}" rows="4" placeholder="What are this person's key strengths?">{{ form.strengths.value|default_if_none:'' }}</textarea>
+                    {% for error in form.strengths.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Areas of Improvement -->
+                <div class="col-md-4">
+                    <label for="{{ form.areas_of_improvement.id_for_label }}" class="form-label">Areas of Improvement</label>
+                    <textarea class="form-control {% if form.areas_of_improvement.errors %}is-invalid{% endif %}" id="{{ form.areas_of_improvement.id_for_label }}" name="{{ form.areas_of_improvement.html_name }}" rows="4" placeholder="Where can this person improve?">{{ form.areas_of_improvement.value|default_if_none:'' }}</textarea>
+                    {% for error in form.areas_of_improvement.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Comments -->
+                <div class="col-12">
+                    <label for="{{ form.comments.id_for_label }}" class="form-label">Additional Comments</label>
+                    <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %}" id="{{ form.comments.id_for_label }}" name="{{ form.comments.html_name }}" rows="3" placeholder="Any additional feedback or observations...">{{ form.comments.value|default_if_none:'' }}</textarea>
+                    {% for error in form.comments.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Submit Feedback
+                </button>
+                <a href="{% url 'performance:review_detail' review.pk %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

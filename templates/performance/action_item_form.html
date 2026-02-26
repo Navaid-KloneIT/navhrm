@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Action Item{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Edit Action Item</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:meeting_list' %}">1:1 Meetings</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:meeting_detail' object.meeting.pk %}">{{ object.meeting.title }}</a></li>
+            <li class="breadcrumb-item active">Edit Action Item</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.description.errors %}is-invalid{% endif %}" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" value="{{ form.description.value|default_if_none:'' }}">
+                    {% if form.description.errors %}<div class="invalid-feedback">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.assigned_to.id_for_label }}" class="form-label">Assigned To</label>
+                    <select class="form-select {% if form.assigned_to.errors %}is-invalid{% endif %}" id="{{ form.assigned_to.id_for_label }}" name="{{ form.assigned_to.html_name }}">
+                        <option value="">-- Select --</option>
+                        {% for choice in form.assigned_to.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.assigned_to.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.assigned_to.errors %}<div class="invalid-feedback">{{ form.assigned_to.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.due_date.id_for_label }}" class="form-label">Due Date</label>
+                    <input type="date" class="form-control {% if form.due_date.errors %}is-invalid{% endif %}" id="{{ form.due_date.id_for_label }}" name="{{ form.due_date.html_name }}" value="{{ form.due_date.value|default_if_none:'' }}">
+                    {% if form.due_date.errors %}<div class="invalid-feedback">{{ form.due_date.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                    <select class="form-select {% if form.status.errors %}is-invalid{% endif %}" id="{{ form.status.id_for_label }}" name="{{ form.status.html_name }}">
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Save
+                </button>
+                <a href="{% url 'performance:meeting_detail' object.meeting.pk %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
