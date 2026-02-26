@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Goals{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Goals</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Goals</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'performance:goal_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search goals...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Goal Type</label>
+                            <select class="form-select" name="goal_type">
+                                <option value="">All Types</option>
+                                {% for value, label in goal_type_choices %}
+                                <option value="{{ value }}" {% if request.GET.goal_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Period</label>
+                            <select class="form-select" name="period">
+                                <option value="">All Periods</option>
+                                {% for p in periods %}
+                                <option value="{{ p.pk }}" {% if request.GET.period == p.pk|stringformat:"s" %}selected{% endif %}>{{ p.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Employee</label>
+                            <select class="form-select" name="employee">
+                                <option value="">All Employees</option>
+                                {% for emp in employees %}
+                                <option value="{{ emp.pk }}" {% if request.GET.employee == emp.pk|stringformat:"s" %}selected{% endif %}>{{ emp }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-3">
+                            <a href="{% url 'performance:goal_create' %}" class="btn btn-primary w-100">
+                                <i class="ri-add-line me-1"></i> Create Goal
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Goals Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Goals</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Employee</th>
+                                <th>Period</th>
+                                <th>Type</th>
+                                <th>Weight</th>
+                                <th style="min-width: 140px;">Progress</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for goal in goals %}
+                            <tr>
+                                <td class="fw-medium">
+                                    <a href="{% url 'performance:goal_detail' goal.pk %}">{{ goal.title }}</a>
+                                </td>
+                                <td>{{ goal.employee|default:"-" }}</td>
+                                <td>{{ goal.period.name|default:"-" }}</td>
+                                <td>
+                                    {% if goal.goal_type == 'okr' %}
+                                    <span class="badge bg-soft-info text-info">OKR</span>
+                                    {% elif goal.goal_type == 'kpi' %}
+                                    <span class="badge bg-soft-primary text-primary">KPI</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ goal.get_goal_type_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ goal.weight|default:"-" }}%</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                            <div class="progress-bar {% if goal.progress >= 75 %}bg-success{% elif goal.progress >= 50 %}bg-info{% elif goal.progress >= 25 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ goal.progress }}%;" aria-valuenow="{{ goal.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <small class="text-muted" style="min-width: 35px;">{{ goal.progress }}%</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if goal.status == 'on_track' %}
+                                    <span class="badge bg-soft-success text-success">On Track</span>
+                                    {% elif goal.status == 'completed' %}
+                                    <span class="badge bg-soft-success text-success">Completed</span>
+                                    {% elif goal.status == 'draft' %}
+                                    <span class="badge bg-soft-secondary text-secondary">Draft</span>
+                                    {% elif goal.status == 'at_risk' %}
+                                    <span class="badge bg-soft-warning text-warning">At Risk</span>
+                                    {% elif goal.status == 'behind' %}
+                                    <span class="badge bg-soft-danger text-danger">Behind</span>
+                                    {% elif goal.status == 'cancelled' %}
+                                    <span class="badge bg-soft-dark text-dark">Cancelled</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ goal.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'performance:goal_detail' goal.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="View">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                        <a href="{% url 'performance:goal_edit' goal.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'performance:goal_delete' goal.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this goal?')">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-focus-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No goals found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search or request.GET.status or request.GET.goal_type or request.GET.period or request.GET.employee %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Goals will appear here when created.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Goal list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.goal_type %}&goal_type={{ request.GET.goal_type }}{% endif %}{% if request.GET.period %}&period={{ request.GET.period }}{% endif %}{% if request.GET.employee %}&employee={{ request.GET.employee }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.goal_type %}&goal_type={{ request.GET.goal_type }}{% endif %}{% if request.GET.period %}&period={{ request.GET.period }}{% endif %}{% if request.GET.employee %}&employee={{ request.GET.employee }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.goal_type %}&goal_type={{ request.GET.goal_type }}{% endif %}{% if request.GET.period %}&period={{ request.GET.period }}{% endif %}{% if request.GET.employee %}&employee={{ request.GET.employee }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
