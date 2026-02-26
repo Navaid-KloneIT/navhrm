@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+{% load report_tags %}
+
+{% block title %}Cost Analysis Report{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Cost Analysis Report</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'reports:reports_dashboard' %}">Reports</a></li>
+            <li class="breadcrumb-item active">Cost Analysis</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Department</label>
+                        {{ form.department }}
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-filter-3-line me-1"></i> Apply
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total CTC</p>
+                        <h3 class="stats-value mb-0">{{ total_ctc|indian_number }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-primary text-primary">
+                        <i class="ri-money-dollar-circle-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Annual cost to company</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Avg CTC</p>
+                        <h3 class="stats-value mb-0">{{ avg_ctc|indian_number }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-info text-info">
+                        <i class="ri-bar-chart-horizontal-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Per employee average</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Gross</p>
+                        <h3 class="stats-value mb-0">{{ total_gross|indian_number }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-success text-success">
+                        <i class="ri-wallet-3-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Total gross salary</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Employee Count</p>
+                        <h3 class="stats-value mb-0">{{ employee_count }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-warning text-warning">
+                        <i class="ri-team-line"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted" style="font-size:12px;">Active employees</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <!-- Department-wise CTC Bar Chart -->
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0">Department-wise CTC</h5>
+                <span class="text-muted" style="font-size: 12px;">Annual</span>
+            </div>
+            <div class="card-body">
+                <div style="height: 350px;">
+                    <canvas id="deptCTCChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Gross vs Deductions Doughnut -->
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Gross vs Deductions</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 350px;">
+                    <canvas id="breakdownChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Department-wise Table -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0">
+                    <i class="ri-building-line me-1"></i> Department-wise Cost
+                </h5>
+                <span class="badge bg-soft-primary text-primary">{{ dept_table|length }} Departments</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Department</th>
+                                <th class="text-end">Total CTC</th>
+                                <th class="text-end">Employee Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in dept_table %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <span class="fw-medium">{{ item.employee__department__name }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-semibold">{{ item.total_ctc|indian_number }}</span>
+                                </td>
+                                <td class="text-end">{{ item.count }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">
+                                    <i class="ri-inbox-line fs-3 d-block mb-2"></i>
+                                    No department cost data found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cost Centers Table -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0">
+                    <i class="ri-pie-chart-line me-1"></i> Cost Centers
+                </h5>
+                <span class="badge bg-soft-primary text-primary">{{ cost_centers|length }} Centers</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th class="text-end">Budget</th>
+                                <th class="text-end">Spent</th>
+                                <th class="text-end">Utilization</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cost_centers %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <span class="fw-medium">{{ item.name }}</span>
+                                </td>
+                                <td class="text-end">{{ item.budget|indian_number }}</td>
+                                <td class="text-end">{{ item.spent|indian_number }}</td>
+                                <td class="text-end">
+                                    {% if item.budget > 0 %}
+                                        {% widthratio item.spent item.budget 100 as utilization %}
+                                        <div class="d-flex align-items-center justify-content-end gap-2">
+                                            <div class="progress flex-grow-1" style="height: 6px; max-width: 100px;">
+                                                <div class="progress-bar {% if utilization > 90 %}bg-danger{% elif utilization > 70 %}bg-warning{% else %}bg-success{% endif %}"
+                                                     role="progressbar"
+                                                     style="width: {{ utilization }}%"
+                                                     aria-valuenow="{{ utilization }}"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100"></div>
+                                            </div>
+                                            <span class="fw-semibold" style="min-width: 45px;">{{ utilization }}%</span>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    <i class="ri-inbox-line fs-3 d-block mb-2"></i>
+                                    No cost center data found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var colors = ['#4b38b3', '#45cb85', '#ef5350', '#ffbe0b', '#39afd1', '#878a99'];
+
+    // Department-wise CTC - Bar Chart
+    var deptLabels = {{ dept_labels|safe }};
+    var deptData = {{ dept_data|safe }};
+
+    var deptCtx = document.getElementById('deptCTCChart').getContext('2d');
+    new Chart(deptCtx, {
+        type: 'bar',
+        data: {
+            labels: deptLabels,
+            datasets: [{
+                label: 'CTC',
+                data: deptData,
+                backgroundColor: deptLabels.map(function(_, i) { return colors[i % colors.length]; }),
+                borderColor: deptLabels.map(function(_, i) { return colors[i % colors.length]; }),
+                borderWidth: 1,
+                borderRadius: 6,
+                barPercentage: 0.6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '\u20B9 ' + context.parsed.y.toLocaleString('en-IN');
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#878a99' }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: {
+                        color: '#878a99',
+                        callback: function(value) {
+                            return '\u20B9 ' + value.toLocaleString('en-IN');
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Gross vs Deductions - Doughnut Chart
+    var breakdownLabels = {{ breakdown_labels|safe }};
+    var breakdownData = {{ breakdown_data|safe }};
+
+    var breakdownCtx = document.getElementById('breakdownChart').getContext('2d');
+    new Chart(breakdownCtx, {
+        type: 'doughnut',
+        data: {
+            labels: breakdownLabels,
+            datasets: [{
+                data: breakdownData,
+                backgroundColor: ['#45cb85', '#ef5350', '#ffbe0b'],
+                borderColor: '#fff',
+                borderWidth: 2,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 16,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        color: '#878a99'
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': \u20B9 ' + context.parsed.toLocaleString('en-IN');
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
