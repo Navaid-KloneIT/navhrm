@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+{% load report_tags %}
+
+{% block title %}Attrition Report{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Attrition Report</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'reports:reports_dashboard' %}">Reports</a></li>
+            <li class="breadcrumb-item active">Attrition Report</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Department</label>
+                            {{ form.department }}
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="ri-filter-3-line me-1"></i> Apply
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Total Exits</p>
+                        <h3 class="stats-value mb-0">{{ total_exits }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-danger text-danger">
+                        <i class="ri-user-unfollow-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Attrition Rate</p>
+                        <h3 class="stats-value mb-0">{{ attrition_rate }}%</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-warning text-warning">
+                        <i class="ri-percent-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Resignations</p>
+                        <h3 class="stats-value mb-0">{{ resignations }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-info text-info">
+                        <i class="ri-file-user-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stats-label mb-1">Terminations</p>
+                        <h3 class="stats-value mb-0">{{ terminations }}</h3>
+                    </div>
+                    <div class="stats-icon bg-soft-secondary text-secondary">
+                        <i class="ri-close-circle-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 1: Monthly Exit Trend + Exits by Department -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0">Monthly Exit Trend</h5>
+                <span class="text-muted" style="font-size: 12px;">Last 12 Months</span>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="exitTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">By Reason</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="reasonChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 2: Exits by Department -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Exits by Department</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="deptExitChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Exits Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0">Recent Exits</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Employee Name</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Date of Leaving</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for emp in recent_exits %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ emp.employee_name }}</td>
+                                <td>{{ emp.department }}</td>
+                                <td>{{ emp.designation }}</td>
+                                <td>{{ emp.date_of_leaving|date:"d M Y" }}</td>
+                                <td>
+                                    {% if emp.status == 'Resigned' %}
+                                    <span class="badge bg-soft-info text-info">Resigned</span>
+                                    {% elif emp.status == 'Terminated' %}
+                                    <span class="badge bg-soft-danger text-danger">Terminated</span>
+                                    {% elif emp.status == 'Retired' %}
+                                    <span class="badge bg-soft-secondary text-secondary">Retired</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-warning text-warning">{{ emp.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">No recent exits found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    var colors = ['#4b38b3', '#45cb85', '#ef5350', '#ffbe0b', '#39afd1', '#878a99'];
+
+    // ------------------------------------------------------------------
+    // 1. Monthly Exit Trend (Line chart with area fill)
+    // ------------------------------------------------------------------
+    var trendCtx = document.getElementById('exitTrendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: {{ trend_labels|safe }},
+            datasets: [{
+                label: 'Exits',
+                data: {{ trend_data|safe }},
+                fill: true,
+                tension: 0.3,
+                backgroundColor: 'rgba(239, 83, 80, 0.1)',
+                borderColor: '#ef5350',
+                borderWidth: 2,
+                pointBackgroundColor: '#ef5350',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#878a99' }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: {
+                        color: '#878a99',
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // ------------------------------------------------------------------
+    // 2. Exits by Department (Bar chart)
+    // ------------------------------------------------------------------
+    var deptCtx = document.getElementById('deptExitChart').getContext('2d');
+    new Chart(deptCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ dept_labels|safe }},
+            datasets: [{
+                label: 'Exits',
+                data: {{ dept_data|safe }},
+                backgroundColor: 'rgba(75, 56, 179, 0.7)',
+                borderColor: '#4b38b3',
+                borderWidth: 1,
+                borderRadius: 6,
+                barPercentage: 0.6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#878a99' }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: {
+                        color: '#878a99',
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // ------------------------------------------------------------------
+    // 3. By Reason (Doughnut chart)
+    // ------------------------------------------------------------------
+    var reasonCtx = document.getElementById('reasonChart').getContext('2d');
+    new Chart(reasonCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ reason_labels|safe }},
+            datasets: [{
+                data: {{ reason_data|safe }},
+                backgroundColor: colors,
+                borderColor: '#fff',
+                borderWidth: 2,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 16,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        color: '#878a99'
+                    }
+                }
+            }
+        }
+    });
+
+});
+</script>
+{% endblock %}
