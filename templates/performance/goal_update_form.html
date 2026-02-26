@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Add Update - {{ goal.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Add Update</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:goal_list' %}">Goals</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'performance:goal_detail' goal.pk %}">{{ goal.title }}</a></li>
+            <li class="breadcrumb-item active">Add Update</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="alert alert-info d-flex align-items-center mb-4">
+            <i class="ri-information-line me-2" style="font-size: 20px;"></i>
+            <div>
+                Adding progress update for: <strong>{{ goal.title }}</strong>
+                <span class="ms-2 badge bg-soft-info text-info">Current Progress: {{ goal.progress }}%</span>
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <!-- Progress -->
+                <div class="col-md-6">
+                    <label for="{{ form.progress.id_for_label }}" class="form-label">Progress (%) <span class="text-danger">*</span></label>
+                    <input type="number" step="0.01" class="form-control {% if form.progress.errors %}is-invalid{% endif %}" id="{{ form.progress.id_for_label }}" name="{{ form.progress.html_name }}" value="{{ form.progress.value|default_if_none:'' }}" min="0" max="100">
+                    {% if form.progress.errors %}<div class="invalid-feedback">{{ form.progress.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Current Value -->
+                <div class="col-md-6">
+                    <label for="{{ form.current_value.id_for_label }}" class="form-label">Current Value</label>
+                    <input type="number" step="0.01" class="form-control {% if form.current_value.errors %}is-invalid{% endif %}" id="{{ form.current_value.id_for_label }}" name="{{ form.current_value.html_name }}" value="{{ form.current_value.value|default_if_none:'' }}">
+                    {% if form.current_value.errors %}<div class="invalid-feedback">{{ form.current_value.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Note -->
+                <div class="col-12">
+                    <label for="{{ form.note.id_for_label }}" class="form-label">Note</label>
+                    <textarea class="form-control {% if form.note.errors %}is-invalid{% endif %}" id="{{ form.note.id_for_label }}" name="{{ form.note.html_name }}" rows="4" placeholder="Describe what progress was made...">{{ form.note.value|default_if_none:'' }}</textarea>
+                    {% if form.note.errors %}<div class="invalid-feedback">{{ form.note.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Save Update
+                </button>
+                <a href="{% url 'performance:goal_detail' goal.pk %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
