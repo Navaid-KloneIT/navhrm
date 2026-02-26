@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>My Profile</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">My Profile</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Header -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex align-items-center">
+            <div class="position-relative me-4">
+                {% if employee.avatar %}
+                <img src="{{ employee.avatar.url }}" alt="Avatar" class="rounded-circle" width="96" height="96" style="object-fit: cover;">
+                {% else %}
+                <div class="rounded-circle bg-soft-primary text-primary d-flex align-items-center justify-content-center" style="width: 96px; height: 96px;">
+                    <i class="ri-user-3-line" style="font-size: 40px;"></i>
+                </div>
+                {% endif %}
+                <a href="{% url 'ess:profile_avatar' %}" class="btn btn-sm btn-primary rounded-circle position-absolute" style="bottom: 0; right: 0; width: 30px; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" title="Change Avatar">
+                    <i class="ri-camera-line" style="font-size: 14px;"></i>
+                </a>
+            </div>
+            <div>
+                <h4 class="mb-1">{{ employee.first_name }} {{ employee.last_name }}</h4>
+                <p class="text-muted mb-1">{{ employee.designation|default:"-" }} &middot; {{ employee.department|default:"-" }}</p>
+                <p class="text-muted mb-0">
+                    <span class="me-3"><i class="ri-mail-line me-1"></i>{{ employee.email }}</span>
+                    <span><i class="ri-phone-line me-1"></i>{{ employee.phone|default:"-" }}</span>
+                </p>
+            </div>
+            <div class="ms-auto">
+                {% if employee.status == 'active' %}
+                <span class="badge bg-soft-success text-success" style="font-size: 13px;">Active</span>
+                {% else %}
+                <span class="badge bg-soft-secondary text-secondary" style="font-size: 13px;">{{ employee.get_status_display|default:employee.status }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
+            <i class="ri-user-line me-1"></i> Personal
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="employment-tab" data-bs-toggle="tab" data-bs-target="#employment" type="button" role="tab" aria-controls="employment" aria-selected="false">
+            <i class="ri-briefcase-line me-1"></i> Employment
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+            <i class="ri-map-pin-line me-1"></i> Contact
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="bank-tab" data-bs-toggle="tab" data-bs-target="#bank" type="button" role="tab" aria-controls="bank" aria-selected="false">
+            <i class="ri-bank-line me-1"></i> Bank
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="profileTabsContent">
+    <!-- Personal Tab -->
+    <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Personal Details</h5>
+                <a href="{% url 'ess:profile_personal' %}" class="btn btn-sm btn-soft-warning">
+                    <i class="ri-pencil-line me-1"></i> Edit
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <small class="text-muted">First Name</small>
+                        <div class="fw-medium">{{ employee.first_name|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Last Name</small>
+                        <div class="fw-medium">{{ employee.last_name|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Employee ID</small>
+                        <div class="fw-medium">{{ employee.employee_id|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Date of Birth</small>
+                        <div class="fw-medium">{{ employee.date_of_birth|date:"M d, Y"|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Gender</small>
+                        <div class="fw-medium">{{ employee.get_gender_display|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Marital Status</small>
+                        <div class="fw-medium">{{ employee.get_marital_status_display|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Blood Group</small>
+                        <div class="fw-medium">{{ employee.blood_group|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Nationality</small>
+                        <div class="fw-medium">{{ employee.nationality|default:"-" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employment Tab -->
+    <div class="tab-pane fade" id="employment" role="tabpanel" aria-labelledby="employment-tab">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Employment Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <small class="text-muted">Employee ID</small>
+                        <div class="fw-medium">{{ employee.employee_id|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Department</small>
+                        <div class="fw-medium">{{ employee.department|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Designation</small>
+                        <div class="fw-medium">{{ employee.designation|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Reporting Manager</small>
+                        <div class="fw-medium">{{ employee.reporting_manager|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Employment Type</small>
+                        <div class="fw-medium">{{ employee.get_employment_type_display|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Date of Joining</small>
+                        <div class="fw-medium">{{ employee.date_of_joining|date:"M d, Y"|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Status</small>
+                        <div>
+                            {% if employee.status == 'active' %}
+                            <span class="badge bg-soft-success text-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-soft-secondary text-secondary">{{ employee.get_status_display|default:employee.status }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Tab -->
+    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Contact &amp; Address</h5>
+                <a href="{% url 'ess:profile_contact' %}" class="btn btn-sm btn-soft-warning">
+                    <i class="ri-pencil-line me-1"></i> Edit
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <small class="text-muted">Email</small>
+                        <div class="fw-medium">{{ employee.email|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Phone</small>
+                        <div class="fw-medium">{{ employee.phone|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Personal Email</small>
+                        <div class="fw-medium">{{ employee.personal_email|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Address Line 1</small>
+                        <div class="fw-medium">{{ employee.address_line1|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Address Line 2</small>
+                        <div class="fw-medium">{{ employee.address_line2|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">City</small>
+                        <div class="fw-medium">{{ employee.city|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">State</small>
+                        <div class="fw-medium">{{ employee.state|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">Country</small>
+                        <div class="fw-medium">{{ employee.country|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">ZIP Code</small>
+                        <div class="fw-medium">{{ employee.zip_code|default:"-" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bank Tab -->
+    <div class="tab-pane fade" id="bank" role="tabpanel" aria-labelledby="bank-tab">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Bank Details</h5>
+                <a href="{% url 'ess:profile_bank' %}" class="btn btn-sm btn-soft-warning">
+                    <i class="ri-pencil-line me-1"></i> Edit
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <small class="text-muted">Bank Name</small>
+                        <div class="fw-medium">{{ employee.bank_name|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Account Number</small>
+                        <div class="fw-medium">{{ employee.bank_account|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">IFSC Code</small>
+                        <div class="fw-medium">{{ employee.ifsc_code|default:"-" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Related Sections -->
+<div class="row mt-4">
+    <!-- Emergency Contacts -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="ri-phone-line me-1"></i> Emergency Contacts</h5>
+                <a href="{% url 'ess:emergency_contact_list' %}" class="btn btn-sm btn-soft-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Relationship</th>
+                                <th>Phone</th>
+                                <th>Primary</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in emergency_contacts %}
+                            <tr>
+                                <td class="fw-medium">{{ contact.name }}</td>
+                                <td>{{ contact.get_relationship_display }}</td>
+                                <td>{{ contact.phone }}</td>
+                                <td>
+                                    {% if contact.is_primary %}
+                                    <span class="badge bg-soft-success text-success">Yes</span>
+                                    {% else %}
+                                    <span class="text-muted">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">
+                                    No emergency contacts added.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Family Members -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="ri-group-line me-1"></i> Family Members</h5>
+                <a href="{% url 'ess:family_list' %}" class="btn btn-sm btn-soft-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Relationship</th>
+                                <th>Dependent</th>
+                                <th>Nominee</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in family_members %}
+                            <tr>
+                                <td class="fw-medium">{{ member.name }}</td>
+                                <td>{{ member.get_relationship_display }}</td>
+                                <td>
+                                    {% if member.is_dependent %}
+                                    <span class="badge bg-soft-success text-success">Yes</span>
+                                    {% else %}
+                                    <span class="text-muted">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if member.is_nominee %}
+                                    <span class="badge bg-soft-success text-success">{{ member.nominee_percentage }}%</span>
+                                    {% else %}
+                                    <span class="text-muted">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">
+                                    No family members added.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Documents -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="ri-file-list-3-line me-1"></i> My Documents</h5>
+                <a href="{% url 'ess:my_documents' %}" class="btn btn-sm btn-soft-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Document</th>
+                                <th>Type</th>
+                                <th>Document No.</th>
+                                <th>Expiry</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in documents %}
+                            <tr>
+                                <td class="fw-medium">{{ doc.name }}</td>
+                                <td>{{ doc.get_document_type_display|default:doc.document_type }}</td>
+                                <td>{{ doc.document_number|default:"-" }}</td>
+                                <td>{{ doc.expiry_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    {% if doc.is_verified %}
+                                    <span class="badge bg-soft-success text-success">Verified</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-warning text-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    No documents uploaded.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
