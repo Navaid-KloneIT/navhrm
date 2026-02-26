@@ -14,133 +14,130 @@
     </nav>
 </div>
 
-<form method="POST">
+<form method="POST" novalidate>
     {% csrf_token %}
 
-    {% if form.errors or formset.errors %}
+    {% if form.non_field_errors or formset.non_form_errors %}
     <div class="alert alert-danger">
-        <ul class="mb-0">
-            {% for field in form %}{% for error in field.errors %}<li>{{ field.label }}: {{ error }}</li>{% endfor %}{% endfor %}
-            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
-            {% for f in formset %}{% for field in f %}{% for error in field.errors %}<li>Question {{ forloop.parentloop.counter }}: {{ error }}</li>{% endfor %}{% endfor %}{% endfor %}
-            {% for error in formset.non_form_errors %}<li>{{ error }}</li>{% endfor %}
-        </ul>
+        {% for error in form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+        {% for error in formset.non_form_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
     </div>
     {% endif %}
 
     <!-- Survey Details -->
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Survey Details</h5>
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Title -->
+                <div class="col-md-8">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="{{ form.title.id_for_label }}" name="{{ form.title.html_name }}" value="{{ form.title.value|default_if_none:'' }}">
+                    {% if form.title.errors %}<div class="invalid-feedback">{{ form.title.errors.0 }}</div>{% endif %}
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Title <span class="text-danger">*</span></label>
-                        {{ form.title }}
-                    </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        {{ form.description }}
+                <!-- Anonymous -->
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="{{ form.is_anonymous.html_name }}" id="{{ form.is_anonymous.id_for_label }}" {% if form.is_anonymous.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_anonymous.id_for_label }}">
+                            <i class="ri-eye-off-line me-1"></i> Anonymous survey
+                        </label>
                     </div>
+                </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Start Date <span class="text-danger">*</span></label>
-                            {{ form.start_date }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">End Date <span class="text-danger">*</span></label>
-                            {{ form.end_date }}
-                        </div>
-                    </div>
+                <!-- Description -->
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="3">{{ form.description.value|default_if_none:'' }}</textarea>
+                    {% if form.description.errors %}<div class="invalid-feedback">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Target Departments</label>
-                        {{ form.target_departments }}
-                        <small class="text-muted">{{ form.target_departments.help_text }}</small>
-                    </div>
+                <!-- Dates -->
+                <div class="col-md-4">
+                    <label for="{{ form.start_date.id_for_label }}" class="form-label">Start Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.start_date.errors %}is-invalid{% endif %}" id="{{ form.start_date.id_for_label }}" name="{{ form.start_date.html_name }}" value="{{ form.start_date.value|default_if_none:'' }}">
+                    {% if form.start_date.errors %}<div class="invalid-feedback">{{ form.start_date.errors.0 }}</div>{% endif %}
+                </div>
 
-                    <div class="mb-3">
-                        <div class="form-check">
-                            {{ form.is_anonymous }}
-                            <label class="form-check-label">
-                                <i class="ri-eye-off-line me-1"></i> Anonymous survey (respondent identity hidden)
-                            </label>
-                        </div>
-                    </div>
+                <div class="col-md-4">
+                    <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.end_date.errors %}is-invalid{% endif %}" id="{{ form.end_date.id_for_label }}" name="{{ form.end_date.html_name }}" value="{{ form.end_date.value|default_if_none:'' }}">
+                    {% if form.end_date.errors %}<div class="invalid-feedback">{{ form.end_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Target Departments -->
+                <div class="col-md-4">
+                    <label for="{{ form.target_departments.id_for_label }}" class="form-label">Target Departments</label>
+                    <select class="form-select {% if form.target_departments.errors %}is-invalid{% endif %}" id="{{ form.target_departments.id_for_label }}" name="{{ form.target_departments.html_name }}" multiple size="3">
+                        {% for value, label in form.target_departments.field.choices %}
+                        <option value="{{ value }}" {% if value|stringformat:"s" in form.target_departments.value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.target_departments.errors %}<div class="invalid-feedback">{{ form.target_departments.errors.0 }}</div>{% endif %}
+                    <small class="text-muted">Leave empty for all departments.</small>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Questions -->
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="mb-0">Questions</h5>
-                    <button type="button" class="btn btn-sm btn-primary" id="add-question">
-                        <i class="ri-add-line me-1"></i> Add Question
-                    </button>
-                </div>
-                <div class="card-body">
-                    {{ formset.management_form }}
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h5 class="mb-0">Questions</h5>
+            <button type="button" class="btn btn-sm btn-primary" id="add-question">
+                <i class="ri-add-line me-1"></i> Add Question
+            </button>
+        </div>
+        <div class="card-body">
+            {{ formset.management_form }}
 
-                    <div id="questions-container">
-                        {% for qform in formset %}
-                        <div class="question-form border rounded p-3 mb-3 {% if qform.DELETE.value %}d-none{% endif %}">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="mb-0">Question <span class="question-number">{{ forloop.counter }}</span></h6>
-                                <button type="button" class="btn btn-sm btn-soft-danger remove-question" title="Remove">
-                                    <i class="ri-delete-bin-line"></i>
-                                </button>
-                            </div>
-                            {% for hidden in qform.hidden_fields %}{{ hidden }}{% endfor %}
-                            <div class="mb-3">
-                                <label class="form-label">Question Text <span class="text-danger">*</span></label>
-                                {{ qform.question_text }}
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label class="form-label">Type <span class="text-danger">*</span></label>
-                                    {{ qform.question_type }}
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">Order</label>
-                                    {{ qform.order }}
-                                </div>
-                                <div class="col-md-4 d-flex align-items-end">
-                                    <div class="form-check mb-2">
-                                        {{ qform.is_required }}
-                                        <label class="form-check-label">Required</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-0">
-                                <label class="form-label">Choices <small class="text-muted">(for single/multiple choice only, pipe-separated)</small></label>
-                                {{ qform.choices }}
-                            </div>
-                            <div class="d-none">{{ qform.DELETE }}</div>
-                        </div>
-                        {% endfor %}
+            <div id="questions-container">
+                {% for qform in formset %}
+                <div class="question-form border rounded p-3 mb-3 {% if qform.DELETE.value %}d-none{% endif %}">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Question <span class="question-number">{{ forloop.counter }}</span></h6>
+                        <button type="button" class="btn btn-sm btn-soft-danger remove-question" title="Remove">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
                     </div>
+                    {% for hidden in qform.hidden_fields %}{{ hidden }}{% endfor %}
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Question Text <span class="text-danger">*</span></label>
+                            {{ qform.question_text }}
+                            {% if qform.question_text.errors %}<div class="text-danger" style="font-size: 13px;">{{ qform.question_text.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Type <span class="text-danger">*</span></label>
+                            {{ qform.question_type }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Order</label>
+                            {{ qform.order }}
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <div class="form-check mb-2">
+                                {{ qform.is_required }}
+                                <label class="form-check-label">Required</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Choices <small class="text-muted">(for single/multiple choice only, pipe-separated)</small></label>
+                            {{ qform.choices }}
+                        </div>
+                    </div>
+                    <div class="d-none">{{ qform.DELETE }}</div>
                 </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="d-flex gap-2 mb-4">
-                <button type="submit" class="btn btn-primary">
-                    <i class="ri-save-line me-1"></i> Create Survey
-                </button>
-                <a href="{% url 'ess:survey_list' %}" class="btn btn-light">Cancel</a>
-            </div>
-        </div>
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Create Survey
+        </button>
+        <a href="{% url 'ess:survey_list' %}" class="btn btn-light">Cancel</a>
     </div>
 </form>
 
