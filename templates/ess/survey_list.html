@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Surveys{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Surveys</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item active">Surveys</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    {% for survey in surveys %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title mb-0">
+                        <a href="{% url 'ess:survey_detail' survey.pk %}" class="text-dark">{{ survey.title }}</a>
+                    </h5>
+                    {% if survey.is_anonymous %}
+                    <span class="badge bg-soft-secondary text-secondary ms-2">
+                        <i class="ri-eye-off-line me-1"></i>Anonymous
+                    </span>
+                    {% endif %}
+                </div>
+                <p class="text-muted mb-3">{{ survey.description|truncatewords:25 }}</p>
+                <div class="mt-auto">
+                    <div class="d-flex flex-wrap gap-2 mb-3" style="font-size: 13px;">
+                        <span class="text-muted">
+                            <i class="ri-calendar-line me-1"></i>{{ survey.start_date|date:"M d" }} - {{ survey.end_date|date:"M d, Y" }}
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge {% if survey.status == 'draft' %}bg-soft-secondary text-secondary{% elif survey.status == 'active' %}bg-soft-success text-success{% elif survey.status == 'closed' %}bg-soft-secondary text-secondary{% endif %}">
+                            {{ survey.get_status_display }}
+                        </span>
+                        {% if survey.pk in responded_surveys %}
+                        <span class="badge bg-soft-success text-success">
+                            <i class="ri-check-double-line me-1"></i>Completed
+                        </span>
+                        {% else %}
+                        <a href="{% url 'ess:survey_respond' survey.pk %}" class="btn btn-sm btn-primary ms-auto">
+                            <i class="ri-edit-line me-1"></i> Respond
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="text-muted">
+                    <i class="ri-survey-line" style="font-size: 48px; opacity: 0.3;"></i>
+                    <p class="mt-2 mb-1">No surveys available</p>
+                    <p class="mb-0" style="font-size: 13px;">Active surveys will appear here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
