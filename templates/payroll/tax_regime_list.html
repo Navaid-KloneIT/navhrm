@@ -22,21 +22,42 @@
             <div class="card-body">
                 <form method="GET" action="{% url 'payroll:tax_regime_list' %}">
                     <div class="row g-3 align-items-end">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Search by employee name or ID...">
+                        </div>
+                        <div class="col-md-2">
                             <label class="form-label">Financial Year</label>
                             <select class="form-select" name="financial_year">
                                 <option value="">All Years</option>
                                 {% for fy in financial_years %}
-                                <option value="{{ fy }}" {% if request.GET.financial_year == fy %}selected{% endif %}>{{ fy }}</option>
+                                <option value="{{ fy }}" {% if selected_financial_year == fy %}selected{% endif %}>{{ fy }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-2">
+                            <label class="form-label">Regime</label>
+                            <select class="form-select" name="regime">
+                                <option value="">All</option>
+                                {% for value, label in regime_choices %}
+                                <option value="{{ value }}" {% if regime == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Locked</label>
+                            <select class="form-select" name="locked">
+                                <option value="">All</option>
+                                <option value="true" {% if locked == 'true' %}selected{% endif %}>Locked</option>
+                                <option value="false" {% if locked == 'false' %}selected{% endif %}>Unlocked</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
                             <button type="submit" class="btn btn-primary w-100">
                                 <i class="ri-filter-3-line"></i> Filter
                             </button>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <a href="{% url 'payroll:tax_regime_list' %}" class="btn btn-light w-100">Clear</a>
                         </div>
                     </div>
@@ -104,7 +125,7 @@
                                         <i class="ri-file-text-line" style="font-size: 48px; opacity: 0.3;"></i>
                                         <p class="mt-2 mb-1">No tax regime choices found</p>
                                         <p class="mb-0" style="font-size: 13px;">
-                                            {% if request.GET.financial_year %}
+                                            {% if search or selected_financial_year or regime or locked %}
                                                 Try adjusting your filter criteria.
                                             {% else %}
                                                 Set employee tax regimes to get started.
@@ -125,7 +146,7 @@
                     <ul class="pagination justify-content-center mb-0">
                         {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.financial_year %}&financial_year={{ request.GET.financial_year }}{% endif %}">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_financial_year %}&financial_year={{ selected_financial_year }}{% endif %}{% if regime %}&regime={{ regime }}{% endif %}{% if locked %}&locked={{ locked }}{% endif %}">
                                 <i class="ri-arrow-left-s-line"></i>
                             </a>
                         </li>
@@ -140,14 +161,14 @@
                             <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}{% if request.GET.financial_year %}&financial_year={{ request.GET.financial_year }}{% endif %}">{{ num }}</a>
+                                <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if selected_financial_year %}&financial_year={{ selected_financial_year }}{% endif %}{% if regime %}&regime={{ regime }}{% endif %}{% if locked %}&locked={{ locked }}{% endif %}">{{ num }}</a>
                             </li>
                             {% endif %}
                         {% endfor %}
 
                         {% if page_obj.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.financial_year %}&financial_year={{ request.GET.financial_year }}{% endif %}">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_financial_year %}&financial_year={{ selected_financial_year }}{% endif %}{% if regime %}&regime={{ regime }}{% endif %}{% if locked %}&locked={{ locked }}{% endif %}">
                                 <i class="ri-arrow-right-s-line"></i>
                             </a>
                         </li>
