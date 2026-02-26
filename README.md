@@ -31,6 +31,12 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Tax & Investment** - Old vs New tax regime selection, investment declarations (80C, 80D, HRA, LTA, etc.), proof uploads with verification, annual tax computation, monthly TDS projection
 - **Payout & Reports** - Bank file generation (HDFC/ICICI/SBI/Axis/NEFT/CSV), digital payslips, payment register with reconciliation, reimbursement claims (LTA, medical, fuel, mobile)
 
+### Performance Management Module
+- **Goal Setting** - OKR/KPI management, goal alignment with cascading goals, weight assignment, quarterly/annual goal periods, progress tracking with milestones
+- **Performance Review** - Configurable review cycles (annual, half-yearly, quarterly), self-assessment forms, manager review with per-goal ratings, 360° peer feedback, rating calibration
+- **Continuous Feedback** - Real-time kudos/constructive/general feedback, anonymous feedback option, 1:1 meeting scheduling with notes and action items, feedback dashboard
+- **Performance Improvement** - PIP management with checkpoints, warning letters (verbal/written/final), coaching notes with follow-up tracking
+
 ### Recruitment Module
 - **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
 - **Job Templates** - Pre-defined job description templates for quick requisition creation
@@ -111,6 +117,7 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
    python manage.py seed_recruitment
    python manage.py seed_attendance
    python manage.py seed_payroll
+   python manage.py seed_performance
    ```
 
 8. **Run the development server**
@@ -148,7 +155,8 @@ navhrm/
 │   ├── offboarding/       # Resignations, exit interviews, clearance, F&F
 │   ├── recruitment/       # Job requisitions, candidates, interviews, offers
 │   ├── attendance/        # Attendance, leave, time tracking, holidays
-│   └── payroll/           # Salary structure, payroll, statutory, tax, payout
+│   ├── payroll/           # Salary structure, payroll, statutory, tax, payout
+│   └── performance/       # Goals, reviews, feedback, PIP, warnings, coaching
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS
@@ -165,7 +173,8 @@ navhrm/
 │   ├── offboarding/       # Offboarding templates
 │   ├── recruitment/       # Recruitment templates + public career page
 │   ├── attendance/        # Attendance & leave module templates
-│   └── payroll/           # Payroll module templates (44 files)
+│   ├── payroll/           # Payroll module templates (44 files)
+│   └── performance/       # Performance management templates (33 files)
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
