@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Document Request Details{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Document Request Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Employee Self Service</li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:document_request_list' %}">Document Requests</a></li>
+            <li class="breadcrumb-item active">Details</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Document Request Information -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Request Information</h5>
+                {% if doc_request.status == 'pending' %}
+                <span class="badge bg-soft-warning text-warning fs-6">Pending</span>
+                {% elif doc_request.status == 'approved' or doc_request.status == 'completed' %}
+                <span class="badge bg-soft-success text-success fs-6">{{ doc_request.get_status_display }}</span>
+                {% elif doc_request.status == 'rejected' %}
+                <span class="badge bg-soft-danger text-danger fs-6">Rejected</span>
+                {% elif doc_request.status == 'cancelled' %}
+                <span class="badge bg-soft-secondary text-secondary fs-6">Cancelled</span>
+                {% elif doc_request.status == 'processing' or doc_request.status == 'in_progress' %}
+                <span class="badge bg-soft-info text-info fs-6">{{ doc_request.get_status_display }}</span>
+                {% else %}
+                <span class="badge bg-soft-secondary text-secondary fs-6">{{ doc_request.get_status_display }}</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Document Type</small>
+                        <div class="fw-medium">{{ doc_request.get_document_type_display }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Purpose</small>
+                        <div class="fw-medium">{{ doc_request.purpose }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Copies Needed</small>
+                        <div class="fw-medium">{{ doc_request.copies_needed }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Delivery Method</small>
+                        <div class="fw-medium">{{ doc_request.get_delivery_method_display }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Requested On</small>
+                        <div class="fw-medium">{{ doc_request.created_at|date:"M d, Y h:i A" }}</div>
+                    </div>
+                </div>
+
+                {% if doc_request.additional_notes %}
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Additional Notes</small>
+                    <p class="mt-1 mb-0">{{ doc_request.additional_notes }}</p>
+                </div>
+                {% endif %}
+
+                {% if doc_request.processed_by %}
+                <div class="mt-4 pt-3 border-top">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">Processed By</small>
+                            <div class="fw-medium">{{ doc_request.processed_by }}</div>
+                        </div>
+                        {% if doc_request.processed_at %}
+                        <div class="col-md-6">
+                            <small class="text-muted">Processed At</small>
+                            <div class="fw-medium">{{ doc_request.processed_at|date:"M d, Y h:i A" }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if doc_request.status == 'rejected' and doc_request.rejection_reason %}
+                <div class="mt-3 pt-3 border-top">
+                    <small class="text-muted text-danger">Rejection Reason</small>
+                    <p class="mt-1 mb-0 text-danger">{{ doc_request.rejection_reason }}</p>
+                </div>
+                {% endif %}
+
+                {% if doc_request.generated_file %}
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Generated Document</small>
+                    <div class="mt-1">
+                        <a href="{{ doc_request.generated_file.url }}" class="btn btn-sm btn-soft-success" target="_blank">
+                            <i class="ri-download-2-line me-1"></i> Download Document
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Cancel Request (for pending requests) -->
+        {% if doc_request.status == 'pending' %}
+        <div class="card border-warning">
+            <div class="card-header bg-soft-warning">
+                <h5 class="mb-0 text-warning">Cancel Request</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'ess:document_request_cancel' doc_request.pk %}">
+                    {% csrf_token %}
+                    <p class="text-muted mb-3">Are you sure you want to cancel this document request?</p>
+                    <button type="submit" class="btn btn-warning" onclick="return confirm('Are you sure you want to cancel this document request?')">
+                        <i class="ri-close-circle-line me-1"></i> Cancel Request
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'ess:document_request_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to List
+                    </a>
+                    <a href="{% url 'ess:document_request_create' %}" class="btn btn-success">
+                        <i class="ri-add-line me-1"></i> New Request
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
