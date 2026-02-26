@@ -432,6 +432,116 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Training &amp; Development <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Training -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'training' and 'category' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'training' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'session' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'vendor' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-presentation-line"></i>
+                    <span class="menu-text">Training</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'training' and 'category' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'training' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'session' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'vendor' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'training:category_list' %}" class="menu-link {% if request.resolver_match.url_name == 'category_list' and request.resolver_match.app_name == 'training' %}active{% endif %}">
+                            <span class="menu-text">Categories</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'training:training_calendar' %}" class="menu-link {% if request.resolver_match.url_name == 'training_calendar' %}active{% endif %}">
+                            <span class="menu-text">Training Calendar</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'training:training_list' %}" class="menu-link {% if request.resolver_match.url_name == 'training_list' and request.resolver_match.app_name == 'training' %}active{% endif %}">
+                            <span class="menu-text">All Trainings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'training:session_list' %}" class="menu-link {% if request.resolver_match.url_name == 'session_list' and request.resolver_match.app_name == 'training' %}active{% endif %}">
+                            <span class="menu-text">Sessions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'training:vendor_list' %}" class="menu-link {% if request.resolver_match.url_name == 'vendor_list' and request.resolver_match.app_name == 'training' %}active{% endif %}">
+                            <span class="menu-text">Vendors</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Learning (LMS) -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'training' and 'course' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'path' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'assessment' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'enrollment' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'badge' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'content' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'question' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'take_assessment' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-book-open-line"></i>
+                    <span class="menu-text">Learning (LMS)</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'training' and 'course' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'path' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'assessment' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'enrollment' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'badge' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'content' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'question' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'take_assessment' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'training:course_list' %}" class="menu-link {% if request.resolver_match.url_name == 'course_list' and request.resolver_match.app_name == 'training' %}active{% endif %}">
+                            <span class="menu-text">Courses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'training:path_list' %}" class="menu-link {% if request.resolver_match.url_name == 'path_list' and request.resolver_match.app_name == 'training' %}active{% endif %}">
+                            <span class="menu-text">Learning Paths</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'training:assessment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'assessment_list' and request.resolver_match.app_name == 'training' %}active{% endif %}">
+                            <span class="menu-text">Assessments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'training:enrollment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'enrollment_list' and request.resolver_match.app_name == 'training' %}active{% endif %}">
+                            <span class="menu-text">Enrollments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'training:badge_list' %}" class="menu-link {% if request.resolver_match.url_name == 'badge_list' and request.resolver_match.app_name == 'training' %}active{% endif %}">
+                            <span class="menu-text">Badges</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Training Administration -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'training' and 'nomination' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'attendance' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'feedback' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'certificate' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'budget' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-settings-4-line"></i>
+                    <span class="menu-text">Administration</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'training' and 'nomination' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'attendance' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'feedback' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'certificate' in request.resolver_match.url_name or request.resolver_match.app_name == 'training' and 'budget' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'training:nomination_list' %}" class="menu-link {% if request.resolver_match.url_name == 'nomination_list' and request.resolver_match.app_name == 'training' %}active{% endif %}">
+                            <span class="menu-text">Nominations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'training:training_attendance_list' %}" class="menu-link {% if request.resolver_match.url_name == 'training_attendance_list' %}active{% endif %}">
+                            <span class="menu-text">Attendance</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'training:training_feedback_list' %}" class="menu-link {% if request.resolver_match.url_name == 'training_feedback_list' %}active{% endif %}">
+                            <span class="menu-text">Feedback</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'training:certificate_list' %}" class="menu-link {% if request.resolver_match.url_name == 'certificate_list' and request.resolver_match.app_name == 'training' %}active{% endif %}">
+                            <span class="menu-text">Certificates</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'training:budget_list' %}" class="menu-link {% if request.resolver_match.url_name == 'budget_list' and request.resolver_match.app_name == 'training' %}active{% endif %}">
+                            <span class="menu-text">Budgets</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Payroll <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Salary Structure -->
