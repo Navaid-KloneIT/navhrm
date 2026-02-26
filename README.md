@@ -47,6 +47,13 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Request Management** - Leave application (wraps attendance module), attendance regularization requests, document requests (experience letter/salary certificate/employment certificate/bonafide/address proof), ID card requests (new/replacement/renewal/update), asset requests (laptop/monitor/headset/furniture/etc.) with priority levels and approval workflow
 - **Communication Hub** - Company/department announcements with pinning and priority, birthday & work anniversary celebrations with wish sending, employee engagement surveys with multiple question types (text/single choice/multiple choice/rating/yes-no), anonymous suggestion box with upvotes and admin response, HR help desk ticketing system with comment threads and status tracking
 
+### Reports & Analytics Module
+- **HR Reports** - Headcount report (active employees, new joins, exits by department), attrition report (turnover analysis, trends), diversity report (gender, age, tenure demographics), cost reports (salary cost, department-wise), hiring reports (time-to-hire, source analysis)
+- **Attendance Reports** - Attendance summary (daily/monthly rates), late/early departure patterns, absenteeism analysis (frequent absentees, department-wise), overtime tracking (hours, cost), utilization report (productivity metrics)
+- **Leave Reports** - Leave register (availed, balances), leave liability (accrued leave liability calculation), comp-off report (earned vs availed), leave trend (monthly/seasonal patterns)
+- **Payroll Reports** - Salary register (monthly details), tax reports (TDS, investment summary), statutory reports (PF, ESI, PT contributions), cost analysis (CTC breakdown, cost center reports)
+- **Analytics Dashboard** - Executive dashboard with key HR metrics, headcount trends, attrition analysis, workforce composition, department cost distribution, gender distribution charts
+
 ### Recruitment Module
 - **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
 - **Job Templates** - Pre-defined job description templates for quick requisition creation
@@ -171,7 +178,8 @@ navhrm/
 │   ├── payroll/           # Salary structure, payroll, statutory, tax, payout
 │   ├── performance/       # Goals, reviews, feedback, PIP, warnings, coaching
 │   ├── training/          # Training management, LMS, administration
-│   └── ess/               # Employee self-service, requests, communication
+│   ├── ess/               # Employee self-service, requests, communication
+│   └── reports/           # Reports & analytics (no models, read-only views)
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS
@@ -191,7 +199,8 @@ navhrm/
 │   ├── payroll/           # Payroll module templates (44 files)
 │   ├── performance/       # Performance management templates (33 files)
 │   ├── training/          # Training & development templates (35 files)
-│   └── ess/               # Employee self-service templates (39 files)
+│   ├── ess/               # Employee self-service templates (39 files)
+│   └── reports/           # Reports & analytics templates (20 files)
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
