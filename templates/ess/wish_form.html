@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Send Wish{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Send Wish</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:celebration_list' %}">Celebrations</a></li>
+            <li class="breadcrumb-item active">Send Wish</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Send a Wish to {{ employee.first_name }} {{ employee.last_name }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'ess:send_wish' employee.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="occasion" value="{{ occasion }}">
+
+                    <div class="mb-3">
+                        <label class="form-label">Occasion</label>
+                        <div class="fw-medium">
+                            {% if occasion == 'birthday' %}
+                            <i class="ri-cake-2-line me-1 text-danger"></i> Birthday
+                            {% elif occasion == 'work_anniversary' %}
+                            <i class="ri-award-line me-1 text-warning"></i> Work Anniversary
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Your Message <span class="text-danger">*</span></label>
+                        <textarea name="message" id="message" class="form-control" rows="4" placeholder="Write your heartfelt wish..." required></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-send-plane-line me-1"></i> Send Wish
+                        </button>
+                        <a href="{% url 'ess:celebration_list' %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
