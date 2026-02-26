@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}{{ announcement.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Announcement Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:announcement_list' %}">Announcements</a></li>
+            <li class="breadcrumb-item active">{{ announcement.title|truncatewords:5 }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ announcement.title }}</h5>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-soft-info text-info">{{ announcement.get_category_display }}</span>
+                    <span class="badge {% if announcement.priority == 'low' %}bg-soft-secondary text-secondary{% elif announcement.priority == 'normal' %}bg-soft-info text-info{% elif announcement.priority == 'high' %}bg-soft-warning text-warning{% elif announcement.priority == 'urgent' %}bg-soft-danger text-danger{% endif %}">
+                        {{ announcement.get_priority_display }}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if announcement.is_pinned %}
+                <div class="alert alert-warning d-flex align-items-center mb-3" role="alert">
+                    <i class="ri-pushpin-fill me-2"></i>
+                    <span>This announcement is pinned.</span>
+                </div>
+                {% endif %}
+
+                <div class="mb-4">
+                    {{ announcement.content|linebreaks }}
+                </div>
+
+                {% if announcement.attachment %}
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted d-block mb-2">Attachment</small>
+                    <a href="{{ announcement.attachment.url }}" class="btn btn-sm btn-soft-primary" download>
+                        <i class="ri-download-line me-1"></i> Download Attachment
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Published By</small>
+                    <div class="fw-medium">{{ announcement.published_by }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Publish Date</small>
+                    <div class="fw-medium">{{ announcement.publish_date|date:"M d, Y" }}</div>
+                </div>
+                {% if announcement.expiry_date %}
+                <div class="mb-3">
+                    <small class="text-muted">Expiry Date</small>
+                    <div class="fw-medium">{{ announcement.expiry_date|date:"M d, Y" }}</div>
+                </div>
+                {% endif %}
+                <div class="mb-3">
+                    <small class="text-muted">Category</small>
+                    <div><span class="badge bg-soft-info text-info">{{ announcement.get_category_display }}</span></div>
+                </div>
+                <div>
+                    <small class="text-muted">Priority</small>
+                    <div>
+                        <span class="badge {% if announcement.priority == 'low' %}bg-soft-secondary text-secondary{% elif announcement.priority == 'normal' %}bg-soft-info text-info{% elif announcement.priority == 'high' %}bg-soft-warning text-warning{% elif announcement.priority == 'urgent' %}bg-soft-danger text-danger{% endif %}">
+                            {{ announcement.get_priority_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'ess:announcement_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to Announcements
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
