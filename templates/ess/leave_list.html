@@ -7,9 +7,9 @@
     <h4>My Leave Applications</h4>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
-            <li class="breadcrumb-item">Employee Self Service</li>
-            <li class="breadcrumb-item active">My Leaves</li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:leave_list' %}">My Requests</a></li>
+            <li class="breadcrumb-item active">Leave Applications</li>
         </ol>
     </nav>
 </div>
@@ -19,9 +19,22 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <form method="GET" action="{% url 'ess:leave_list' %}">
+                <form method="GET">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Search by reason...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Leave Type</label>
+                            <select class="form-select" name="leave_type">
+                                <option value="">All Types</option>
+                                {% for lt in leave_types %}
+                                <option value="{{ lt.pk }}" {% if request.GET.leave_type == lt.pk|stringformat:"d" %}selected{% endif %}>{{ lt.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
                             <label class="form-label">Status</label>
                             <select class="form-select" name="status">
                                 <option value="">All Statuses</option>
@@ -35,8 +48,8 @@
                                 <i class="ri-filter-3-line me-1"></i> Filter
                             </button>
                         </div>
-                        <div class="col-md-7 text-end">
-                            <a href="{% url 'ess:leave_apply' %}" class="btn btn-success">
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'ess:leave_apply' %}" class="btn btn-primary">
                                 <i class="ri-add-line me-1"></i> Apply Leave
                             </a>
                         </div>
@@ -47,11 +60,11 @@
     </div>
 </div>
 
-<!-- Leave Applications Table -->
+<!-- Table -->
 <div class="row">
     <div class="col-12">
         <div class="card table-card">
-            <div class="card-header">
+            <div class="card-header d-flex align-items-center justify-content-between">
                 <h5 class="mb-0">My Leave Applications</h5>
             </div>
             <div class="card-body p-0">
@@ -70,9 +83,9 @@
                         <tbody>
                             {% for leave in leaves %}
                             <tr>
-                                <td><span class="fw-medium">{{ leave.leave_type }}</span></td>
-                                <td>{{ leave.from_date|date:"M d, Y" }}</td>
-                                <td>{{ leave.to_date|date:"M d, Y" }}</td>
+                                <td class="fw-medium">{{ leave.leave_type }}</td>
+                                <td>{{ leave.from_date|date:"d M Y" }}</td>
+                                <td>{{ leave.to_date|date:"d M Y" }}</td>
                                 <td class="text-center">{{ leave.total_days }}</td>
                                 <td>
                                     {% if leave.status == 'draft' %}
@@ -102,7 +115,7 @@
                                         <i class="ri-calendar-todo-line" style="font-size: 48px; opacity: 0.3;"></i>
                                         <p class="mt-2 mb-1">No leave applications found</p>
                                         <p class="mb-0" style="font-size: 13px;">
-                                            {% if request.GET.status %}
+                                            {% if request.GET.status or request.GET.search or request.GET.leave_type %}
                                                 Try adjusting your filter criteria.
                                             {% else %}
                                                 Your leave applications will appear here when submitted.
@@ -120,9 +133,9 @@
             {% if page_obj.has_other_pages %}
             <div class="card-footer">
                 <nav><ul class="pagination justify-content-center mb-0">
-                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>{% endif %}
-                    {% for num in page_obj.paginator.page_range %}{% if page_obj.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}<li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a></li>{% endif %}{% endfor %}
-                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>{% endif %}
+                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.leave_type %}&leave_type={{ request.GET.leave_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-left-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>{% endif %}
+                    {% for num in page_obj.paginator.page_range %}{% if page_obj.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}<li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.leave_type %}&leave_type={{ request.GET.leave_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a></li>{% endif %}{% endfor %}
+                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.leave_type %}&leave_type={{ request.GET.leave_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"><i class="ri-arrow-right-s-line"></i></a></li>{% else %}<li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>{% endif %}
                 </ul></nav>
             </div>
             {% endif %}
