@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from apps.core.models import Tenant
+from apps.accounts.models import User
 from apps.employees.models import Employee
 from apps.organization.models import Department
 from apps.ess.models import (
@@ -30,6 +31,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING(f'  Skipping {tenant.name} - not enough employees.'))
                 continue
 
+            self._link_admin_users_to_employees(tenant, employees)
             self._seed_family_members(tenant, employees)
             self._seed_document_requests(tenant, employees)
             self._seed_idcard_requests(tenant, employees)
@@ -44,6 +46,24 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f'  Done seeding ESS data for {tenant.name}.'))
 
         self.stdout.write(self.style.SUCCESS('ESS data seeding complete!'))
+
+    def _link_admin_users_to_employees(self, tenant, employees):
+        """Link admin/HR users to employee records so they can access ESS."""
+        users_without_employee = User.objects.filter(
+            tenant=tenant, employee__isnull=True
+        )
+        unlinked_employees = [e for e in employees if e.user is None]
+
+        for user in users_without_employee:
+            if not unlinked_employees:
+                break
+            emp = unlinked_employees.pop(0)
+            emp.user = user
+            emp.first_name = user.first_name
+            emp.last_name = user.last_name
+            emp.email = user.email
+            emp.save()
+            self.stdout.write(f'  Linked user "{user.username}" to employee {emp.employee_id}')
 
     def _seed_family_members(self, tenant, employees):
         family_data = [
