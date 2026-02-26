@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}My Documents{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>My Documents</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'ess:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:my_profile' %}">My Profile</a></li>
+            <li class="breadcrumb-item active">My Documents</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Documents</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Document Name</th>
+                                <th>Type</th>
+                                <th>Document No.</th>
+                                <th>Issue Date</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in documents %}
+                            <tr>
+                                <td class="fw-medium">{{ doc.name }}</td>
+                                <td>{{ doc.get_document_type_display|default:doc.document_type }}</td>
+                                <td>{{ doc.document_number|default:"-" }}</td>
+                                <td>{{ doc.issue_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>{{ doc.expiry_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    {% if doc.is_verified %}
+                                    <span class="badge bg-soft-success text-success">Verified</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-warning text-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ doc.notes|truncatewords:8|default:"-" }}</td>
+                                <td>
+                                    {% if doc.file %}
+                                    <a href="{{ doc.file.url }}" class="btn btn-sm btn-soft-primary" target="_blank" data-bs-toggle="tooltip" title="Download">
+                                        <i class="ri-download-2-line"></i>
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No documents found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            Your uploaded documents will appear here.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
