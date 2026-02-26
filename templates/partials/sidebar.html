@@ -341,6 +341,97 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Performance <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Goals -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'performance' and 'goal' in request.resolver_match.url_name or 'period' in request.resolver_match.url_name and request.resolver_match.app_name == 'performance' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-focus-2-line"></i>
+                    <span class="menu-text">Goals</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'performance' and 'goal' in request.resolver_match.url_name or 'period' in request.resolver_match.url_name and request.resolver_match.app_name == 'performance' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'performance:period_list' %}" class="menu-link {% if request.resolver_match.url_name == 'period_list' and request.resolver_match.app_name == 'performance' %}active{% endif %}">
+                            <span class="menu-text">Goal Periods</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'performance:goal_list' %}" class="menu-link {% if request.resolver_match.url_name == 'goal_list' %}active{% endif %}">
+                            <span class="menu-text">All Goals</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Reviews -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'performance' and 'cycle' in request.resolver_match.url_name or 'review' in request.resolver_match.url_name and request.resolver_match.app_name == 'performance' or 'assessment' in request.resolver_match.url_name or 'calibrat' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-star-line"></i>
+                    <span class="menu-text">Reviews</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'performance' and 'cycle' in request.resolver_match.url_name or 'review' in request.resolver_match.url_name and request.resolver_match.app_name == 'performance' or 'assessment' in request.resolver_match.url_name or 'calibrat' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'performance:cycle_list' %}" class="menu-link {% if request.resolver_match.url_name == 'cycle_list' and request.resolver_match.app_name == 'performance' %}active{% endif %}">
+                            <span class="menu-text">Review Cycles</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'performance:review_list' %}" class="menu-link {% if request.resolver_match.url_name == 'review_list' and request.resolver_match.app_name == 'performance' %}active{% endif %}">
+                            <span class="menu-text">Reviews</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Feedback -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'performance' and 'feedback' in request.resolver_match.url_name or 'meeting' in request.resolver_match.url_name and request.resolver_match.app_name == 'performance' %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-chat-3-line"></i>
+                    <span class="menu-text">Feedback</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'performance' and 'feedback' in request.resolver_match.url_name or 'meeting' in request.resolver_match.url_name and request.resolver_match.app_name == 'performance' %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'performance:feedback_list' %}" class="menu-link {% if request.resolver_match.url_name == 'feedback_list' and request.resolver_match.app_name == 'performance' %}active{% endif %}">
+                            <span class="menu-text">Feedback</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'performance:meeting_list' %}" class="menu-link {% if request.resolver_match.url_name == 'meeting_list' and request.resolver_match.app_name == 'performance' %}active{% endif %}">
+                            <span class="menu-text">1:1 Meetings</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Improvement -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'performance' and 'pip' in request.resolver_match.url_name or 'warning' in request.resolver_match.url_name and request.resolver_match.app_name == 'performance' or 'coaching' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-line-chart-line"></i>
+                    <span class="menu-text">Improvement</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'performance' and 'pip' in request.resolver_match.url_name or 'warning' in request.resolver_match.url_name and request.resolver_match.app_name == 'performance' or 'coaching' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'performance:pip_list' %}" class="menu-link {% if request.resolver_match.url_name == 'pip_list' %}active{% endif %}">
+                            <span class="menu-text">PIP</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'performance:warning_list' %}" class="menu-link {% if request.resolver_match.url_name == 'warning_list' and request.resolver_match.app_name == 'performance' %}active{% endif %}">
+                            <span class="menu-text">Warning Letters</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'performance:coaching_list' %}" class="menu-link {% if request.resolver_match.url_name == 'coaching_list' %}active{% endif %}">
+                            <span class="menu-text">Coaching Notes</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Payroll <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- Salary Structure -->
