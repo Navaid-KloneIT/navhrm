@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Employee Self Service</li>
+            <li class="breadcrumb-item"><a href="{% url 'ess:document_request_list' %}">Document Requests</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Document Request</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="{{ form.document_type.id_for_label }}" class="form-label">
+                        Document Type <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.document_type.html_name }}"
+                            id="{{ form.document_type.id_for_label }}"
+                            class="form-select {% if form.document_type.errors %}is-invalid{% endif %}">
+                        <option value="">Select Document Type</option>
+                        {% for value, label in form.document_type.field.choices %}
+                        {% if value %}
+                        <option value="{{ value }}" {% if form.document_type.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.document_type.errors %}<div class="invalid-feedback">{{ form.document_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.copies_needed.id_for_label }}" class="form-label">
+                        Copies Needed <span class="text-danger">*</span>
+                    </label>
+                    <input type="number"
+                           name="{{ form.copies_needed.html_name }}"
+                           id="{{ form.copies_needed.id_for_label }}"
+                           class="form-control {% if form.copies_needed.errors %}is-invalid{% endif %}"
+                           value="{{ form.copies_needed.value|default:'1' }}"
+                           min="1">
+                    {% if form.copies_needed.errors %}<div class="invalid-feedback">{{ form.copies_needed.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.delivery_method.id_for_label }}" class="form-label">
+                        Delivery Method <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.delivery_method.html_name }}"
+                            id="{{ form.delivery_method.id_for_label }}"
+                            class="form-select {% if form.delivery_method.errors %}is-invalid{% endif %}">
+                        <option value="">Select Delivery Method</option>
+                        {% for value, label in form.delivery_method.field.choices %}
+                        {% if value %}
+                        <option value="{{ value }}" {% if form.delivery_method.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.delivery_method.errors %}<div class="invalid-feedback">{{ form.delivery_method.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.purpose.id_for_label }}" class="form-label">
+                        Purpose <span class="text-danger">*</span>
+                    </label>
+                    <input type="text"
+                           name="{{ form.purpose.html_name }}"
+                           id="{{ form.purpose.id_for_label }}"
+                           class="form-control {% if form.purpose.errors %}is-invalid{% endif %}"
+                           value="{{ form.purpose.value|default:'' }}"
+                           placeholder="e.g., Visa application, Bank loan, etc.">
+                    {% if form.purpose.errors %}<div class="invalid-feedback">{{ form.purpose.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label for="{{ form.additional_notes.id_for_label }}" class="form-label">
+                        Additional Notes
+                    </label>
+                    <textarea name="{{ form.additional_notes.html_name }}"
+                              id="{{ form.additional_notes.id_for_label }}"
+                              class="form-control {% if form.additional_notes.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Any additional information or special requirements...">{{ form.additional_notes.value|default:'' }}</textarea>
+                    {% if form.additional_notes.errors %}<div class="invalid-feedback">{{ form.additional_notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-send-plane-line me-1"></i> Submit Request
+                </button>
+                <a href="{% url 'ess:document_request_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
