@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}{{ goal.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div>
+        <h4>{{ goal.title }}</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'performance:goal_list' %}">Goals</a></li>
+                <li class="breadcrumb-item active">{{ goal.title }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'performance:goal_update_create' goal.pk %}" class="btn btn-primary">
+            <i class="ri-add-line me-1"></i> Add Update
+        </a>
+        <a href="{% url 'performance:goal_edit' goal.pk %}" class="btn btn-warning">
+            <i class="ri-pencil-line me-1"></i> Edit
+        </a>
+    </div>
+</div>
+
+<!-- Goal Info -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Goal Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Title</p>
+                        <p class="fw-medium">{{ goal.title }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Goal Type</p>
+                        <p class="fw-medium">
+                            {% if goal.goal_type == 'okr' %}
+                            <span class="badge bg-soft-info text-info">OKR</span>
+                            {% elif goal.goal_type == 'kpi' %}
+                            <span class="badge bg-soft-primary text-primary">KPI</span>
+                            {% else %}
+                            <span class="badge bg-soft-secondary text-secondary">{{ goal.get_goal_type_display }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Employee</p>
+                        <p class="fw-medium">{{ goal.employee|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Period</p>
+                        <p class="fw-medium">{{ goal.period.name|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Parent Goal</p>
+                        <p class="fw-medium">
+                            {% if goal.parent_goal %}
+                            <a href="{% url 'performance:goal_detail' goal.parent_goal.pk %}">{{ goal.parent_goal.title }}</a>
+                            {% else %}-{% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Visibility</p>
+                        <p class="fw-medium">{{ goal.get_visibility_display|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Target Value</p>
+                        <p class="fw-medium">{{ goal.target_value|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Current Value</p>
+                        <p class="fw-medium">{{ goal.current_value|default:"-" }}</p>
+                    </div>
+                </div>
+
+                {% if goal.description %}
+                <h6 class="mt-4">Description</h6>
+                <p>{{ goal.description|linebreaks }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Child Goals -->
+        {% if child_goals %}
+        <div class="card">
+            <div class="card-header">
+                <h5>Child Goals ({{ child_goals|length }})</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Employee</th>
+                                <th>Progress</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for child in child_goals %}
+                            <tr>
+                                <td class="fw-medium">
+                                    <a href="{% url 'performance:goal_detail' child.pk %}">{{ child.title }}</a>
+                                </td>
+                                <td>{{ child.employee|default:"-" }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height: 6px;">
+                                            <div class="progress-bar {% if child.progress >= 75 %}bg-success{% elif child.progress >= 50 %}bg-info{% elif child.progress >= 25 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ child.progress }}%;" aria-valuenow="{{ child.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <small class="text-muted">{{ child.progress }}%</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if child.status == 'on_track' %}
+                                    <span class="badge bg-soft-success text-success">On Track</span>
+                                    {% elif child.status == 'completed' %}
+                                    <span class="badge bg-soft-success text-success">Completed</span>
+                                    {% elif child.status == 'at_risk' %}
+                                    <span class="badge bg-soft-warning text-warning">At Risk</span>
+                                    {% elif child.status == 'behind' %}
+                                    <span class="badge bg-soft-danger text-danger">Behind</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ child.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Status Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="text-muted">Status:</span>
+                    {% if goal.status == 'on_track' %}
+                    <span class="badge bg-soft-success text-success">On Track</span>
+                    {% elif goal.status == 'completed' %}
+                    <span class="badge bg-soft-success text-success">Completed</span>
+                    {% elif goal.status == 'draft' %}
+                    <span class="badge bg-soft-secondary text-secondary">Draft</span>
+                    {% elif goal.status == 'at_risk' %}
+                    <span class="badge bg-soft-warning text-warning">At Risk</span>
+                    {% elif goal.status == 'behind' %}
+                    <span class="badge bg-soft-danger text-danger">Behind</span>
+                    {% elif goal.status == 'cancelled' %}
+                    <span class="badge bg-soft-dark text-dark">Cancelled</span>
+                    {% else %}
+                    <span class="badge bg-soft-secondary text-secondary">{{ goal.get_status_display }}</span>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted">Weight:</span>
+                    <span>{{ goal.weight|default:"-" }}%</span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted d-block mb-1">Progress:</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="progress flex-grow-1" style="height: 10px;">
+                            <div class="progress-bar {% if goal.progress >= 75 %}bg-success{% elif goal.progress >= 50 %}bg-info{% elif goal.progress >= 25 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ goal.progress }}%;" aria-valuenow="{{ goal.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <span class="fw-medium">{{ goal.progress }}%</span>
+                    </div>
+                </div>
+                {% if goal.start_date %}
+                <div class="mb-3">
+                    <span class="text-muted">Start Date:</span>
+                    <span>{{ goal.start_date|date:"M d, Y" }}</span>
+                </div>
+                {% endif %}
+                {% if goal.due_date %}
+                <div class="mb-3">
+                    <span class="text-muted">Due Date:</span>
+                    <span>{{ goal.due_date|date:"M d, Y" }}</span>
+                </div>
+                {% endif %}
+                <div class="mb-0">
+                    <span class="text-muted">Created:</span>
+                    <span>{{ goal.created_at|date:"M d, Y" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Updates Timeline -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Updates ({{ updates|length }})</h5>
+        <a href="{% url 'performance:goal_update_create' goal.pk %}" class="btn btn-sm btn-primary">
+            <i class="ri-add-line me-1"></i> Add Update
+        </a>
+    </div>
+    <div class="card-body">
+        {% for update in updates %}
+        <div class="d-flex {% if not forloop.last %}mb-4 pb-4 border-bottom{% endif %}">
+            <div class="flex-shrink-0 me-3">
+                <div class="avatar-sm bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="ri-refresh-line"></i>
+                </div>
+            </div>
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-1">{{ update.updated_by|default:"System" }}</h6>
+                        <small class="text-muted">{{ update.created_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                    <span class="badge bg-soft-info text-info">{{ update.progress }}%</span>
+                </div>
+                {% if update.note %}
+                <p class="mt-2 mb-0 text-muted">{{ update.note }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-4">
+            <div class="text-muted">
+                <i class="ri-history-line" style="font-size: 48px; opacity: 0.3;"></i>
+                <p class="mt-2 mb-1">No updates yet</p>
+                <p class="mb-0" style="font-size: 13px;">Progress updates will appear here when added.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
