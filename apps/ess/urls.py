@@ -71,6 +71,7 @@ urlpatterns = [
 
     # Announcements
     path('announcements/', views.AnnouncementListView.as_view(), name='announcement_list'),
+    path('announcements/create/', views.AnnouncementCreateView.as_view(), name='announcement_create'),
     path('announcements/<int:pk>/', views.AnnouncementDetailView.as_view(), name='announcement_detail'),
 
     # Celebrations (Birthday / Work Anniversary)
@@ -79,6 +80,7 @@ urlpatterns = [
 
     # Surveys
     path('surveys/', views.SurveyListView.as_view(), name='survey_list'),
+    path('surveys/create/', views.SurveyCreateView.as_view(), name='survey_create'),
     path('surveys/<int:pk>/', views.SurveyDetailView.as_view(), name='survey_detail'),
     path('surveys/<int:pk>/respond/', views.SurveyRespondView.as_view(), name='survey_respond'),
 
