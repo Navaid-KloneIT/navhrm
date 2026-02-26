@@ -23,7 +23,11 @@
                     <div class="row g-3 align-items-end">
                         <div class="col-md-4">
                             <label class="form-label">Select Month</label>
-                            <input type="month" class="form-control" name="month" value="{{ current_month|date:'Y-m' }}">
+                            <select class="form-select" name="month">
+                                {% for value, label in month_choices %}
+                                <option value="{{ value }}" {% if current_month == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="col-md-2">
                             <button type="submit" class="btn btn-primary w-100">
