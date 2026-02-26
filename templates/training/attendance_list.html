@@ -75,8 +75,8 @@
                             <tr>
                                 <td class="fw-medium">{{ record.employee }}</td>
                                 <td>{{ record.session|default:"-" }}</td>
-                                <td>{{ record.session.training|default:record.training|default:"-" }}</td>
-                                <td>{{ record.date|date:"M d, Y" }}</td>
+                                <td>{{ record.session.training|default:"-" }}</td>
+                                <td>{{ record.session.session_date|date:"M d, Y"|default:"-" }}</td>
                                 <td>
                                     {% if record.status == 'present' %}
                                     <span class="badge bg-soft-success text-success">Present</span>
