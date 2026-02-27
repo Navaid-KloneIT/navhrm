@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% load additional_tags %}
+
+{% block title %}{{ ticket.ticket_number }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ ticket.ticket_number }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Helpdesk</li>
+            <li class="breadcrumb-item"><a href="{% url 'additional:ticket_list' %}">Tickets</a></li>
+            <li class="breadcrumb-item active">{{ ticket.ticket_number }}</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Header Card -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h5 class="mb-1">{{ ticket.ticket_number }} - {{ ticket.subject }}</h5>
+                <div class="d-flex gap-2 mt-2">
+                    <span class="badge bg-soft-{{ ticket.priority|ticket_priority_color }} text-{{ ticket.priority|ticket_priority_color }}">{{ ticket.get_priority_display }}</span>
+                    <span class="badge bg-soft-{{ ticket.status|ticket_status_color }} text-{{ ticket.status|ticket_status_color }}">{{ ticket.get_status_display }}</span>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'additional:ticket_edit' ticket.pk %}" class="btn btn-warning">
+                    <i class="ri-pencil-line me-1"></i> Edit
+                </a>
+                {% if ticket.status != 'closed' %}
+                <form method="post" action="{% url 'additional:ticket_close' ticket.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary" onclick="return confirm('Are you sure you want to close this ticket?')">
+                        <i class="ri-close-circle-line me-1"></i> Close
+                    </button>
+                </form>
+                {% endif %}
+                {% if ticket.status == 'closed' %}
+                <form method="post" action="{% url 'additional:ticket_reopen' ticket.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-info" onclick="return confirm('Are you sure you want to reopen this ticket?')">
+                        <i class="ri-refresh-line me-1"></i> Reopen
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <!-- Ticket Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Ticket Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Ticket Number</small>
+                    <div class="fw-medium">{{ ticket.ticket_number }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Subject</small>
+                    <div class="fw-medium">{{ ticket.subject }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Employee</small>
+                    <div class="fw-medium">{{ ticket.employee }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Category</small>
+                    <div class="fw-medium">{{ ticket.category|default:"-" }}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Description</small>
+                    <div>{{ ticket.description|linebreaks }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resolution -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Resolution</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Resolution</small>
+                    <div>{{ ticket.resolution|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Resolved Date</small>
+                    <div class="fw-medium">{% if ticket.resolved_date %}{{ ticket.resolved_date|date:"d M Y, h:i A" }}{% else %}-{% endif %}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Closed Date</small>
+                    <div class="fw-medium">{% if ticket.closed_date %}{{ ticket.closed_date|date:"d M Y, h:i A" }}{% else %}-{% endif %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <!-- Classification & Assignment -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Classification & Assignment</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Priority</small>
+                    <div>
+                        <span class="badge bg-soft-{{ ticket.priority|ticket_priority_color }} text-{{ ticket.priority|ticket_priority_color }}">{{ ticket.get_priority_display }}</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        <span class="badge bg-soft-{{ ticket.status|ticket_status_color }} text-{{ ticket.status|ticket_status_color }}">{{ ticket.get_status_display }}</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Assigned To</small>
+                    <div class="fw-medium">{{ ticket.assigned_to|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Created</small>
+                    <div class="fw-medium">{{ ticket.created_at|date:"d M Y, h:i A" }}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Updated</small>
+                    <div class="fw-medium">{{ ticket.updated_at|date:"d M Y, h:i A" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Satisfaction -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Satisfaction</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Rating</small>
+                    <div>
+                        {% if ticket.satisfaction_rating %}
+                        <span class="text-warning">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= ticket.satisfaction_rating %}&#9733;{% else %}&#9734;{% endif %}
+                            {% endfor %}
+                        </span>
+                        <span class="ms-1 fw-medium">{{ ticket.satisfaction_rating }}/5</span>
+                        {% else %}
+                        <span class="text-muted">Not rated</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Feedback</small>
+                    <div>{{ ticket.satisfaction_feedback|default:"-" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Comments Section -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">Comments</h5>
+    </div>
+    <div class="card-body">
+        {% for comment in comments %}
+        <div class="d-flex gap-3 mb-4 {% if comment.is_internal %}bg-light p-3 rounded{% endif %}">
+            <div class="flex-shrink-0">
+                <span class="avatar-title rounded-circle bg-soft-primary text-primary d-inline-flex align-items-center justify-content-center" style="width:36px; height:36px; font-size:14px;">
+                    {{ comment.user.get_full_name|first|default:"U" }}
+                </span>
+            </div>
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between">
+                    <h6 class="mb-1">{{ comment.user.get_full_name|default:comment.user.username }}
+                        {% if comment.is_internal %}<span class="badge bg-soft-warning text-warning ms-1">Internal</span>{% endif %}
+                    </h6>
+                    <small class="text-muted">{{ comment.created_at|timesince }} ago</small>
+                </div>
+                <p class="mb-1">{{ comment.comment }}</p>
+                {% if comment.attachment %}
+                <a href="{{ comment.attachment.url }}" target="_blank" class="text-primary"><i class="ri-attachment-2 me-1"></i>Attachment</a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted text-center py-3">No comments yet.</p>
+        {% endfor %}
+
+        <!-- Add Comment Form -->
+        <hr>
+        <form method="post" action="{% url 'additional:ticket_comment_create' ticket.pk %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label">Add Comment</label>
+                    {{ comment_form.comment }}
+                </div>
+                <div class="col-md-6">
+                    {{ comment_form.attachment }}
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <div class="form-check">
+                        {{ comment_form.is_internal }}
+                        <label class="form-check-label" for="{{ comment_form.is_internal.id_for_label }}">Internal note (not visible to employee)</label>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary"><i class="ri-send-plane-line me-1"></i> Add Comment</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
