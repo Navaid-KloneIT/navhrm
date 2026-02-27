@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Assets</li>
+            <li class="breadcrumb-item"><a href="{% url 'additional:asset_maintenance_list' %}">Maintenance</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Maintenance Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Maintenance Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Asset -->
+                <div class="col-md-6">
+                    <label for="{{ form.asset.id_for_label }}" class="form-label">Asset <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.asset.errors %}is-invalid{% endif %}" id="{{ form.asset.id_for_label }}" name="{{ form.asset.html_name }}">
+                        <option value="">-- Select Asset --</option>
+                        {% for choice in form.asset.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.asset.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.asset.errors %}<div class="invalid-feedback d-block">{{ form.asset.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Maintenance Type -->
+                <div class="col-md-6">
+                    <label for="{{ form.maintenance_type.id_for_label }}" class="form-label">Maintenance Type <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.maintenance_type.errors %}is-invalid{% endif %}" id="{{ form.maintenance_type.id_for_label }}" name="{{ form.maintenance_type.html_name }}">
+                        <option value="">-- Select Type --</option>
+                        {% for value, label in form.maintenance_type.field.choices %}
+                        <option value="{{ value }}" {% if form.maintenance_type.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.maintenance_type.errors %}<div class="invalid-feedback d-block">{{ form.maintenance_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Scheduled Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.scheduled_date.id_for_label }}" class="form-label">Scheduled Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.scheduled_date.errors %}is-invalid{% endif %}" id="{{ form.scheduled_date.id_for_label }}" name="{{ form.scheduled_date.html_name }}" value="{{ form.scheduled_date.value|default_if_none:'' }}">
+                    {% if form.scheduled_date.errors %}<div class="invalid-feedback d-block">{{ form.scheduled_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Completed Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.completed_date.id_for_label }}" class="form-label">Completed Date</label>
+                    <input type="date" class="form-control {% if form.completed_date.errors %}is-invalid{% endif %}" id="{{ form.completed_date.id_for_label }}" name="{{ form.completed_date.html_name }}" value="{{ form.completed_date.value|default_if_none:'' }}">
+                    {% if form.completed_date.errors %}<div class="invalid-feedback d-block">{{ form.completed_date.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vendor & Cost -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Vendor & Cost</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Vendor -->
+                <div class="col-md-6">
+                    <label for="{{ form.vendor.id_for_label }}" class="form-label">Vendor</label>
+                    <input type="text" class="form-control {% if form.vendor.errors %}is-invalid{% endif %}" id="{{ form.vendor.id_for_label }}" name="{{ form.vendor.html_name }}" value="{{ form.vendor.value|default_if_none:'' }}" placeholder="Vendor name...">
+                    {% if form.vendor.errors %}<div class="invalid-feedback d-block">{{ form.vendor.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Cost -->
+                <div class="col-md-6">
+                    <label for="{{ form.cost.id_for_label }}" class="form-label">Cost</label>
+                    <input type="number" class="form-control {% if form.cost.errors %}is-invalid{% endif %}" id="{{ form.cost.id_for_label }}" name="{{ form.cost.html_name }}" value="{{ form.cost.value|default_if_none:'' }}" min="0" step="0.01" placeholder="e.g., 250.00">
+                    {% if form.cost.errors %}<div class="invalid-feedback d-block">{{ form.cost.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.status.errors %}is-invalid{% endif %}" id="{{ form.status.id_for_label }}" name="{{ form.status.html_name }}">
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback d-block">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description & Notes -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Description & Notes</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Description -->
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="4" placeholder="Maintenance description...">{{ form.description.value|default_if_none:'' }}</textarea>
+                    {% if form.description.errors %}<div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Notes -->
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                    <textarea class="form-control {% if form.notes.errors %}is-invalid{% endif %}" id="{{ form.notes.id_for_label }}" name="{{ form.notes.html_name }}" rows="4" placeholder="Additional notes...">{{ form.notes.value|default_if_none:'' }}</textarea>
+                    {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Record
+        </button>
+        <a href="{% url 'additional:asset_maintenance_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
