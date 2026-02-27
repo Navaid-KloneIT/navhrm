@@ -60,6 +60,32 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **System Configuration** - Company settings (logo, timezone, date format, currency), financial year setup with auto-generated monthly periods, working hours policies (grace time, overtime threshold, working days), location/office management, third-party integration settings (SMTP, Slack, Teams, biometric, APIs)
 - **Audit & Compliance** - Full audit trail logging all CRUD operations with old/new value diffs, data privacy & GDPR compliance dashboard, data retention policies (archive/anonymize/delete), access logs (login/logout tracking), backup configuration and recovery with manual/scheduled options
 
+### Additional Modules
+
+#### Asset Management
+- **Asset Categories** - Categorize assets (laptops, phones, furniture, vehicles, etc.)
+- **Asset Register** - Track all assets with asset ID, serial number, purchase details, warranty, condition and status
+- **Asset Allocation** - Assign assets to employees with allocation tracking, expected return dates
+- **Asset Return** - Process asset returns with condition assessment during offboarding or transfers
+- **Asset Maintenance** - Schedule and track preventive, corrective, and AMC maintenance with vendor and cost tracking
+
+#### Expense Management
+- **Expense Categories** - Define expense types (travel, food, office supplies, etc.) with maximum limits
+- **Expense Policies** - Configure policies per employee group (all/department/designation) with amount limits and receipt requirements
+- **Expense Claims** - Submit claims with receipts, multi-level approval workflow (draft → submitted → approved → reimbursed), rejection with reason tracking
+
+#### Travel Management
+- **Travel Policies** - Define travel class (economy/business/first), daily allowance, and hotel limits
+- **Travel Requests** - Request domestic/international travel with itinerary, cost estimation, advance requests, and approval workflow
+- **Travel Expenses** - Record itemized travel expenses (flight, hotel, cab, food) with receipt uploads
+- **Travel Settlement** - Post-travel expense settlement with advance reconciliation
+
+#### Helpdesk Module
+- **Ticket Categories** - Define categories (IT Support, HR Query, Facilities, Finance, Admin) with SLA response and resolution hours
+- **Ticket Management** - Raise, assign, track, and resolve tickets with priority levels (low/medium/high/critical), status workflow (open → assigned → in_progress → resolved → closed), satisfaction rating
+- **Ticket Comments** - Comment threads with internal notes (visible only to staff) and file attachments
+- **Knowledge Base** - Self-help articles organized by category with view tracking and publish controls
+
 ### Recruitment Module
 - **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
 - **Job Templates** - Pre-defined job description templates for quick requisition creation
@@ -144,6 +170,8 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
    python manage.py seed_performance
    python manage.py seed_training
    python manage.py seed_ess
+   python manage.py seed_administration
+   python manage.py seed_additional
    ```
 
 8. **Run the development server**
@@ -186,7 +214,8 @@ navhrm/
 │   ├── training/          # Training management, LMS, administration
 │   ├── ess/               # Employee self-service, requests, communication
 │   ├── reports/           # Reports & analytics (no models, read-only views)
-│   └── administration/   # Admin & settings, roles, workflows, audit
+│   ├── administration/    # Admin & settings, roles, workflows, audit
+│   └── additional/        # Asset, expense, travel management & helpdesk
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS
@@ -208,7 +237,8 @@ navhrm/
 │   ├── training/          # Training & development templates (35 files)
 │   ├── ess/               # Employee self-service templates (39 files)
 │   ├── reports/           # Reports & analytics templates (20 files)
-│   └── administration/   # Admin & settings templates (33 files)
+│   ├── administration/    # Admin & settings templates (33 files)
+│   └── additional/        # Additional modules templates (31 files)
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
