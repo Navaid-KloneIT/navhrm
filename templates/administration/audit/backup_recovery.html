@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Backup & Recovery{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Backup & Recovery</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Admin & Settings</li>
+            <li class="breadcrumb-item active">Backup & Recovery</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Backup Configuration -->
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="ri-settings-3-line me-2"></i>Backup Configuration</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <!-- Backup Type -->
+                        <div class="col-12">
+                            <label for="{{ form.backup_type.id_for_label }}" class="form-label">Backup Type</label>
+                            <select class="form-select {% if form.backup_type.errors %}is-invalid{% endif %}" id="{{ form.backup_type.id_for_label }}" name="{{ form.backup_type.html_name }}">
+                                {% for choice in form.backup_type.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.backup_type.value == choice.0|stringformat:"s" %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.backup_type.errors %}<div class="invalid-feedback">{{ form.backup_type.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Frequency -->
+                        <div class="col-12">
+                            <label for="{{ form.frequency.id_for_label }}" class="form-label">Frequency</label>
+                            <select class="form-select {% if form.frequency.errors %}is-invalid{% endif %}" id="{{ form.frequency.id_for_label }}" name="{{ form.frequency.html_name }}">
+                                {% for choice in form.frequency.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.frequency.value == choice.0|stringformat:"s" %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.frequency.errors %}<div class="invalid-feedback">{{ form.frequency.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Retention Count -->
+                        <div class="col-12">
+                            <label for="{{ form.retention_count.id_for_label }}" class="form-label">Retention Count</label>
+                            <input type="number" class="form-control {% if form.retention_count.errors %}is-invalid{% endif %}" id="{{ form.retention_count.id_for_label }}" name="{{ form.retention_count.html_name }}" value="{{ form.retention_count.value|default_if_none:'' }}" min="1">
+                            <small class="text-muted">Number of backups to keep before oldest is removed.</small>
+                            {% if form.retention_count.errors %}<div class="invalid-feedback">{{ form.retention_count.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Include Media -->
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="{{ form.include_media.id_for_label }}" name="{{ form.include_media.html_name }}" {% if form.include_media.value %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ form.include_media.id_for_label }}">Include Media Files</label>
+                            </div>
+                        </div>
+
+                        <!-- Is Active -->
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="{{ form.is_active.id_for_label }}" name="{{ form.is_active.html_name }}" {% if form.is_active.value %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Enable Automated Backups</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Configuration
+                        </button>
+                    </div>
+                </form>
+
+                <hr>
+
+                <form method="post" action="{% url 'administration:backup_run' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100" onclick="return confirm('Start a backup now? This may take several minutes.')">
+                        <i class="ri-download-cloud-line me-1"></i> Backup Now
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup History -->
+    <div class="col-lg-7">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="ri-history-line me-2"></i>Backup History</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Size</th>
+                                <th>Initiated By</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td>{{ log.created_at|date:"M d, Y h:i A" }}</td>
+                                <td>
+                                    {% if log.status == 'completed' or log.status == 'success' %}
+                                    <span class="badge bg-soft-success text-success">{{ log.status|title }}</span>
+                                    {% elif log.status == 'failed' or log.status == 'error' %}
+                                    <span class="badge bg-soft-danger text-danger">{{ log.status|title }}</span>
+                                    {% elif log.status == 'in_progress' or log.status == 'running' %}
+                                    <span class="badge bg-soft-warning text-warning">{{ log.status|title }}</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ log.status|title }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ log.size|default:"-" }}</td>
+                                <td>{{ log.initiated_by|default:"-" }}</td>
+                                <td>
+                                    {% if log.status == 'completed' or log.status == 'success' %}
+                                    <a href="{% url 'administration:backup_download' log.pk %}" class="btn btn-sm btn-soft-primary" data-bs-toggle="tooltip" title="Download">
+                                        <i class="ri-download-2-line"></i>
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-hard-drive-2-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No backup history found</p>
+                                        <p class="mb-0" style="font-size: 13px;">Backup records will appear here after running a backup.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
