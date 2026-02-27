@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Detail{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Audit Detail</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Admin & Settings</li>
+            <li class="breadcrumb-item"><a href="{% url 'administration:audit_trail' %}">Audit Trail</a></li>
+            <li class="breadcrumb-item active">Detail</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Audit Info Card -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Audit Information</h5>
+                {% if audit.action == 'create' or audit.action == 'CREATE' %}
+                <span class="badge bg-soft-success text-success fs-6">{{ audit.action }}</span>
+                {% elif audit.action == 'update' or audit.action == 'UPDATE' %}
+                <span class="badge bg-soft-warning text-warning fs-6">{{ audit.action }}</span>
+                {% elif audit.action == 'delete' or audit.action == 'DELETE' %}
+                <span class="badge bg-soft-danger text-danger fs-6">{{ audit.action }}</span>
+                {% else %}
+                <span class="badge bg-soft-info text-info fs-6">{{ audit.action }}</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Timestamp</small>
+                        <div class="fw-medium">{{ audit.timestamp|date:"M d, Y h:i:s A" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">User</small>
+                        <div class="fw-medium">{{ audit.user|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Action</small>
+                        <div class="fw-medium">{{ audit.action }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Model</small>
+                        <div class="fw-medium">{{ audit.model_name }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Object ID</small>
+                        <div class="fw-medium">{{ audit.object_id|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Object</small>
+                        <div class="fw-medium">{{ audit.object_repr|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">IP Address</small>
+                        <div class="fw-medium"><code>{{ audit.ip_address|default:"-" }}</code></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Changes Card -->
+        {% if audit.changes %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Changes</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Old Value</th>
+                                <th>New Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for field, values in audit.changes.items %}
+                            <tr>
+                                <td><span class="fw-medium">{{ field }}</span></td>
+                                <td>
+                                    {% if values.0 %}
+                                    <span class="text-danger">{{ values.0 }}</span>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if values.1 %}
+                                    <span class="text-success">{{ values.1 }}</span>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'administration:audit_trail' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to Audit Trail
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
