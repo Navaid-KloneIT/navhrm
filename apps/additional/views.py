@@ -290,7 +290,7 @@ class AssetReturnView(LoginRequiredMixin, View):
 class AssetMaintenanceListView(LoginRequiredMixin, ListView):
     model = AssetMaintenance
     template_name = 'additional/asset_maintenance_list.html'
-    context_object_name = 'records'
+    context_object_name = 'maintenance_records'
     paginate_by = 20
 
     def get_queryset(self):
@@ -706,7 +706,7 @@ class TravelPolicyDeleteView(LoginRequiredMixin, View):
 class TravelRequestListView(LoginRequiredMixin, ListView):
     model = TravelRequest
     template_name = 'additional/travel_request_list.html'
-    context_object_name = 'requests'
+    context_object_name = 'travel_requests'
     paginate_by = 20
 
     def get_queryset(self):
