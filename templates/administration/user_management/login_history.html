@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Login History{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Login History</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Admin & Settings</li>
+            <li class="breadcrumb-item active">Login History</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'administration:login_history' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search by username or IP...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="success" {% if request.GET.status == 'success' %}selected{% endif %}>Success</option>
+                                <option value="failed" {% if request.GET.status == 'failed' %}selected{% endif %}>Failed</option>
+                                <option value="locked" {% if request.GET.status == 'locked' %}selected{% endif %}>Locked</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Date From</label>
+                            <input type="date" class="form-control" name="date_from" value="{{ request.GET.date_from }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Date To</label>
+                            <input type="date" class="form-control" name="date_to" value="{{ request.GET.date_to }}">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'administration:login_history' %}" class="btn btn-light w-100">
+                                <i class="ri-refresh-line me-1"></i> Reset
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Login History Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>Login Logs</h5>
+                {% if page_obj %}
+                <span class="text-muted">{{ page_obj.paginator.count }} total record{{ page_obj.paginator.count|pluralize }}</span>
+                {% endif %}
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>IP Address</th>
+                                <th>Status</th>
+                                <th>User Agent</th>
+                                <th>Login Time</th>
+                                <th>Logout Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar avatar-sm">
+                                            {% if log.user and log.user.avatar %}
+                                                <img src="{{ log.user.avatar.url }}" alt="{{ log.user.get_full_name }}" class="rounded-circle" width="36" height="36" style="object-fit: cover;">
+                                            {% else %}
+                                                <span class="avatar-title rounded-circle bg-soft-primary text-primary d-inline-flex align-items-center justify-content-center" style="width:36px; height:36px; font-size:13px;">
+                                                    {% if log.user %}{{ log.user.get_initials }}{% else %}?{% endif %}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">
+                                                {% if log.user %}
+                                                    {{ log.user.get_full_name|default:log.user.username }}
+                                                {% else %}
+                                                    <span class="text-muted">Unknown</span>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <code>{{ log.ip_address|default:"-" }}</code>
+                                </td>
+                                <td>
+                                    {% if log.status == 'success' %}
+                                        <span class="status-badge badge-soft-success">
+                                            <span class="status-dot bg-success"></span>
+                                            Success
+                                        </span>
+                                    {% elif log.status == 'failed' %}
+                                        <span class="status-badge badge-soft-danger">
+                                            <span class="status-dot bg-danger"></span>
+                                            Failed
+                                        </span>
+                                    {% elif log.status == 'locked' %}
+                                        <span class="status-badge badge-soft-warning">
+                                            <span class="status-dot bg-warning"></span>
+                                            Locked
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-light text-muted">{{ log.get_status_display|default:log.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="text-truncate d-inline-block" style="max-width: 200px;" data-bs-toggle="tooltip" title="{{ log.user_agent }}">
+                                        {{ log.user_agent|default:"-"|truncatechars:40 }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if log.login_time %}
+                                        {{ log.login_time|date:"M d, Y H:i" }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if log.logout_time %}
+                                        {{ log.logout_time|date:"M d, Y H:i" }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-login-box-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No login records found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search or request.GET.status or request.GET.date_from or request.GET.date_to %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Login history will appear here as users log in.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Login history pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
