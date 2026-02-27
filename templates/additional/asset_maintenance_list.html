@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load additional_tags %}
+
+{% block title %}Asset Maintenance{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Asset Maintenance</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Assets</li>
+            <li class="breadcrumb-item active">Maintenance</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'additional:asset_maintenance_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search maintenance...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line"></i>
+                            </button>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'additional:asset_maintenance_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> Add Record
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Maintenance Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">All Maintenance Records</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th>Type</th>
+                                <th>Scheduled Date</th>
+                                <th>Completed Date</th>
+                                <th>Vendor</th>
+                                <th>Cost</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in maintenance_records %}
+                            <tr>
+                                <td class="fw-medium">{{ record.asset }}</td>
+                                <td>{{ record.get_maintenance_type_display }}</td>
+                                <td>{{ record.scheduled_date|date:"M d, Y" }}</td>
+                                <td>{% if record.completed_date %}{{ record.completed_date|date:"M d, Y" }}{% else %}-{% endif %}</td>
+                                <td>{{ record.vendor|default:"-" }}</td>
+                                <td>{% if record.cost %}{{ record.cost }}{% else %}-{% endif %}</td>
+                                <td>
+                                    <span class="badge bg-soft-{{ record.status|maintenance_status_color }} text-{{ record.status|maintenance_status_color }}">{{ record.get_status_display }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'additional:asset_maintenance_edit' record.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-tools-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No maintenance records found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search or request.GET.status %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Maintenance records will appear here when created.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Maintenance list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
