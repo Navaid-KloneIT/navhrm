@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Admin & Settings</li>
+            <li class="breadcrumb-item"><a href="{% url 'administration:role_list' %}">Roles</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST" action="">
+    {% csrf_token %}
+
+    <!-- Role Details -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Role Details</h5>
+                </div>
+                <div class="card-body">
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <!-- Name -->
+                        <div class="col-md-6">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Role Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Code -->
+                        <div class="col-md-6">
+                            <label for="{{ form.code.id_for_label }}" class="form-label">Role Code</label>
+                            {{ form.code }}
+                            {% if form.code.errors %}
+                            <div class="invalid-feedback d-block">{{ form.code.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-12">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Is Active -->
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="form-check form-switch">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Active Role</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Permissions Matrix -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Permissions Matrix</h5>
+                    <span class="text-muted">Select the permissions for this role</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 200px;">Module</th>
+                                    {% for action_code, action_label in actions %}
+                                    <th class="text-center">{{ action_label }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for module_code, module_label in modules %}
+                                <tr>
+                                    <td>
+                                        <span class="fw-medium">{{ module_label }}</span>
+                                    </td>
+                                    {% for action_code, action_label in actions %}
+                                    <td class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input perm-checkbox"
+                                                   type="checkbox"
+                                                   name="perm_{{ module_code }}_{{ action_code }}"
+                                                   id="perm_{{ module_code }}_{{ action_code }}"
+                                                   value="1"
+                                                   data-module="{{ module_code }}"
+                                                   data-action="{{ action_code }}">
+                                        </div>
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex gap-2 mb-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Save Role
+                </button>
+                <a href="{% url 'administration:role_list' %}" class="btn btn-light">
+                    <i class="ri-arrow-left-line me-1"></i> Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Pre-check permissions from perm_matrix context (edit mode)
+        {% if perm_matrix %}
+        var permMatrix = JSON.parse('{{ perm_matrix_json|escapejs }}');
+        document.querySelectorAll('.perm-checkbox').forEach(function(checkbox) {
+            var module = checkbox.getAttribute('data-module');
+            var action = checkbox.getAttribute('data-action');
+            if (permMatrix[module] && permMatrix[module][action] === true) {
+                checkbox.checked = true;
+            }
+        });
+        {% endif %}
+
+        // Select All / Deselect All per row
+        document.querySelectorAll('table tbody tr').forEach(function(row) {
+            var checkboxes = row.querySelectorAll('.perm-checkbox');
+            if (checkboxes.length > 0) {
+                row.querySelector('td:first-child').style.cursor = 'pointer';
+                row.querySelector('td:first-child').addEventListener('dblclick', function() {
+                    var allChecked = Array.from(checkboxes).every(function(cb) { return cb.checked; });
+                    checkboxes.forEach(function(cb) { cb.checked = !allChecked; });
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
