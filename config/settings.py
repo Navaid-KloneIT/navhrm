@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'apps.ess',
     'apps.reports',
     'apps.administration',
+    'apps.additional',
 ]
 
 MIDDLEWARE = [
