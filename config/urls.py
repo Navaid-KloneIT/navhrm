@@ -19,6 +19,7 @@ urlpatterns = [
     path('training/', include('apps.training.urls')),
     path('ess/', include('apps.ess.urls')),
     path('reports/', include('apps.reports.urls')),
+    path('administration/', include('apps.administration.urls')),
 ]
 
 if settings.DEBUG:
