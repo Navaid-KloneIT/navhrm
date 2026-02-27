@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Company Settings{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Company Settings</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Admin & Settings</li>
+            <li class="breadcrumb-item active">Company Settings</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Company Settings</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <!-- Company Name -->
+                        <div class="col-md-6">
+                            <label for="{{ form.company_name.id_for_label }}" class="form-label">Company Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control {% if form.company_name.errors %}is-invalid{% endif %}" id="{{ form.company_name.id_for_label }}" name="{{ form.company_name.html_name }}" value="{{ form.company_name.value|default_if_none:'' }}">
+                            {% if form.company_name.errors %}<div class="invalid-feedback">{{ form.company_name.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Company Logo -->
+                        <div class="col-md-6">
+                            <label for="{{ form.company_logo.id_for_label }}" class="form-label">Company Logo</label>
+                            {% if tenant.logo %}
+                            <div class="mb-2">
+                                <img src="{{ tenant.logo.url }}" alt="Current Logo" class="rounded" width="48" height="48" style="object-fit: cover;">
+                                <small class="text-muted ms-2">Current logo</small>
+                            </div>
+                            {% endif %}
+                            <input type="file" class="form-control {% if form.company_logo.errors %}is-invalid{% endif %}" id="{{ form.company_logo.id_for_label }}" name="{{ form.company_logo.html_name }}" accept="image/*">
+                            {% if form.company_logo.errors %}<div class="invalid-feedback">{{ form.company_logo.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Timezone -->
+                        <div class="col-md-6">
+                            <label for="{{ form.timezone.id_for_label }}" class="form-label">Timezone <span class="text-danger">*</span></label>
+                            <select class="form-select {% if form.timezone.errors %}is-invalid{% endif %}" id="{{ form.timezone.id_for_label }}" name="{{ form.timezone.html_name }}">
+                                {% for choice in form.timezone.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.timezone.value == choice.0|stringformat:"s" %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.timezone.errors %}<div class="invalid-feedback">{{ form.timezone.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Date Format -->
+                        <div class="col-md-6">
+                            <label for="{{ form.date_format.id_for_label }}" class="form-label">Date Format</label>
+                            <select class="form-select {% if form.date_format.errors %}is-invalid{% endif %}" id="{{ form.date_format.id_for_label }}" name="{{ form.date_format.html_name }}">
+                                {% for choice in form.date_format.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.date_format.value == choice.0|stringformat:"s" %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.date_format.errors %}<div class="invalid-feedback">{{ form.date_format.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Currency -->
+                        <div class="col-md-6">
+                            <label for="{{ form.currency.id_for_label }}" class="form-label">Currency</label>
+                            <select class="form-select {% if form.currency.errors %}is-invalid{% endif %}" id="{{ form.currency.id_for_label }}" name="{{ form.currency.html_name }}">
+                                {% for choice in form.currency.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.currency.value == choice.0|stringformat:"s" %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.currency.errors %}<div class="invalid-feedback">{{ form.currency.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Fiscal Year Start -->
+                        <div class="col-md-6">
+                            <label for="{{ form.fiscal_year_start.id_for_label }}" class="form-label">Fiscal Year Start</label>
+                            <select class="form-select {% if form.fiscal_year_start.errors %}is-invalid{% endif %}" id="{{ form.fiscal_year_start.id_for_label }}" name="{{ form.fiscal_year_start.html_name }}">
+                                {% for choice in form.fiscal_year_start.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.fiscal_year_start.value == choice.0|stringformat:"s" %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.fiscal_year_start.errors %}<div class="invalid-feedback">{{ form.fiscal_year_start.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Settings
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Current Settings</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-column gap-3">
+                    <div>
+                        <small class="text-muted">Company Name</small>
+                        <div class="fw-medium">{{ tenant.name|default:"-" }}</div>
+                    </div>
+                    <div>
+                        <small class="text-muted">Timezone</small>
+                        <div class="fw-medium">{{ tenant.timezone|default:"-" }}</div>
+                    </div>
+                    <div>
+                        <small class="text-muted">Currency</small>
+                        <div class="fw-medium">{{ tenant.currency|default:"-" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
