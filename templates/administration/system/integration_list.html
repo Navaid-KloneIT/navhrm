@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Integration Settings{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Integration Settings</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Admin & Settings</li>
+            <li class="breadcrumb-item active">Integration Settings</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">All Integrations</h5>
+                <a href="{% url 'administration:integration_create' %}" class="btn btn-primary btn-sm">
+                    <i class="ri-add-line me-1"></i> Add Integration
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Provider</th>
+                                <th>Status</th>
+                                <th>Last Tested</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for integration in integrations %}
+                            <tr>
+                                <td><span class="fw-medium">{{ integration.name }}</span></td>
+                                <td>
+                                    <span class="badge bg-soft-primary text-primary">{{ integration.provider }}</span>
+                                </td>
+                                <td>
+                                    {% if integration.status == 'active' %}
+                                    <span class="badge bg-soft-success text-success">Active</span>
+                                    {% elif integration.status == 'error' %}
+                                    <span class="badge bg-soft-danger text-danger">Error</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ integration.last_tested|date:"M d, Y h:i A"|default:"-" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <form method="post" action="{% url 'administration:integration_test' integration.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="Test Connection">
+                                                <i class="ri-wifi-line"></i>
+                                            </button>
+                                        </form>
+                                        <a href="{% url 'administration:integration_edit' integration.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'administration:integration_delete' integration.pk %}" class="d-inline" data-confirm-delete>
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this integration?')">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-plug-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No integrations found</p>
+                                        <p class="mb-0" style="font-size: 13px;">Integrations will appear here when configured.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
