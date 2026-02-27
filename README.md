@@ -54,6 +54,12 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Payroll Reports** - Salary register (monthly details), tax reports (TDS, investment summary), statutory reports (PF, ESI, PT contributions), cost analysis (CTC breakdown, cost center reports)
 - **Analytics Dashboard** - Executive dashboard with key HR metrics, headcount trends, attrition analysis, workforce composition, department cost distribution, gender distribution charts
 
+### Admin & Settings Module
+- **User Management** - User accounts with CRUD, custom roles & permissions matrix (module-level access control), role assignment to users, login history with IP tracking and session audit
+- **Workflow Configuration** - Multi-level approval workflows (leave, expense, timesheet, etc.), customizable email templates with variable placeholders, notification settings per event (email/in-app/both), escalation rules with auto-reminders and auto-approval
+- **System Configuration** - Company settings (logo, timezone, date format, currency), financial year setup with auto-generated monthly periods, working hours policies (grace time, overtime threshold, working days), location/office management, third-party integration settings (SMTP, Slack, Teams, biometric, APIs)
+- **Audit & Compliance** - Full audit trail logging all CRUD operations with old/new value diffs, data privacy & GDPR compliance dashboard, data retention policies (archive/anonymize/delete), access logs (login/logout tracking), backup configuration and recovery with manual/scheduled options
+
 ### Recruitment Module
 - **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
 - **Job Templates** - Pre-defined job description templates for quick requisition creation
@@ -179,7 +185,8 @@ navhrm/
 │   ├── performance/       # Goals, reviews, feedback, PIP, warnings, coaching
 │   ├── training/          # Training management, LMS, administration
 │   ├── ess/               # Employee self-service, requests, communication
-│   └── reports/           # Reports & analytics (no models, read-only views)
+│   ├── reports/           # Reports & analytics (no models, read-only views)
+│   └── administration/   # Admin & settings, roles, workflows, audit
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS
@@ -200,7 +207,8 @@ navhrm/
 │   ├── performance/       # Performance management templates (33 files)
 │   ├── training/          # Training & development templates (35 files)
 │   ├── ess/               # Employee self-service templates (39 files)
-│   └── reports/           # Reports & analytics templates (20 files)
+│   ├── reports/           # Reports & analytics templates (20 files)
+│   └── administration/   # Admin & settings templates (33 files)
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
