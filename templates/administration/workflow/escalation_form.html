@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Admin & Settings</li>
+            <li class="breadcrumb-item"><a href="{% url 'administration:escalation_list' %}">Escalation Rules</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <!-- Workflow -->
+                <div class="col-md-6">
+                    <label for="{{ form.workflow.id_for_label }}" class="form-label">Workflow <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.workflow.errors %}is-invalid{% endif %}" id="{{ form.workflow.id_for_label }}" name="{{ form.workflow.html_name }}">
+                        <option value="">Select Workflow</option>
+                        {% for choice in form.workflow.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.workflow.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice.name }} ({{ choice.get_module_display }})</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.workflow.errors %}<div class="invalid-feedback">{{ form.workflow.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Action -->
+                <div class="col-md-6">
+                    <label for="{{ form.action.id_for_label }}" class="form-label">Action <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.action.errors %}is-invalid{% endif %}" id="{{ form.action.id_for_label }}" name="{{ form.action.html_name }}">
+                        <option value="">Select Action</option>
+                        <option value="remind" {% if form.action.value == 'remind' %}selected{% endif %}>Send Reminder</option>
+                        <option value="escalate_next" {% if form.action.value == 'escalate_next' %}selected{% endif %}>Escalate to Next Level</option>
+                        <option value="auto_approve" {% if form.action.value == 'auto_approve' %}selected{% endif %}>Auto Approve</option>
+                        <option value="notify_admin" {% if form.action.value == 'notify_admin' %}selected{% endif %}>Notify Admin</option>
+                    </select>
+                    {% if form.action.errors %}<div class="invalid-feedback">{{ form.action.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Trigger After Days -->
+                <div class="col-md-6">
+                    <label for="{{ form.trigger_after_days.id_for_label }}" class="form-label">Trigger After (Days) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.trigger_after_days.errors %}is-invalid{% endif %}" id="{{ form.trigger_after_days.id_for_label }}" name="{{ form.trigger_after_days.html_name }}" value="{{ form.trigger_after_days.value|default_if_none:'3' }}" min="1">
+                    {% if form.trigger_after_days.errors %}<div class="invalid-feedback">{{ form.trigger_after_days.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Max Reminders -->
+                <div class="col-md-6">
+                    <label for="{{ form.max_reminders.id_for_label }}" class="form-label">Max Reminders <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.max_reminders.errors %}is-invalid{% endif %}" id="{{ form.max_reminders.id_for_label }}" name="{{ form.max_reminders.html_name }}" value="{{ form.max_reminders.value|default_if_none:'3' }}" min="1">
+                    {% if form.max_reminders.errors %}<div class="invalid-feedback">{{ form.max_reminders.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Notify User -->
+                <div class="col-md-6">
+                    <label for="{{ form.notify_user.id_for_label }}" class="form-label">Notify User</label>
+                    <select class="form-select {% if form.notify_user.errors %}is-invalid{% endif %}" id="{{ form.notify_user.id_for_label }}" name="{{ form.notify_user.html_name }}">
+                        <option value="">None</option>
+                        {% for choice in form.notify_user.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.notify_user.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice.get_full_name|default:choice.username }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.notify_user.errors %}<div class="invalid-feedback">{{ form.notify_user.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Is Active -->
+                <div class="col-md-6">
+                    <div class="form-check form-switch mt-4">
+                        <input class="form-check-input" type="checkbox" id="{{ form.is_active.id_for_label }}" name="{{ form.is_active.html_name }}" {% if form.is_active.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Active</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Save
+                </button>
+                <a href="{% url 'administration:escalation_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
