@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Preview: {{ template.name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div>
+        <h4>Preview: {{ template.name }}</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+                <li class="breadcrumb-item">Admin & Settings</li>
+                <li class="breadcrumb-item"><a href="{% url 'administration:email_template_list' %}">Email Templates</a></li>
+                <li class="breadcrumb-item active">Preview</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'administration:email_template_edit' template.pk %}" class="btn btn-soft-warning">
+            <i class="ri-pencil-line me-1"></i> Edit
+        </a>
+        <a href="{% url 'administration:email_template_list' %}" class="btn btn-light">
+            <i class="ri-arrow-left-line me-1"></i> Back
+        </a>
+    </div>
+</div>
+
+<!-- Template Info -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-4 align-items-center">
+                    <div>
+                        <span class="text-muted">Template:</span>
+                        <span class="fw-medium ms-1">{{ template.name }}</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">Event:</span>
+                        <span class="badge bg-soft-info text-info ms-1">{{ template.get_event_display }}</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">Status:</span>
+                        {% if template.is_active %}
+                        <span class="badge bg-soft-success text-success ms-1">Active</span>
+                        {% else %}
+                        <span class="badge bg-soft-danger text-danger ms-1">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Email Preview -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="ri-mail-line me-2"></i>Email Preview</h5>
+            </div>
+            <div class="card-body">
+                <!-- Subject Line -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <label class="form-label text-muted fw-normal mb-1">Subject</label>
+                    <h5 class="mb-0">{{ preview_subject }}</h5>
+                </div>
+
+                <!-- Email Body -->
+                <div class="mb-0">
+                    <label class="form-label text-muted fw-normal mb-2">Body</label>
+                    <div class="border rounded p-4 bg-light">
+                        {{ preview_body|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
