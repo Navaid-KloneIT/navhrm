@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}{{ role.name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div>
+        <h4>{{ role.name }}</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+                <li class="breadcrumb-item">Admin & Settings</li>
+                <li class="breadcrumb-item"><a href="{% url 'administration:role_list' %}">Roles</a></li>
+                <li class="breadcrumb-item active">{{ role.name }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'administration:role_edit' role.pk %}" class="btn btn-soft-warning">
+            <i class="ri-pencil-line me-1"></i> Edit
+        </a>
+        <a href="{% url 'administration:role_list' %}" class="btn btn-soft-secondary">
+            <i class="ri-arrow-left-line me-1"></i> Back to Roles
+        </a>
+    </div>
+</div>
+
+<!-- Role Info Card -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Role Information</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted" style="width: 40%;">Role Name</td>
+                            <td><span class="fw-medium">{{ role.name }}</span></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Code</td>
+                            <td><code>{{ role.code }}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Description</td>
+                            <td>{{ role.description|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">System Role</td>
+                            <td>
+                                {% if role.system_role %}
+                                    <span class="badge bg-soft-primary text-primary">Yes</span>
+                                {% else %}
+                                    <span class="badge bg-light text-muted">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Status</td>
+                            <td>
+                                {% if role.is_active %}
+                                    <span class="status-badge badge-soft-success">
+                                        <span class="status-dot bg-success"></span>
+                                        Active
+                                    </span>
+                                {% else %}
+                                    <span class="status-badge badge-soft-danger">
+                                        <span class="status-dot bg-danger"></span>
+                                        Inactive
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Permissions Matrix (Read-Only) -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Permissions</h5>
+                <span class="text-muted">Assigned permissions for this role</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="min-width: 200px;">Module</th>
+                                {% for action_code, action_label in actions %}
+                                <th class="text-center">{{ action_label }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for module_code, module_label in modules %}
+                            <tr>
+                                <td>
+                                    <span class="fw-medium">{{ module_label }}</span>
+                                </td>
+                                {% for action_code, action_label in actions %}
+                                <td class="text-center">
+                                    <span class="perm-indicator" data-module="{{ module_code }}" data-action="{{ action_code }}">
+                                        <i class="ri-subtract-line text-muted" style="font-size: 16px;"></i>
+                                    </span>
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Render permission indicators from perm_matrix
+        {% if perm_matrix %}
+        var permMatrix = JSON.parse('{{ perm_matrix_json|escapejs }}');
+        document.querySelectorAll('.perm-indicator').forEach(function(indicator) {
+            var module = indicator.getAttribute('data-module');
+            var action = indicator.getAttribute('data-action');
+            if (permMatrix[module] && permMatrix[module][action] === true) {
+                indicator.innerHTML = '<i class="ri-check-line text-success" style="font-size: 18px;"></i>';
+            } else {
+                indicator.innerHTML = '<i class="ri-close-line text-danger" style="font-size: 18px; opacity: 0.4;"></i>';
+            }
+        });
+        {% endif %}
+    });
+</script>
+{% endblock %}
