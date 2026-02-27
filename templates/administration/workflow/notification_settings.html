@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Notification Settings{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Notification Settings</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Admin & Settings</li>
+            <li class="breadcrumb-item active">Notification Settings</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <form method="post" action="{% url 'administration:notification_settings' %}">
+            {% csrf_token %}
+
+            <div class="card table-card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0">Notification Configuration</h5>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="ri-save-line me-1"></i> Save Settings
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Channel</th>
+                                    <th>Recipients</th>
+                                    <th class="text-center">Enabled</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for setting in settings_list %}
+                                <tr>
+                                    <td>
+                                        <span class="fw-medium">{{ setting.get_event_display }}</span>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" name="channel_{{ setting.pk }}" style="width: 150px;">
+                                            <option value="email" {% if setting.channel == 'email' %}selected{% endif %}>Email</option>
+                                            <option value="in_app" {% if setting.channel == 'in_app' %}selected{% endif %}>In-App</option>
+                                            <option value="both" {% if setting.channel == 'both' %}selected{% endif %}>Both</option>
+                                            <option value="none" {% if setting.channel == 'none' %}selected{% endif %}>None</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" name="recipients_{{ setting.pk }}" style="width: 150px;">
+                                            <option value="employee" {% if setting.recipients == 'employee' %}selected{% endif %}>Employee</option>
+                                            <option value="manager" {% if setting.recipients == 'manager' %}selected{% endif %}>Manager</option>
+                                            <option value="hr" {% if setting.recipients == 'hr' %}selected{% endif %}>HR</option>
+                                            <option value="admin" {% if setting.recipients == 'admin' %}selected{% endif %}>Admin</option>
+                                            <option value="custom" {% if setting.recipients == 'custom' %}selected{% endif %}>Custom</option>
+                                        </select>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check form-switch d-flex justify-content-center">
+                                            <input class="form-check-input" type="checkbox" name="enabled_{{ setting.pk }}" {% if setting.is_enabled %}checked{% endif %}>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-5">
+                                        <div class="text-muted">
+                                            <i class="ri-notification-off-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                            <p class="mt-2 mb-1">No notification settings found</p>
+                                            <p class="mb-0" style="font-size: 13px;">Notification settings will appear here when configured.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {% if settings_list %}
+                <div class="card-footer">
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Settings
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
