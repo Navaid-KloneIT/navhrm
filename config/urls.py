@@ -20,6 +20,7 @@ urlpatterns = [
     path('ess/', include('apps.ess.urls')),
     path('reports/', include('apps.reports.urls')),
     path('administration/', include('apps.administration.urls')),
+    path('additional/', include('apps.additional.urls')),
 ]
 
 if settings.DEBUG:
