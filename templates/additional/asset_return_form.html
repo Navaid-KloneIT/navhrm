@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Return Asset{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Return Asset</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Assets</li>
+            <li class="breadcrumb-item"><a href="{% url 'additional:asset_allocation_list' %}">Allocations</a></li>
+            <li class="breadcrumb-item active">Return Asset</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Allocation Info Card -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Allocation Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <small class="text-muted">Asset</small>
+                <div class="fw-medium">{{ allocation.asset.name }}</div>
+            </div>
+            <div class="col-md-4">
+                <small class="text-muted">Employee</small>
+                <div class="fw-medium">{{ allocation.employee }}</div>
+            </div>
+            <div class="col-md-4">
+                <small class="text-muted">Allocated Date</small>
+                <div class="fw-medium">{{ allocation.allocated_date|date:"M d, Y" }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Return Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Actual Return Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.actual_return_date.id_for_label }}" class="form-label">Actual Return Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.actual_return_date.errors %}is-invalid{% endif %}" id="{{ form.actual_return_date.id_for_label }}" name="{{ form.actual_return_date.html_name }}" value="{{ form.actual_return_date.value|default_if_none:'' }}">
+                    {% if form.actual_return_date.errors %}<div class="invalid-feedback d-block">{{ form.actual_return_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Condition at Return -->
+                <div class="col-md-6">
+                    <label for="{{ form.condition_at_return.id_for_label }}" class="form-label">Condition at Return <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.condition_at_return.errors %}is-invalid{% endif %}" id="{{ form.condition_at_return.id_for_label }}" name="{{ form.condition_at_return.html_name }}">
+                        {% for value, label in form.condition_at_return.field.choices %}
+                        <option value="{{ value }}" {% if form.condition_at_return.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.condition_at_return.errors %}<div class="invalid-feedback d-block">{{ form.condition_at_return.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Notes -->
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                    <textarea class="form-control {% if form.notes.errors %}is-invalid{% endif %}" id="{{ form.notes.id_for_label }}" name="{{ form.notes.html_name }}" rows="4" placeholder="Return notes...">{{ form.notes.value|default_if_none:'' }}</textarea>
+                    {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-arrow-go-back-line me-1"></i> Process Return
+        </button>
+        <a href="{% url 'additional:asset_allocation_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
