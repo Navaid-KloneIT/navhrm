@@ -943,24 +943,137 @@
                 </ul>
             </li>
 
-            <li class="menu-title" data-toggle="menu-section">Administration <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+            <li class="menu-title" data-toggle="menu-section">Admin & Settings <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
-            <!-- Users -->
-            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'accounts' %}open{% endif %}">
+            <!-- User Management -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'administration' and 'user' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'role' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and request.resolver_match.url_name == 'login_history' %}open{% endif %}">
                 <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
                     <i class="ri-shield-user-line"></i>
-                    <span class="menu-text">Users</span>
+                    <span class="menu-text">User Management</span>
                     <i class="ri-arrow-right-s-line menu-arrow"></i>
                 </a>
-                <ul class="sub-menu" {% if request.resolver_match.app_name == 'accounts' %}style="display:block"{% endif %}>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'administration' and 'user' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'role' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and request.resolver_match.url_name == 'login_history' %}style="display:block"{% endif %}>
                     <li class="nav-item">
-                        <a href="{% url 'accounts:user_list' %}" class="menu-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">
+                        <a href="{% url 'administration:user_list' %}" class="menu-link {% if request.resolver_match.url_name == 'user_list' and request.resolver_match.app_name == 'administration' %}active{% endif %}">
                             <span class="menu-text">User List</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{% url 'accounts:invite_list' %}" class="menu-link {% if request.resolver_match.url_name == 'invite_list' %}active{% endif %}">
-                            <span class="menu-text">Invite Users</span>
+                        <a href="{% url 'administration:role_list' %}" class="menu-link {% if 'role' in request.resolver_match.url_name and request.resolver_match.app_name == 'administration' %}active{% endif %}">
+                            <span class="menu-text">Roles & Permissions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:role_assign' %}" class="menu-link {% if request.resolver_match.url_name == 'role_assign' %}active{% endif %}">
+                            <span class="menu-text">Role Assignment</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:login_history' %}" class="menu-link {% if request.resolver_match.url_name == 'login_history' %}active{% endif %}">
+                            <span class="menu-text">Login History</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Workflow Configuration -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'administration' and 'workflow' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'email_template' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'notification' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'escalation' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-flow-chart"></i>
+                    <span class="menu-text">Workflow Config</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'administration' and 'workflow' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'email_template' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'notification' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'escalation' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:workflow_list' %}" class="menu-link {% if 'workflow' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Approval Workflows</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:email_template_list' %}" class="menu-link {% if 'email_template' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Email Templates</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:notification_settings' %}" class="menu-link {% if request.resolver_match.url_name == 'notification_settings' %}active{% endif %}">
+                            <span class="menu-text">Notification Settings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:escalation_list' %}" class="menu-link {% if 'escalation' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Escalation Rules</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- System Configuration -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'administration' and 'company' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'financial' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'working_hours' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'location' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'integration' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-settings-3-line"></i>
+                    <span class="menu-text">System Config</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'administration' and 'company' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'financial' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'working_hours' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'location' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'integration' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:company_settings' %}" class="menu-link {% if 'company' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Company Settings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:financial_year_list' %}" class="menu-link {% if 'financial' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Financial Year</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:working_hours_list' %}" class="menu-link {% if 'working_hours' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Working Hours</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:location_list' %}" class="menu-link {% if 'location' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Locations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:integration_list' %}" class="menu-link {% if 'integration' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Integrations</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Audit & Compliance -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'administration' and 'audit' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'data_privacy' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'data_retention' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'access_logs' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'backup' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-shield-2-line"></i>
+                    <span class="menu-text">Audit & Compliance</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'administration' and 'audit' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'data_privacy' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'data_retention' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'access_logs' in request.resolver_match.url_name or request.resolver_match.app_name == 'administration' and 'backup' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:audit_trail' %}" class="menu-link {% if 'audit' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Audit Trail</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:data_privacy' %}" class="menu-link {% if request.resolver_match.url_name == 'data_privacy' %}active{% endif %}">
+                            <span class="menu-text">Data Privacy</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:data_retention_list' %}" class="menu-link {% if 'data_retention' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Data Retention</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:access_logs' %}" class="menu-link {% if request.resolver_match.url_name == 'access_logs' %}active{% endif %}">
+                            <span class="menu-text">Access Logs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'administration:backup' %}" class="menu-link {% if 'backup' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Backup & Recovery</span>
                         </a>
                     </li>
                 </ul>
@@ -969,8 +1082,8 @@
             <!-- Settings / Profile -->
             <li class="nav-item">
                 <a href="{% url 'accounts:profile' %}" class="menu-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
-                    <i class="ri-settings-3-line"></i>
-                    <span class="menu-text">Settings</span>
+                    <i class="ri-user-settings-line"></i>
+                    <span class="menu-text">My Profile</span>
                 </a>
             </li>
         </ul>
