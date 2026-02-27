@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Periods - {{ financial_year.name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Periods - {{ financial_year.name }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Admin & Settings</li>
+            <li class="breadcrumb-item"><a href="{% url 'administration:financial_year_list' %}">Financial Years</a></li>
+            <li class="breadcrumb-item active">{{ financial_year.name }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Financial Periods</h5>
+                {% if not periods %}
+                <form method="post" action="{% url 'administration:generate_periods' financial_year.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('Generate periods for this financial year?')">
+                        <i class="ri-refresh-line me-1"></i> Generate Periods
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Period #</th>
+                                <th>Name</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Locked</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for period in periods %}
+                            <tr>
+                                <td class="text-center">{{ period.period_number }}</td>
+                                <td><span class="fw-medium">{{ period.name }}</span></td>
+                                <td>{{ period.start_date|date:"M d, Y" }}</td>
+                                <td>{{ period.end_date|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if period.is_locked %}
+                                    <span class="badge bg-soft-warning text-warning"><i class="ri-lock-line me-1"></i>Locked</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-success text-success">Open</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-calendar-event-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No periods found</p>
+                                        <p class="mb-0" style="font-size: 13px;">Click "Generate Periods" to create periods for this financial year.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'administration:financial_year_list' %}" class="btn btn-light">
+        <i class="ri-arrow-left-line me-1"></i> Back to Financial Years
+    </a>
+</div>
+{% endblock %}
