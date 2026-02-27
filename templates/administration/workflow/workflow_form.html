@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Admin & Settings</li>
+            <li class="breadcrumb-item"><a href="{% url 'administration:workflow_list' %}">Approval Workflows</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" id="workflow-form">
+    {% csrf_token %}
+
+    <!-- Workflow Details Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Workflow Details</h5>
+        </div>
+        <div class="card-body">
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <!-- Name -->
+                <div class="col-md-6">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">Workflow Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.name.errors %}is-invalid{% endif %}" id="{{ form.name.id_for_label }}" name="{{ form.name.html_name }}" value="{{ form.name.value|default_if_none:'' }}">
+                    {% if form.name.errors %}<div class="invalid-feedback">{{ form.name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Module -->
+                <div class="col-md-6">
+                    <label for="{{ form.module.id_for_label }}" class="form-label">Module <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.module.errors %}is-invalid{% endif %}" id="{{ form.module.id_for_label }}" name="{{ form.module.html_name }}">
+                        <option value="">Select Module</option>
+                        <option value="leave" {% if form.module.value == 'leave' %}selected{% endif %}>Leave</option>
+                        <option value="attendance_regularization" {% if form.module.value == 'attendance_regularization' %}selected{% endif %}>Attendance Regularization</option>
+                        <option value="expense" {% if form.module.value == 'expense' %}selected{% endif %}>Expense</option>
+                        <option value="timesheet" {% if form.module.value == 'timesheet' %}selected{% endif %}>Timesheet</option>
+                        <option value="loan" {% if form.module.value == 'loan' %}selected{% endif %}>Loan</option>
+                        <option value="resignation" {% if form.module.value == 'resignation' %}selected{% endif %}>Resignation</option>
+                        <option value="recruitment" {% if form.module.value == 'recruitment' %}selected{% endif %}>Recruitment</option>
+                        <option value="training_nomination" {% if form.module.value == 'training_nomination' %}selected{% endif %}>Training Nomination</option>
+                    </select>
+                    {% if form.module.errors %}<div class="invalid-feedback">{{ form.module.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="3">{{ form.description.value|default_if_none:'' }}</textarea>
+                    {% if form.description.errors %}<div class="invalid-feedback">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Is Active -->
+                <div class="col-md-6">
+                    <div class="form-check form-switch mt-2">
+                        <input class="form-check-input" type="checkbox" id="{{ form.is_active.id_for_label }}" name="{{ form.is_active.html_name }}" {% if form.is_active.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Active</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approval Steps Card -->
+    <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h5 class="mb-0">Approval Steps</h5>
+            <button type="button" class="btn btn-sm btn-primary" id="add-step-btn">
+                <i class="ri-add-line me-1"></i> Add Step
+            </button>
+        </div>
+        <div class="card-body">
+            <input type="hidden" name="step_count" id="step-count" value="{{ steps|length|default:'0' }}">
+
+            <div id="steps-container">
+                {% for step in steps %}
+                <div class="step-row border rounded p-3 mb-3" data-step-index="{{ forloop.counter0 }}">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Step <span class="step-number">{{ forloop.counter }}</span></h6>
+                        <button type="button" class="btn btn-sm btn-soft-danger remove-step-btn">
+                            <i class="ri-delete-bin-line me-1"></i> Remove
+                        </button>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Step Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="step_name_{{ forloop.counter0 }}" value="{{ step.name }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Approver Type <span class="text-danger">*</span></label>
+                            <select class="form-select approver-type-select" name="approver_type_{{ forloop.counter0 }}" required>
+                                <option value="">Select Approver Type</option>
+                                <option value="reporting_manager" {% if step.approver_type == 'reporting_manager' %}selected{% endif %}>Reporting Manager</option>
+                                <option value="department_head" {% if step.approver_type == 'department_head' %}selected{% endif %}>Department Head</option>
+                                <option value="hr_manager" {% if step.approver_type == 'hr_manager' %}selected{% endif %}>HR Manager</option>
+                                <option value="specific_user" {% if step.approver_type == 'specific_user' %}selected{% endif %}>Specific User</option>
+                                <option value="role_based" {% if step.approver_type == 'role_based' %}selected{% endif %}>Role Based</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 specific-user-field" {% if step.approver_type != 'specific_user' %}style="display:none;"{% endif %}>
+                            <label class="form-label">Specific User</label>
+                            <select class="form-select" name="specific_user_{{ forloop.counter0 }}">
+                                <option value="">Select User</option>
+                                {% for user in step_form.users %}
+                                <option value="{{ user.pk }}" {% if step.specific_user_id == user.pk %}selected{% endif %}>{{ user.get_full_name|default:user.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 specific-role-field" {% if step.approver_type != 'role_based' %}style="display:none;"{% endif %}>
+                            <label class="form-label">Specific Role</label>
+                            <select class="form-select" name="specific_role_{{ forloop.counter0 }}">
+                                <option value="">Select Role</option>
+                                {% for role in step_form.roles %}
+                                <option value="{{ role.pk }}" {% if step.specific_role_id == role.pk %}selected{% endif %}>{{ role.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Auto Approve After (Days)</label>
+                            <input type="number" class="form-control" name="auto_approve_days_{{ forloop.counter0 }}" value="{{ step.auto_approve_days|default:'0' }}" min="0">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" name="can_skip_{{ forloop.counter0 }}" {% if step.can_skip %}checked{% endif %}>
+                                <label class="form-check-label">Can Skip</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div id="no-steps-message" class="text-center py-4 text-muted" {% if steps %}style="display:none;"{% endif %}>
+                <i class="ri-list-ordered" style="font-size: 36px; opacity: 0.3;"></i>
+                <p class="mt-2 mb-0">No approval steps added yet. Click "Add Step" to begin.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save
+        </button>
+        <a href="{% url 'administration:workflow_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var stepCount = parseInt(document.getElementById('step-count').value) || 0;
+    var container = document.getElementById('steps-container');
+    var noStepsMsg = document.getElementById('no-steps-message');
+
+    // User and Role options for dynamic rows
+    var userOptions = '<option value="">Select User</option>';
+    {% for user in step_form.users %}
+    userOptions += '<option value="{{ user.pk }}">{{ user.get_full_name|default:user.username }}</option>';
+    {% endfor %}
+
+    var roleOptions = '<option value="">Select Role</option>';
+    {% for role in step_form.roles %}
+    roleOptions += '<option value="{{ role.pk }}">{{ role.name }}</option>';
+    {% endfor %}
+
+    function updateStepNumbers() {
+        var rows = container.querySelectorAll('.step-row');
+        rows.forEach(function(row, index) {
+            row.setAttribute('data-step-index', index);
+            row.querySelector('.step-number').textContent = index + 1;
+            // Update field names
+            row.querySelector('[name^="step_name_"]').name = 'step_name_' + index;
+            row.querySelector('[name^="approver_type_"]').name = 'approver_type_' + index;
+            var specificUser = row.querySelector('[name^="specific_user_"]');
+            if (specificUser) specificUser.name = 'specific_user_' + index;
+            var specificRole = row.querySelector('[name^="specific_role_"]');
+            if (specificRole) specificRole.name = 'specific_role_' + index;
+            row.querySelector('[name^="auto_approve_days_"]').name = 'auto_approve_days_' + index;
+            row.querySelector('[name^="can_skip_"]').name = 'can_skip_' + index;
+        });
+        stepCount = rows.length;
+        document.getElementById('step-count').value = stepCount;
+        noStepsMsg.style.display = stepCount === 0 ? '' : 'none';
+    }
+
+    function bindApproverTypeChange(row) {
+        var select = row.querySelector('.approver-type-select');
+        var userField = row.querySelector('.specific-user-field');
+        var roleField = row.querySelector('.specific-role-field');
+        select.addEventListener('change', function() {
+            userField.style.display = this.value === 'specific_user' ? '' : 'none';
+            roleField.style.display = this.value === 'role_based' ? '' : 'none';
+        });
+    }
+
+    // Bind existing rows
+    container.querySelectorAll('.step-row').forEach(function(row) {
+        bindApproverTypeChange(row);
+        row.querySelector('.remove-step-btn').addEventListener('click', function() {
+            row.remove();
+            updateStepNumbers();
+        });
+    });
+
+    // Add Step
+    document.getElementById('add-step-btn').addEventListener('click', function() {
+        var index = stepCount;
+        var html = '<div class="step-row border rounded p-3 mb-3" data-step-index="' + index + '">' +
+            '<div class="d-flex justify-content-between align-items-center mb-3">' +
+            '<h6 class="mb-0">Step <span class="step-number">' + (index + 1) + '</span></h6>' +
+            '<button type="button" class="btn btn-sm btn-soft-danger remove-step-btn">' +
+            '<i class="ri-delete-bin-line me-1"></i> Remove</button></div>' +
+            '<div class="row g-3">' +
+            '<div class="col-md-6"><label class="form-label">Step Name <span class="text-danger">*</span></label>' +
+            '<input type="text" class="form-control" name="step_name_' + index + '" required></div>' +
+            '<div class="col-md-6"><label class="form-label">Approver Type <span class="text-danger">*</span></label>' +
+            '<select class="form-select approver-type-select" name="approver_type_' + index + '" required>' +
+            '<option value="">Select Approver Type</option>' +
+            '<option value="reporting_manager">Reporting Manager</option>' +
+            '<option value="department_head">Department Head</option>' +
+            '<option value="hr_manager">HR Manager</option>' +
+            '<option value="specific_user">Specific User</option>' +
+            '<option value="role_based">Role Based</option></select></div>' +
+            '<div class="col-md-6 specific-user-field" style="display:none;">' +
+            '<label class="form-label">Specific User</label>' +
+            '<select class="form-select" name="specific_user_' + index + '">' + userOptions + '</select></div>' +
+            '<div class="col-md-6 specific-role-field" style="display:none;">' +
+            '<label class="form-label">Specific Role</label>' +
+            '<select class="form-select" name="specific_role_' + index + '">' + roleOptions + '</select></div>' +
+            '<div class="col-md-4"><label class="form-label">Auto Approve After (Days)</label>' +
+            '<input type="number" class="form-control" name="auto_approve_days_' + index + '" value="0" min="0"></div>' +
+            '<div class="col-md-2 d-flex align-items-end">' +
+            '<div class="form-check form-switch mb-2">' +
+            '<input class="form-check-input" type="checkbox" name="can_skip_' + index + '">' +
+            '<label class="form-check-label">Can Skip</label></div></div></div></div>';
+
+        container.insertAdjacentHTML('beforeend', html);
+        var newRow = container.lastElementChild;
+        bindApproverTypeChange(newRow);
+        newRow.querySelector('.remove-step-btn').addEventListener('click', function() {
+            newRow.remove();
+            updateStepNumbers();
+        });
+        stepCount++;
+        document.getElementById('step-count').value = stepCount;
+        noStepsMsg.style.display = 'none';
+    });
+});
+</script>
+{% endblock %}
