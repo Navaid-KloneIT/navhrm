@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Email Templates{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Email Templates</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Admin & Settings</li>
+            <li class="breadcrumb-item active">Email Templates</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'administration:email_template_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search by name or subject...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Filter by Event</label>
+                            <select class="form-select" name="event">
+                                <option value="">All Events</option>
+                                <option value="leave_applied" {% if request.GET.event == 'leave_applied' %}selected{% endif %}>Leave Applied</option>
+                                <option value="leave_approved" {% if request.GET.event == 'leave_approved' %}selected{% endif %}>Leave Approved</option>
+                                <option value="leave_rejected" {% if request.GET.event == 'leave_rejected' %}selected{% endif %}>Leave Rejected</option>
+                                <option value="attendance_regularization" {% if request.GET.event == 'attendance_regularization' %}selected{% endif %}>Attendance Regularization</option>
+                                <option value="expense_submitted" {% if request.GET.event == 'expense_submitted' %}selected{% endif %}>Expense Submitted</option>
+                                <option value="expense_approved" {% if request.GET.event == 'expense_approved' %}selected{% endif %}>Expense Approved</option>
+                                <option value="new_employee" {% if request.GET.event == 'new_employee' %}selected{% endif %}>New Employee</option>
+                                <option value="employee_birthday" {% if request.GET.event == 'employee_birthday' %}selected{% endif %}>Employee Birthday</option>
+                                <option value="salary_processed" {% if request.GET.event == 'salary_processed' %}selected{% endif %}>Salary Processed</option>
+                                <option value="password_reset" {% if request.GET.event == 'password_reset' %}selected{% endif %}>Password Reset</option>
+                                <option value="welcome_email" {% if request.GET.event == 'welcome_email' %}selected{% endif %}>Welcome Email</option>
+                                <option value="exit_initiated" {% if request.GET.event == 'exit_initiated' %}selected{% endif %}>Exit Initiated</option>
+                                <option value="custom" {% if request.GET.event == 'custom' %}selected{% endif %}>Custom</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'administration:email_template_create' %}" class="btn btn-primary w-100">
+                                <i class="ri-add-line me-1"></i> Create Template
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Email Templates Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Email Templates</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Event</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for template in templates %}
+                            <tr>
+                                <td><span class="fw-medium">{{ template.name }}</span></td>
+                                <td>
+                                    <span class="badge bg-soft-info text-info">{{ template.get_event_display }}</span>
+                                </td>
+                                <td>{{ template.subject|truncatewords:8 }}</td>
+                                <td>
+                                    {% if template.is_active %}
+                                    <span class="badge bg-soft-success text-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-danger text-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'administration:email_template_preview' template.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="Preview">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                        <a href="{% url 'administration:email_template_edit' template.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'administration:email_template_delete' template.pk %}" class="d-inline" data-confirm-delete>
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this email template?')">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-mail-settings-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No email templates found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search or request.GET.event %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Email templates will appear here when created.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Email template list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.event %}&event={{ request.GET.event }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.event %}&event={{ request.GET.event }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.event %}&event={{ request.GET.event }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
