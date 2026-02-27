@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Travel</li>
+            <li class="breadcrumb-item"><a href="{% url 'additional:travel_request_list' %}">Requests</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'additional:travel_request_detail' travel_request.pk %}">{{ travel_request.request_number }}</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Info Card -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <small class="text-muted">Travel Request</small>
+                <div class="fw-medium">{{ travel_request.request_number }}</div>
+            </div>
+            <div class="col-md-6">
+                <small class="text-muted">Employee</small>
+                <div class="fw-medium">{{ travel_request.employee }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Settlement Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Total Expenses -->
+                <div class="col-md-6">
+                    <label for="{{ form.total_expenses.id_for_label }}" class="form-label">Total Expenses <span class="text-danger">*</span></label>
+                    {{ form.total_expenses }}
+                    {% if form.total_expenses.errors %}<div class="invalid-feedback d-block">{{ form.total_expenses.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Advance Given -->
+                <div class="col-md-6">
+                    <label for="{{ form.advance_given.id_for_label }}" class="form-label">Advance Given <span class="text-danger">*</span></label>
+                    {{ form.advance_given }}
+                    {% if form.advance_given.errors %}<div class="invalid-feedback d-block">{{ form.advance_given.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Settlement Amount -->
+                <div class="col-md-6">
+                    <label for="{{ form.settlement_amount.id_for_label }}" class="form-label">Settlement Amount <span class="text-danger">*</span></label>
+                    {{ form.settlement_amount }}
+                    {% if form.settlement_amount.errors %}<div class="invalid-feedback d-block">{{ form.settlement_amount.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status <span class="text-danger">*</span></label>
+                    {{ form.status }}
+                    {% if form.status.errors %}<div class="invalid-feedback d-block">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Settled Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.settled_date.id_for_label }}" class="form-label">Settled Date</label>
+                    {{ form.settled_date }}
+                    {% if form.settled_date.errors %}<div class="invalid-feedback d-block">{{ form.settled_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Notes -->
+                <div class="col-md-6">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                    {{ form.notes }}
+                    {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Settlement
+        </button>
+        <a href="{% url 'additional:travel_request_detail' travel_request.pk %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
