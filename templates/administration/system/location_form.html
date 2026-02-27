@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">NavHRM</a></li>
+            <li class="breadcrumb-item">Admin & Settings</li>
+            <li class="breadcrumb-item"><a href="{% url 'administration:location_list' %}">Location Settings</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="row g-3">
+                <!-- Name -->
+                <div class="col-md-6">
+                    <label for="id_name" class="form-label">Location Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="id_name" name="name" value="{{ location.name|default_if_none:'' }}" placeholder="e.g. Head Office" required>
+                </div>
+
+                <!-- Company -->
+                <div class="col-md-6">
+                    <label for="id_company" class="form-label">Company <span class="text-danger">*</span></label>
+                    <select class="form-select" id="id_company" name="company" required>
+                        <option value="">Select Company</option>
+                        {% for company in companies %}
+                        <option value="{{ company.pk }}" {% if location.company_id == company.pk %}selected{% endif %}>{{ company.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Address -->
+                <div class="col-12">
+                    <label for="id_address" class="form-label">Address</label>
+                    <textarea class="form-control" id="id_address" name="address" rows="2" placeholder="Street address...">{{ location.address|default_if_none:'' }}</textarea>
+                </div>
+
+                <!-- City -->
+                <div class="col-md-3">
+                    <label for="id_city" class="form-label">City</label>
+                    <input type="text" class="form-control" id="id_city" name="city" value="{{ location.city|default_if_none:'' }}">
+                </div>
+
+                <!-- State -->
+                <div class="col-md-3">
+                    <label for="id_state" class="form-label">State</label>
+                    <input type="text" class="form-control" id="id_state" name="state" value="{{ location.state|default_if_none:'' }}">
+                </div>
+
+                <!-- Country -->
+                <div class="col-md-3">
+                    <label for="id_country" class="form-label">Country</label>
+                    <input type="text" class="form-control" id="id_country" name="country" value="{{ location.country|default_if_none:'' }}">
+                </div>
+
+                <!-- Zip Code -->
+                <div class="col-md-3">
+                    <label for="id_zip_code" class="form-label">Zip Code</label>
+                    <input type="text" class="form-control" id="id_zip_code" name="zip_code" value="{{ location.zip_code|default_if_none:'' }}">
+                </div>
+
+                <!-- Phone -->
+                <div class="col-md-6">
+                    <label for="id_phone" class="form-label">Phone</label>
+                    <input type="text" class="form-control" id="id_phone" name="phone" value="{{ location.phone|default_if_none:'' }}">
+                </div>
+
+                <!-- Is Headquarters -->
+                <div class="col-md-3">
+                    <div class="form-check form-switch mt-4">
+                        <input class="form-check-input" type="checkbox" id="id_is_headquarters" name="is_headquarters" {% if location.is_headquarters %}checked{% endif %}>
+                        <label class="form-check-label" for="id_is_headquarters">Headquarters</label>
+                    </div>
+                </div>
+
+                <!-- Is Active -->
+                <div class="col-md-3">
+                    <div class="form-check form-switch mt-4">
+                        <input class="form-check-input" type="checkbox" id="id_is_active" name="is_active" {% if location.is_active %}checked{% endif %} {% if not location %}checked{% endif %}>
+                        <label class="form-check-label" for="id_is_active">Active</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Save
+                </button>
+                <a href="{% url 'administration:location_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
