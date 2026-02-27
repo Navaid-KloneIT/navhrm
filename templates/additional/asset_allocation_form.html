@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Assets</li>
+            <li class="breadcrumb-item"><a href="{% url 'additional:asset_allocation_list' %}">Allocations</a></li>
+            <li class="breadcrumb-item active">Allocate Asset</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Allocation Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Asset -->
+                <div class="col-md-6">
+                    <label for="{{ form.asset.id_for_label }}" class="form-label">Asset <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.asset.errors %}is-invalid{% endif %}" id="{{ form.asset.id_for_label }}" name="{{ form.asset.html_name }}">
+                        <option value="">-- Select Asset --</option>
+                        {% for choice in form.asset.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.asset.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.asset.errors %}<div class="invalid-feedback d-block">{{ form.asset.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.employee.errors %}is-invalid{% endif %}" id="{{ form.employee.id_for_label }}" name="{{ form.employee.html_name }}">
+                        <option value="">-- Select Employee --</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback d-block">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Allocated Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.allocated_date.id_for_label }}" class="form-label">Allocated Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.allocated_date.errors %}is-invalid{% endif %}" id="{{ form.allocated_date.id_for_label }}" name="{{ form.allocated_date.html_name }}" value="{{ form.allocated_date.value|default_if_none:'' }}">
+                    {% if form.allocated_date.errors %}<div class="invalid-feedback d-block">{{ form.allocated_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Expected Return Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.expected_return_date.id_for_label }}" class="form-label">Expected Return Date</label>
+                    <input type="date" class="form-control {% if form.expected_return_date.errors %}is-invalid{% endif %}" id="{{ form.expected_return_date.id_for_label }}" name="{{ form.expected_return_date.html_name }}" value="{{ form.expected_return_date.value|default_if_none:'' }}">
+                    {% if form.expected_return_date.errors %}<div class="invalid-feedback d-block">{{ form.expected_return_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Condition at Allocation -->
+                <div class="col-md-6">
+                    <label for="{{ form.condition_at_allocation.id_for_label }}" class="form-label">Condition at Allocation</label>
+                    <select class="form-select {% if form.condition_at_allocation.errors %}is-invalid{% endif %}" id="{{ form.condition_at_allocation.id_for_label }}" name="{{ form.condition_at_allocation.html_name }}">
+                        {% for value, label in form.condition_at_allocation.field.choices %}
+                        <option value="{{ value }}" {% if form.condition_at_allocation.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.condition_at_allocation.errors %}<div class="invalid-feedback d-block">{{ form.condition_at_allocation.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Notes -->
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                    <textarea class="form-control {% if form.notes.errors %}is-invalid{% endif %}" id="{{ form.notes.id_for_label }}" name="{{ form.notes.html_name }}" rows="4" placeholder="Additional notes...">{{ form.notes.value|default_if_none:'' }}</textarea>
+                    {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Allocate
+        </button>
+        <a href="{% url 'additional:asset_allocation_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
