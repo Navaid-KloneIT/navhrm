@@ -943,6 +943,112 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Additional <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Asset Management -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'additional' and 'asset' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-computer-line"></i>
+                    <span class="menu-text">Assets</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'additional' and 'asset' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'additional:asset_category_list' %}" class="menu-link {% if request.resolver_match.url_name == 'asset_category_list' %}active{% endif %}">
+                            <span class="menu-text">Categories</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'additional:asset_list' %}" class="menu-link {% if request.resolver_match.url_name == 'asset_list' %}active{% endif %}">
+                            <span class="menu-text">All Assets</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'additional:asset_allocation_list' %}" class="menu-link {% if request.resolver_match.url_name == 'asset_allocation_list' %}active{% endif %}">
+                            <span class="menu-text">Allocations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'additional:asset_maintenance_list' %}" class="menu-link {% if request.resolver_match.url_name == 'asset_maintenance_list' %}active{% endif %}">
+                            <span class="menu-text">Maintenance</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Expense Management -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'additional' and 'expense' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-money-dollar-circle-line"></i>
+                    <span class="menu-text">Expenses</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'additional' and 'expense' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'additional:expense_category_list' %}" class="menu-link {% if request.resolver_match.url_name == 'expense_category_list' %}active{% endif %}">
+                            <span class="menu-text">Categories</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'additional:expense_policy_list' %}" class="menu-link {% if request.resolver_match.url_name == 'expense_policy_list' %}active{% endif %}">
+                            <span class="menu-text">Policies</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'additional:expense_claim_list' %}" class="menu-link {% if request.resolver_match.url_name == 'expense_claim_list' %}active{% endif %}">
+                            <span class="menu-text">Claims</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Travel Management -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'additional' and 'travel' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-flight-takeoff-line"></i>
+                    <span class="menu-text">Travel</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'additional' and 'travel' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'additional:travel_policy_list' %}" class="menu-link {% if request.resolver_match.url_name == 'travel_policy_list' %}active{% endif %}">
+                            <span class="menu-text">Policies</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'additional:travel_request_list' %}" class="menu-link {% if request.resolver_match.url_name == 'travel_request_list' %}active{% endif %}">
+                            <span class="menu-text">Requests</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Helpdesk -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'additional' and 'ticket' in request.resolver_match.url_name or request.resolver_match.app_name == 'additional' and 'knowledge' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-customer-service-2-line"></i>
+                    <span class="menu-text">Helpdesk</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'additional' and 'ticket' in request.resolver_match.url_name or request.resolver_match.app_name == 'additional' and 'knowledge' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'additional:ticket_category_list' %}" class="menu-link {% if request.resolver_match.url_name == 'ticket_category_list' %}active{% endif %}">
+                            <span class="menu-text">Categories</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'additional:ticket_list' %}" class="menu-link {% if request.resolver_match.url_name == 'ticket_list' and request.resolver_match.app_name == 'additional' %}active{% endif %}">
+                            <span class="menu-text">Tickets</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'additional:knowledge_base_list' %}" class="menu-link {% if request.resolver_match.url_name == 'knowledge_base_list' %}active{% endif %}">
+                            <span class="menu-text">Knowledge Base</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Admin & Settings <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- User Management -->
