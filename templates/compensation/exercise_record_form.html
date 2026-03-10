@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compensation</li>
+            <li class="breadcrumb-item">Stock/ESOP</li>
+            <li class="breadcrumb-item"><a href="{% url 'compensation:equity_grant_list' %}">Equity Grants</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'compensation:equity_grant_detail' grant.pk %}">Grant {{ grant.grant_number }}</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Exercise Record Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Exercise Record Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Exercise Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.exercise_date.id_for_label }}" class="form-label">Exercise Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.exercise_date.errors %}is-invalid{% endif %}" id="{{ form.exercise_date.id_for_label }}" name="{{ form.exercise_date.html_name }}" value="{{ form.exercise_date.value|default_if_none:'' }}">
+                    {% if form.exercise_date.errors %}<div class="invalid-feedback d-block">{{ form.exercise_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Shares Exercised -->
+                <div class="col-md-6">
+                    <label for="{{ form.shares_exercised.id_for_label }}" class="form-label">Shares Exercised <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.shares_exercised.errors %}is-invalid{% endif %}" id="{{ form.shares_exercised.id_for_label }}" name="{{ form.shares_exercised.html_name }}" value="{{ form.shares_exercised.value|default_if_none:'' }}" min="0" placeholder="e.g., 100">
+                    {% if form.shares_exercised.errors %}<div class="invalid-feedback d-block">{{ form.shares_exercised.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Exercise Price Per Share -->
+                <div class="col-md-6">
+                    <label for="{{ form.exercise_price_per_share.id_for_label }}" class="form-label">Exercise Price Per Share <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.exercise_price_per_share.errors %}is-invalid{% endif %}" id="{{ form.exercise_price_per_share.id_for_label }}" name="{{ form.exercise_price_per_share.html_name }}" value="{{ form.exercise_price_per_share.value|default_if_none:'' }}" min="0" step="0.01" placeholder="e.g., 10.00">
+                    {% if form.exercise_price_per_share.errors %}<div class="invalid-feedback d-block">{{ form.exercise_price_per_share.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Market Price Per Share -->
+                <div class="col-md-6">
+                    <label for="{{ form.market_price_per_share.id_for_label }}" class="form-label">Market Price Per Share <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.market_price_per_share.errors %}is-invalid{% endif %}" id="{{ form.market_price_per_share.id_for_label }}" name="{{ form.market_price_per_share.html_name }}" value="{{ form.market_price_per_share.value|default_if_none:'' }}" min="0" step="0.01" placeholder="e.g., 25.00">
+                    {% if form.market_price_per_share.errors %}<div class="invalid-feedback d-block">{{ form.market_price_per_share.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Total Value -->
+                <div class="col-md-6">
+                    <label for="{{ form.total_value.id_for_label }}" class="form-label">Total Value</label>
+                    <input type="number" class="form-control {% if form.total_value.errors %}is-invalid{% endif %}" id="{{ form.total_value.id_for_label }}" name="{{ form.total_value.html_name }}" value="{{ form.total_value.value|default_if_none:'' }}" min="0" step="0.01" placeholder="e.g., 2500.00">
+                    {% if form.total_value.errors %}<div class="invalid-feedback d-block">{{ form.total_value.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.status.errors %}is-invalid{% endif %}" id="{{ form.status.id_for_label }}" name="{{ form.status.html_name }}">
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback d-block">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Exercise Record
+        </button>
+        <a href="{% url 'compensation:equity_grant_detail' grant.pk %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
