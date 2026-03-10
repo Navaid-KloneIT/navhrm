@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compensation</li>
+            <li class="breadcrumb-item">Rewards</li>
+            <li class="breadcrumb-item"><a href="{% url 'compensation:reward_program_list' %}">Programs</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Program Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Program Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Name -->
+                <div class="col-md-6">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.name.errors %}is-invalid{% endif %}" id="{{ form.name.id_for_label }}" name="{{ form.name.html_name }}" value="{{ form.name.value|default_if_none:'' }}" placeholder="e.g., Employee of the Month">
+                    {% if form.name.errors %}<div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Program Type -->
+                <div class="col-md-6">
+                    <label for="{{ form.program_type.id_for_label }}" class="form-label">Program Type <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.program_type.errors %}is-invalid{% endif %}" id="{{ form.program_type.id_for_label }}" name="{{ form.program_type.html_name }}">
+                        <option value="">-- Select Type --</option>
+                        {% for value, label in form.program_type.field.choices %}
+                        <option value="{{ value }}" {% if form.program_type.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.program_type.errors %}<div class="invalid-feedback d-block">{{ form.program_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="3" placeholder="Program description...">{{ form.description.value|default_if_none:'' }}</textarea>
+                    {% if form.description.errors %}<div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget & Value -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Budget & Value</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Budget Amount -->
+                <div class="col-md-6">
+                    <label for="{{ form.budget_amount.id_for_label }}" class="form-label">Budget Amount <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.budget_amount.errors %}is-invalid{% endif %}" id="{{ form.budget_amount.id_for_label }}" name="{{ form.budget_amount.html_name }}" value="{{ form.budget_amount.value|default_if_none:'' }}" step="0.01" placeholder="0.00">
+                    {% if form.budget_amount.errors %}<div class="invalid-feedback d-block">{{ form.budget_amount.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Reward Value -->
+                <div class="col-md-6">
+                    <label for="{{ form.reward_value.id_for_label }}" class="form-label">Reward Value <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.reward_value.errors %}is-invalid{% endif %}" id="{{ form.reward_value.id_for_label }}" name="{{ form.reward_value.html_name }}" value="{{ form.reward_value.value|default_if_none:'' }}" step="0.01" placeholder="0.00">
+                    {% if form.reward_value.errors %}<div class="invalid-feedback d-block">{{ form.reward_value.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Is Monetary -->
+                <div class="col-md-6">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input {% if form.is_monetary.errors %}is-invalid{% endif %}" id="{{ form.is_monetary.id_for_label }}" name="{{ form.is_monetary.html_name }}" {% if form.is_monetary.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_monetary.id_for_label }}">Monetary Reward</label>
+                        {% if form.is_monetary.errors %}<div class="invalid-feedback d-block">{{ form.is_monetary.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <!-- Is Active -->
+                <div class="col-md-6">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input {% if form.is_active.errors %}is-invalid{% endif %}" id="{{ form.is_active.id_for_label }}" name="{{ form.is_active.html_name }}" {% if form.is_active.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Active</label>
+                        {% if form.is_active.errors %}<div class="invalid-feedback d-block">{{ form.is_active.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Program
+        </button>
+        <a href="{% url 'compensation:reward_program_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
