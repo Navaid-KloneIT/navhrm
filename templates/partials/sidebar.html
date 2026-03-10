@@ -1049,6 +1049,124 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Compensation & Benefits <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Salary Benchmarking -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'compensation' and 'benchmark' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-bar-chart-line"></i>
+                    <span class="menu-text">Salary Benchmarking</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'compensation' and 'benchmark' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'compensation:benchmark_list' %}" class="menu-link {% if request.resolver_match.url_name == 'benchmark_list' %}active{% endif %}">
+                            <span class="menu-text">Benchmarks</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Benefits Administration -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'compensation' and 'benefit' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-shield-cross-line"></i>
+                    <span class="menu-text">Benefits</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'compensation' and 'benefit' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'compensation:benefit_plan_list' %}" class="menu-link {% if request.resolver_match.url_name == 'benefit_plan_list' %}active{% endif %}">
+                            <span class="menu-text">Benefit Plans</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'compensation:employee_benefit_list' %}" class="menu-link {% if request.resolver_match.url_name == 'employee_benefit_list' %}active{% endif %}">
+                            <span class="menu-text">Enrollments</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Flexible Benefits -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'compensation' and 'flex' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-gift-line"></i>
+                    <span class="menu-text">Flexible Benefits</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'compensation' and 'flex' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'compensation:flex_plan_list' %}" class="menu-link {% if request.resolver_match.url_name == 'flex_plan_list' %}active{% endif %}">
+                            <span class="menu-text">Flex Plans</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'compensation:flex_selection_list' %}" class="menu-link {% if request.resolver_match.url_name == 'flex_selection_list' %}active{% endif %}">
+                            <span class="menu-text">Selections</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Stock/ESOP -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'compensation' and 'equity' in request.resolver_match.url_name or request.resolver_match.app_name == 'compensation' and 'vesting' in request.resolver_match.url_name or request.resolver_match.app_name == 'compensation' and 'exercise' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-stock-line"></i>
+                    <span class="menu-text">Stock/ESOP</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'compensation' and 'equity' in request.resolver_match.url_name or request.resolver_match.app_name == 'compensation' and 'vesting' in request.resolver_match.url_name or request.resolver_match.app_name == 'compensation' and 'exercise' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'compensation:equity_grant_list' %}" class="menu-link {% if request.resolver_match.url_name == 'equity_grant_list' %}active{% endif %}">
+                            <span class="menu-text">Equity Grants</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Compensation Planning -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'compensation' and 'compensation_plan' in request.resolver_match.url_name or request.resolver_match.app_name == 'compensation' and 'recommendation' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-money-dollar-box-line"></i>
+                    <span class="menu-text">Compensation Planning</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'compensation' and 'compensation_plan' in request.resolver_match.url_name or request.resolver_match.app_name == 'compensation' and 'recommendation' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'compensation:compensation_plan_list' %}" class="menu-link {% if request.resolver_match.url_name == 'compensation_plan_list' %}active{% endif %}">
+                            <span class="menu-text">Plans</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'compensation:recommendation_list' %}" class="menu-link {% if request.resolver_match.url_name == 'recommendation_list' %}active{% endif %}">
+                            <span class="menu-text">Recommendations</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Rewards & Recognition -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'compensation' and 'reward' in request.resolver_match.url_name or request.resolver_match.app_name == 'compensation' and 'recognition' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-award-line"></i>
+                    <span class="menu-text">Rewards & Recognition</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'compensation' and 'reward' in request.resolver_match.url_name or request.resolver_match.app_name == 'compensation' and 'recognition' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'compensation:reward_program_list' %}" class="menu-link {% if request.resolver_match.url_name == 'reward_program_list' %}active{% endif %}">
+                            <span class="menu-text">Programs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'compensation:recognition_list' %}" class="menu-link {% if request.resolver_match.url_name == 'recognition_list' %}active{% endif %}">
+                            <span class="menu-text">Recognitions</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Admin & Settings <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- User Management -->
