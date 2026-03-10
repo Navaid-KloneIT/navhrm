@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compensation</li>
+            <li class="breadcrumb-item">Rewards</li>
+            <li class="breadcrumb-item"><a href="{% url 'compensation:recognition_list' %}">Recognitions</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Recognition Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Recognition Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Reward Program -->
+                <div class="col-md-6">
+                    <label for="{{ form.reward_program.id_for_label }}" class="form-label">Reward Program <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.reward_program.errors %}is-invalid{% endif %}" id="{{ form.reward_program.id_for_label }}" name="{{ form.reward_program.html_name }}">
+                        <option value="">-- Select Program --</option>
+                        {% for choice in form.reward_program.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.reward_program.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.reward_program.errors %}<div class="invalid-feedback d-block">{{ form.reward_program.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Recognition Type -->
+                <div class="col-md-6">
+                    <label for="{{ form.recognition_type.id_for_label }}" class="form-label">Recognition Type <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.recognition_type.errors %}is-invalid{% endif %}" id="{{ form.recognition_type.id_for_label }}" name="{{ form.recognition_type.html_name }}">
+                        <option value="">-- Select Type --</option>
+                        {% for value, label in form.recognition_type.field.choices %}
+                        <option value="{{ value }}" {% if form.recognition_type.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.recognition_type.errors %}<div class="invalid-feedback d-block">{{ form.recognition_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Nominee -->
+                <div class="col-md-6">
+                    <label for="{{ form.nominee.id_for_label }}" class="form-label">Nominee <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.nominee.errors %}is-invalid{% endif %}" id="{{ form.nominee.id_for_label }}" name="{{ form.nominee.html_name }}">
+                        <option value="">-- Select Nominee --</option>
+                        {% for choice in form.nominee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.nominee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.nominee.errors %}<div class="invalid-feedback d-block">{{ form.nominee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Nominator -->
+                <div class="col-md-6">
+                    <label for="{{ form.nominator.id_for_label }}" class="form-label">Nominator</label>
+                    <select class="form-select {% if form.nominator.errors %}is-invalid{% endif %}" id="{{ form.nominator.id_for_label }}" name="{{ form.nominator.html_name }}">
+                        <option value="">-- Select Nominator --</option>
+                        {% for choice in form.nominator.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.nominator.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.nominator.errors %}<div class="invalid-feedback d-block">{{ form.nominator.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Title -->
+                <div class="col-md-12">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="{{ form.title.id_for_label }}" name="{{ form.title.html_name }}" value="{{ form.title.value|default_if_none:'' }}" placeholder="e.g., Outstanding Performance Award">
+                    {% if form.title.errors %}<div class="invalid-feedback d-block">{{ form.title.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="3" placeholder="Recognition description...">{{ form.description.value|default_if_none:'' }}</textarea>
+                    {% if form.description.errors %}<div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reward -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Reward</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Reward Value -->
+                <div class="col-md-6">
+                    <label for="{{ form.reward_value.id_for_label }}" class="form-label">Reward Value</label>
+                    <input type="number" class="form-control {% if form.reward_value.errors %}is-invalid{% endif %}" id="{{ form.reward_value.id_for_label }}" name="{{ form.reward_value.html_name }}" value="{{ form.reward_value.value|default_if_none:'' }}" step="0.01" placeholder="0.00">
+                    {% if form.reward_value.errors %}<div class="invalid-feedback d-block">{{ form.reward_value.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Recognition
+        </button>
+        <a href="{% url 'compensation:recognition_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
