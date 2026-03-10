@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compensation</li>
+            <li class="breadcrumb-item"><a href="{% url 'compensation:employee_benefit_list' %}">Benefit Enrollments</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Enrollment Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Enrollment Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.employee.errors %}is-invalid{% endif %}" id="{{ form.employee.id_for_label }}" name="{{ form.employee.html_name }}">
+                        <option value="">-- Select Employee --</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback d-block">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Benefit Plan -->
+                <div class="col-md-6">
+                    <label for="{{ form.benefit_plan.id_for_label }}" class="form-label">Benefit Plan <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.benefit_plan.errors %}is-invalid{% endif %}" id="{{ form.benefit_plan.id_for_label }}" name="{{ form.benefit_plan.html_name }}">
+                        <option value="">-- Select Plan --</option>
+                        {% for choice in form.benefit_plan.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.benefit_plan.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.benefit_plan.errors %}<div class="invalid-feedback d-block">{{ form.benefit_plan.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Enrollment Date -->
+                <div class="col-md-4">
+                    <label for="{{ form.enrollment_date.id_for_label }}" class="form-label">Enrollment Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.enrollment_date.errors %}is-invalid{% endif %}" id="{{ form.enrollment_date.id_for_label }}" name="{{ form.enrollment_date.html_name }}" value="{{ form.enrollment_date.value|default_if_none:'' }}">
+                    {% if form.enrollment_date.errors %}<div class="invalid-feedback d-block">{{ form.enrollment_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Coverage Level -->
+                <div class="col-md-4">
+                    <label for="{{ form.coverage_level.id_for_label }}" class="form-label">Coverage Level <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.coverage_level.errors %}is-invalid{% endif %}" id="{{ form.coverage_level.id_for_label }}" name="{{ form.coverage_level.html_name }}">
+                        <option value="">-- Select Level --</option>
+                        {% for value, label in form.coverage_level.field.choices %}
+                        <option value="{{ value }}" {% if form.coverage_level.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.coverage_level.errors %}<div class="invalid-feedback d-block">{{ form.coverage_level.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-4">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.status.errors %}is-invalid{% endif %}" id="{{ form.status.id_for_label }}" name="{{ form.status.html_name }}">
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback d-block">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Information -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Additional Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Policy Number -->
+                <div class="col-md-6">
+                    <label for="{{ form.policy_number.id_for_label }}" class="form-label">Policy Number</label>
+                    <input type="text" class="form-control {% if form.policy_number.errors %}is-invalid{% endif %}" id="{{ form.policy_number.id_for_label }}" name="{{ form.policy_number.html_name }}" value="{{ form.policy_number.value|default_if_none:'' }}" placeholder="e.g., POL-2026-001">
+                    {% if form.policy_number.errors %}<div class="invalid-feedback d-block">{{ form.policy_number.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Nominated Dependents -->
+                <div class="col-md-6">
+                    <label for="{{ form.nominated_dependents.id_for_label }}" class="form-label">Nominated Dependents</label>
+                    <textarea class="form-control {% if form.nominated_dependents.errors %}is-invalid{% endif %}" id="{{ form.nominated_dependents.id_for_label }}" name="{{ form.nominated_dependents.html_name }}" rows="3" placeholder="List nominated dependents...">{{ form.nominated_dependents.value|default_if_none:'' }}</textarea>
+                    {% if form.nominated_dependents.errors %}<div class="invalid-feedback d-block">{{ form.nominated_dependents.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Notes -->
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                    <textarea class="form-control {% if form.notes.errors %}is-invalid{% endif %}" id="{{ form.notes.id_for_label }}" name="{{ form.notes.html_name }}" rows="4" placeholder="Additional notes...">{{ form.notes.value|default_if_none:'' }}</textarea>
+                    {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Enrollment
+        </button>
+        <a href="{% url 'compensation:employee_benefit_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
