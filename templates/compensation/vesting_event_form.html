@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compensation</li>
+            <li class="breadcrumb-item">Stock/ESOP</li>
+            <li class="breadcrumb-item"><a href="{% url 'compensation:equity_grant_list' %}">Equity Grants</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'compensation:equity_grant_detail' grant.pk %}">Grant {{ grant.grant_number }}</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Vesting Event Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Vesting Event Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Vesting Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.vesting_date.id_for_label }}" class="form-label">Vesting Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.vesting_date.errors %}is-invalid{% endif %}" id="{{ form.vesting_date.id_for_label }}" name="{{ form.vesting_date.html_name }}" value="{{ form.vesting_date.value|default_if_none:'' }}">
+                    {% if form.vesting_date.errors %}<div class="invalid-feedback d-block">{{ form.vesting_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Shares Vested -->
+                <div class="col-md-6">
+                    <label for="{{ form.shares_vested.id_for_label }}" class="form-label">Shares Vested <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.shares_vested.errors %}is-invalid{% endif %}" id="{{ form.shares_vested.id_for_label }}" name="{{ form.shares_vested.html_name }}" value="{{ form.shares_vested.value|default_if_none:'' }}" min="0" placeholder="e.g., 250">
+                    {% if form.shares_vested.errors %}<div class="invalid-feedback d-block">{{ form.shares_vested.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Is Vested -->
+                <div class="col-md-6">
+                    <div class="form-check mt-4">
+                        <input type="checkbox" class="form-check-input {% if form.is_vested.errors %}is-invalid{% endif %}" id="{{ form.is_vested.id_for_label }}" name="{{ form.is_vested.html_name }}" {% if form.is_vested.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_vested.id_for_label }}">Is Vested</label>
+                        {% if form.is_vested.errors %}<div class="invalid-feedback d-block">{{ form.is_vested.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Vesting Event
+        </button>
+        <a href="{% url 'compensation:equity_grant_detail' grant.pk %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
