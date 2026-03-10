@@ -21,6 +21,7 @@ urlpatterns = [
     path('reports/', include('apps.reports.urls')),
     path('administration/', include('apps.administration.urls')),
     path('additional/', include('apps.additional.urls')),
+    path('compensation/', include('apps.compensation.urls')),
 ]
 
 if settings.DEBUG:
