@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load compensation_tags %}
+
+{% block title %}{{ plan.name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>Benefit Plan Detail</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item">Compensation</li>
+                    <li class="breadcrumb-item"><a href="{% url 'compensation:benefit_plan_list' %}">Benefit Plans</a></li>
+                    <li class="breadcrumb-item active">{{ plan.name }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'compensation:benefit_plan_edit' plan.pk %}" class="btn btn-soft-warning">
+                <i class="ri-pencil-line me-1"></i> Edit
+            </a>
+            <form method="post" action="{% url 'compensation:benefit_plan_delete' plan.pk %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-soft-danger" onclick="return confirm('Are you sure you want to delete this benefit plan?')">
+                    <i class="ri-delete-bin-line me-1"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Header Card -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+            <div>
+                <h5 class="mb-1">{{ plan.name }}</h5>
+                <span class="badge bg-soft-{{ plan.plan_type|benefit_plan_type_color }} text-{{ plan.plan_type|benefit_plan_type_color }} me-1">{{ plan.get_plan_type_display }}</span>
+                {% if plan.is_active %}
+                <span class="badge bg-soft-success text-success">Active</span>
+                {% else %}
+                <span class="badge bg-soft-secondary text-secondary">Inactive</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info Cards -->
+<div class="row">
+    <!-- Plan Information -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Plan Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Name</small>
+                    <div class="fw-medium">{{ plan.name }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Type</small>
+                    <div>
+                        <span class="badge bg-soft-{{ plan.plan_type|benefit_plan_type_color }} text-{{ plan.plan_type|benefit_plan_type_color }}">{{ plan.get_plan_type_display }}</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Provider</small>
+                    <div class="fw-medium">{{ plan.provider|default:"-" }}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Description</small>
+                    <div class="fw-medium">{{ plan.description|default:"-" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premiums -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Premiums</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Employee Premium</small>
+                    <div class="fw-medium">{{ plan.premium_employee|floatformat:2 }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Employer Premium</small>
+                    <div class="fw-medium">{{ plan.premium_employer|floatformat:2 }}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Total Premium</small>
+                    <div class="fw-medium">{{ plan.total_premium|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dates -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Dates</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Enrollment Start</small>
+                    <div class="fw-medium">{% if plan.enrollment_start %}{{ plan.enrollment_start|date:"M d, Y" }}{% else %}-{% endif %}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Enrollment End</small>
+                    <div class="fw-medium">{% if plan.enrollment_end %}{{ plan.enrollment_end|date:"M d, Y" }}{% else %}-{% endif %}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Effective Start</small>
+                    <div class="fw-medium">{% if plan.effective_start %}{{ plan.effective_start|date:"M d, Y" }}{% else %}-{% endif %}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Effective End</small>
+                    <div class="fw-medium">{% if plan.effective_end %}{{ plan.effective_end|date:"M d, Y" }}{% else %}-{% endif %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enrollments Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Enrollments</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Coverage Level</th>
+                                <th>Enrollment Date</th>
+                                <th>Status</th>
+                                <th>Policy Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enrollment in enrollments %}
+                            <tr>
+                                <td class="fw-medium">{{ enrollment.employee }}</td>
+                                <td>{{ enrollment.get_coverage_level_display|default:"-" }}</td>
+                                <td>{{ enrollment.enrollment_date|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge bg-soft-{{ enrollment.status|employee_benefit_status_color }} text-{{ enrollment.status|employee_benefit_status_color }}">{{ enrollment.get_status_display }}</span>
+                                </td>
+                                <td>{{ enrollment.policy_number|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    No enrollments recorded yet.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
