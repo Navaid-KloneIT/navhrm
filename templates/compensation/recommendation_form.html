@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compensation</li>
+            <li class="breadcrumb-item">Planning</li>
+            <li class="breadcrumb-item"><a href="{% url 'compensation:recommendation_list' %}">Recommendations</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Recommendation Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Recommendation Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Compensation Plan -->
+                <div class="col-md-6">
+                    <label for="{{ form.compensation_plan.id_for_label }}" class="form-label">Compensation Plan <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.compensation_plan.errors %}is-invalid{% endif %}" id="{{ form.compensation_plan.id_for_label }}" name="{{ form.compensation_plan.html_name }}">
+                        <option value="">-- Select Plan --</option>
+                        {% for choice in form.compensation_plan.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.compensation_plan.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.compensation_plan.errors %}<div class="invalid-feedback d-block">{{ form.compensation_plan.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.employee.errors %}is-invalid{% endif %}" id="{{ form.employee.id_for_label }}" name="{{ form.employee.html_name }}">
+                        <option value="">-- Select Employee --</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback d-block">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Current Salary -->
+                <div class="col-md-4">
+                    <label for="{{ form.current_salary.id_for_label }}" class="form-label">Current Salary <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.current_salary.errors %}is-invalid{% endif %}" id="{{ form.current_salary.id_for_label }}" name="{{ form.current_salary.html_name }}" value="{{ form.current_salary.value|default_if_none:'' }}" step="0.01" placeholder="0.00">
+                    {% if form.current_salary.errors %}<div class="invalid-feedback d-block">{{ form.current_salary.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Recommended Salary -->
+                <div class="col-md-4">
+                    <label for="{{ form.recommended_salary.id_for_label }}" class="form-label">Recommended Salary <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.recommended_salary.errors %}is-invalid{% endif %}" id="{{ form.recommended_salary.id_for_label }}" name="{{ form.recommended_salary.html_name }}" value="{{ form.recommended_salary.value|default_if_none:'' }}" step="0.01" placeholder="0.00">
+                    {% if form.recommended_salary.errors %}<div class="invalid-feedback d-block">{{ form.recommended_salary.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Increase Percentage -->
+                <div class="col-md-4">
+                    <label for="{{ form.increase_percentage.id_for_label }}" class="form-label">Increase Percentage</label>
+                    <input type="number" class="form-control {% if form.increase_percentage.errors %}is-invalid{% endif %}" id="{{ form.increase_percentage.id_for_label }}" name="{{ form.increase_percentage.html_name }}" value="{{ form.increase_percentage.value|default_if_none:'' }}" step="0.01" placeholder="0.00">
+                    {% if form.increase_percentage.errors %}<div class="invalid-feedback d-block">{{ form.increase_percentage.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Classification -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Classification</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Increase Type -->
+                <div class="col-md-6">
+                    <label for="{{ form.increase_type.id_for_label }}" class="form-label">Increase Type <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.increase_type.errors %}is-invalid{% endif %}" id="{{ form.increase_type.id_for_label }}" name="{{ form.increase_type.html_name }}">
+                        <option value="">-- Select Increase Type --</option>
+                        {% for value, label in form.increase_type.field.choices %}
+                            {% if value %}
+                            <option value="{{ value }}" {% if form.increase_type.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.increase_type.errors %}<div class="invalid-feedback d-block">{{ form.increase_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.status.errors %}is-invalid{% endif %}" id="{{ form.status.id_for_label }}" name="{{ form.status.html_name }}">
+                        <option value="">-- Select Status --</option>
+                        {% for value, label in form.status.field.choices %}
+                            {% if value %}
+                            <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback d-block">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Justification -->
+                <div class="col-12">
+                    <label for="{{ form.justification.id_for_label }}" class="form-label">Justification</label>
+                    <textarea class="form-control {% if form.justification.errors %}is-invalid{% endif %}" id="{{ form.justification.id_for_label }}" name="{{ form.justification.html_name }}" rows="4" placeholder="Reason for this recommendation...">{{ form.justification.value|default_if_none:'' }}</textarea>
+                    {% if form.justification.errors %}<div class="invalid-feedback d-block">{{ form.justification.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Recommendation
+        </button>
+        <a href="{% url 'compensation:recommendation_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
