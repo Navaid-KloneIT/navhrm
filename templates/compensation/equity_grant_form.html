@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compensation</li>
+            <li class="breadcrumb-item">Stock/ESOP</li>
+            <li class="breadcrumb-item"><a href="{% url 'compensation:equity_grant_list' %}">Equity Grants</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Grant Information -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Grant Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.employee.errors %}is-invalid{% endif %}" id="{{ form.employee.id_for_label }}" name="{{ form.employee.html_name }}">
+                        <option value="">-- Select Employee --</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback d-block">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Grant Type -->
+                <div class="col-md-6">
+                    <label for="{{ form.grant_type.id_for_label }}" class="form-label">Grant Type <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.grant_type.errors %}is-invalid{% endif %}" id="{{ form.grant_type.id_for_label }}" name="{{ form.grant_type.html_name }}">
+                        <option value="">-- Select Type --</option>
+                        {% for value, label in form.grant_type.field.choices %}
+                        <option value="{{ value }}" {% if form.grant_type.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.grant_type.errors %}<div class="invalid-feedback d-block">{{ form.grant_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Grant Date -->
+                <div class="col-md-4">
+                    <label for="{{ form.grant_date.id_for_label }}" class="form-label">Grant Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.grant_date.errors %}is-invalid{% endif %}" id="{{ form.grant_date.id_for_label }}" name="{{ form.grant_date.html_name }}" value="{{ form.grant_date.value|default_if_none:'' }}">
+                    {% if form.grant_date.errors %}<div class="invalid-feedback d-block">{{ form.grant_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Total Shares -->
+                <div class="col-md-4">
+                    <label for="{{ form.total_shares.id_for_label }}" class="form-label">Total Shares <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.total_shares.errors %}is-invalid{% endif %}" id="{{ form.total_shares.id_for_label }}" name="{{ form.total_shares.html_name }}" value="{{ form.total_shares.value|default_if_none:'' }}" min="0" placeholder="e.g., 1000">
+                    {% if form.total_shares.errors %}<div class="invalid-feedback d-block">{{ form.total_shares.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Exercise Price -->
+                <div class="col-md-4">
+                    <label for="{{ form.exercise_price.id_for_label }}" class="form-label">Exercise Price <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.exercise_price.errors %}is-invalid{% endif %}" id="{{ form.exercise_price.id_for_label }}" name="{{ form.exercise_price.html_name }}" value="{{ form.exercise_price.value|default_if_none:'' }}" min="0" step="0.01" placeholder="e.g., 10.00">
+                    {% if form.exercise_price.errors %}<div class="invalid-feedback d-block">{{ form.exercise_price.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Current Value Per Share -->
+                <div class="col-md-4">
+                    <label for="{{ form.current_value_per_share.id_for_label }}" class="form-label">Current Value Per Share</label>
+                    <input type="number" class="form-control {% if form.current_value_per_share.errors %}is-invalid{% endif %}" id="{{ form.current_value_per_share.id_for_label }}" name="{{ form.current_value_per_share.html_name }}" value="{{ form.current_value_per_share.value|default_if_none:'' }}" min="0" step="0.01" placeholder="e.g., 25.00">
+                    {% if form.current_value_per_share.errors %}<div class="invalid-feedback d-block">{{ form.current_value_per_share.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vesting Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Vesting Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Vesting Start Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.vesting_start_date.id_for_label }}" class="form-label">Vesting Start Date</label>
+                    <input type="date" class="form-control {% if form.vesting_start_date.errors %}is-invalid{% endif %}" id="{{ form.vesting_start_date.id_for_label }}" name="{{ form.vesting_start_date.html_name }}" value="{{ form.vesting_start_date.value|default_if_none:'' }}">
+                    {% if form.vesting_start_date.errors %}<div class="invalid-feedback d-block">{{ form.vesting_start_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Vesting End Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.vesting_end_date.id_for_label }}" class="form-label">Vesting End Date</label>
+                    <input type="date" class="form-control {% if form.vesting_end_date.errors %}is-invalid{% endif %}" id="{{ form.vesting_end_date.id_for_label }}" name="{{ form.vesting_end_date.html_name }}" value="{{ form.vesting_end_date.value|default_if_none:'' }}">
+                    {% if form.vesting_end_date.errors %}<div class="invalid-feedback d-block">{{ form.vesting_end_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Vesting Schedule -->
+                <div class="col-md-6">
+                    <label for="{{ form.vesting_schedule.id_for_label }}" class="form-label">Vesting Schedule</label>
+                    <select class="form-select {% if form.vesting_schedule.errors %}is-invalid{% endif %}" id="{{ form.vesting_schedule.id_for_label }}" name="{{ form.vesting_schedule.html_name }}">
+                        <option value="">-- Select Schedule --</option>
+                        {% for value, label in form.vesting_schedule.field.choices %}
+                        <option value="{{ value }}" {% if form.vesting_schedule.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.vesting_schedule.errors %}<div class="invalid-feedback d-block">{{ form.vesting_schedule.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Cliff Months -->
+                <div class="col-md-6">
+                    <label for="{{ form.cliff_months.id_for_label }}" class="form-label">Cliff Months</label>
+                    <input type="number" class="form-control {% if form.cliff_months.errors %}is-invalid{% endif %}" id="{{ form.cliff_months.id_for_label }}" name="{{ form.cliff_months.html_name }}" value="{{ form.cliff_months.value|default_if_none:'' }}" min="0" placeholder="e.g., 12">
+                    {% if form.cliff_months.errors %}<div class="invalid-feedback d-block">{{ form.cliff_months.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status & Notes -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Status & Notes</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Status -->
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.status.errors %}is-invalid{% endif %}" id="{{ form.status.id_for_label }}" name="{{ form.status.html_name }}">
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback d-block">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Notes -->
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                    <textarea class="form-control {% if form.notes.errors %}is-invalid{% endif %}" id="{{ form.notes.id_for_label }}" name="{{ form.notes.html_name }}" rows="4" placeholder="Additional notes...">{{ form.notes.value|default_if_none:'' }}</textarea>
+                    {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Equity Grant
+        </button>
+        <a href="{% url 'compensation:equity_grant_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
