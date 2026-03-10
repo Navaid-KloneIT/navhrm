@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load compensation_tags %}
+
+{% block title %}Recognitions{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Recognitions</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compensation</li>
+            <li class="breadcrumb-item">Rewards</li>
+            <li class="breadcrumb-item active">All Recognitions</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'compensation:recognition_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search by title, nominee...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Recognition Type</label>
+                            <select class="form-select" name="recognition_type">
+                                <option value="">All Types</option>
+                                {% for value, label in recognition_type_choices %}
+                                <option value="{{ value }}" {% if request.GET.recognition_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line"></i>
+                            </button>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'compensation:recognition_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> Add Recognition
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recognitions Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">All Recognitions</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Nominee</th>
+                                <th>Nominator</th>
+                                <th>Program</th>
+                                <th>Type</th>
+                                <th>Value</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for recognition in recognitions %}
+                            <tr>
+                                <td class="fw-medium">
+                                    <a href="{% url 'compensation:recognition_detail' recognition.pk %}" class="text-primary">{{ recognition.title }}</a>
+                                </td>
+                                <td>{{ recognition.nominee }}</td>
+                                <td>{{ recognition.nominator|default:"-" }}</td>
+                                <td>{{ recognition.reward_program|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-soft-{{ recognition.recognition_type|recognition_type_color }} text-{{ recognition.recognition_type|recognition_type_color }}">{{ recognition.get_recognition_type_display }}</span>
+                                </td>
+                                <td>{{ recognition.reward_value|floatformat:2 }}</td>
+                                <td>
+                                    <span class="badge bg-soft-{{ recognition.status|recognition_status_color }} text-{{ recognition.status|recognition_status_color }}">{{ recognition.get_status_display }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'compensation:recognition_detail' recognition.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="View">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                        <a href="{% url 'compensation:recognition_edit' recognition.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        {% if recognition.status == 'nominated' %}
+                                        <form method="post" action="{% url 'compensation:recognition_approve' recognition.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-success" data-bs-toggle="tooltip" title="Approve" onclick="return confirm('Approve this recognition?')">
+                                                <i class="ri-check-line"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{% url 'compensation:recognition_reject' recognition.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Reject" onclick="return confirm('Reject this recognition?')">
+                                                <i class="ri-close-line"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-trophy-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No recognitions found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search or request.GET.status or request.GET.recognition_type %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Recognitions will appear here once created.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Recognition list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.recognition_type %}&recognition_type={{ request.GET.recognition_type }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.recognition_type %}&recognition_type={{ request.GET.recognition_type }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.recognition_type %}&recognition_type={{ request.GET.recognition_type }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
