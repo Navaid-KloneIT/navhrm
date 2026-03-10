@@ -95,7 +95,7 @@
                                 </td>
                                 <td>{{ enrollment.enrollment_date|date:"M d, Y" }}</td>
                                 <td>
-                                    <span class="badge bg-soft-{{ enrollment.status|employee_benefit_status_color }} text-{{ enrollment.status|employee_benefit_status_color }}">{{ enrollment.get_status_display }}</span>
+                                    <span class="badge bg-soft-{{ enrollment.status|benefit_status_color }} text-{{ enrollment.status|benefit_status_color }}">{{ enrollment.get_status_display }}</span>
                                 </td>
                                 <td>{{ enrollment.policy_number|default:"-" }}</td>
                                 <td>
