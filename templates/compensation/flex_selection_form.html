@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compensation</li>
+            <li class="breadcrumb-item">Flexible Benefits</li>
+            <li class="breadcrumb-item"><a href="{% url 'compensation:flex_selection_list' %}">Selections</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Selection Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Selection Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.employee.errors %}is-invalid{% endif %}" id="{{ form.employee.id_for_label }}" name="{{ form.employee.html_name }}">
+                        <option value="">-- Select Employee --</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback d-block">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.flex_plan.id_for_label }}" class="form-label">Flex Plan <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.flex_plan.errors %}is-invalid{% endif %}" id="{{ form.flex_plan.id_for_label }}" name="{{ form.flex_plan.html_name }}">
+                        <option value="">-- Select Flex Plan --</option>
+                        {% for choice in form.flex_plan.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.flex_plan.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.flex_plan.errors %}<div class="invalid-feedback d-block">{{ form.flex_plan.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.flex_option.id_for_label }}" class="form-label">Flex Option <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.flex_option.errors %}is-invalid{% endif %}" id="{{ form.flex_option.id_for_label }}" name="{{ form.flex_option.html_name }}">
+                        <option value="">-- Select Flex Option --</option>
+                        {% for choice in form.flex_option.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.flex_option.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.flex_option.errors %}<div class="invalid-feedback d-block">{{ form.flex_option.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.status.errors %}is-invalid{% endif %}" id="{{ form.status.id_for_label }}" name="{{ form.status.html_name }}">
+                        <option value="">-- Select Status --</option>
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback d-block">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.period_start.id_for_label }}" class="form-label">Period Start <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.period_start.errors %}is-invalid{% endif %}" id="{{ form.period_start.id_for_label }}" name="{{ form.period_start.html_name }}" value="{{ form.period_start.value|default_if_none:'' }}">
+                    {% if form.period_start.errors %}<div class="invalid-feedback d-block">{{ form.period_start.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.period_end.id_for_label }}" class="form-label">Period End <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.period_end.errors %}is-invalid{% endif %}" id="{{ form.period_end.id_for_label }}" name="{{ form.period_end.html_name }}" value="{{ form.period_end.value|default_if_none:'' }}">
+                    {% if form.period_end.errors %}<div class="invalid-feedback d-block">{{ form.period_end.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Selection
+        </button>
+        <a href="{% url 'compensation:flex_selection_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
