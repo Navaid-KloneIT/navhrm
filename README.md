@@ -86,6 +86,14 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Ticket Comments** - Comment threads with internal notes (visible only to staff) and file attachments
 - **Knowledge Base** - Self-help articles organized by category with view tracking and publish controls
 
+#### Compensation & Benefits
+- **Salary Benchmarking** - Market salary data by designation, industry and location with min/median/max salary, percentile tracking
+- **Benefits Administration** - Benefit plans (health/life/dental/vision/retirement/disability/wellness) with employee/employer premiums, employee enrollment with coverage levels (employee only/spouse/children/family)
+- **Flexible Benefits** - Cafeteria-style benefit plans with amount/points allocation, benefit options by category, employee opt-in/opt-out selections
+- **Stock/ESOP Management** - Equity grants (ESOP/RSU/stock option/phantom stock) with auto-generated grant numbers, vesting schedules (monthly/quarterly/annual/cliff), vesting event tracking, exercise records with profit calculation
+- **Compensation Planning** - Compensation plans (merit/promotion/market adjustment/annual review) with budget tracking and utilization, employee recommendations with current/recommended salary and increase percentage, approval workflow
+- **Rewards & Recognition** - Reward programs (spot award/service award/peer recognition/performance bonus/team award) with budget tracking, employee recognitions with nominee/nominator, approval workflow (nominated → approved → awarded)
+
 ### Recruitment Module
 - **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
 - **Job Templates** - Pre-defined job description templates for quick requisition creation
@@ -172,6 +180,7 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
    python manage.py seed_ess
    python manage.py seed_administration
    python manage.py seed_additional
+   python manage.py seed_compensation
    ```
 
 8. **Run the development server**
@@ -215,7 +224,8 @@ navhrm/
 │   ├── ess/               # Employee self-service, requests, communication
 │   ├── reports/           # Reports & analytics (no models, read-only views)
 │   ├── administration/    # Admin & settings, roles, workflows, audit
-│   └── additional/        # Asset, expense, travel management & helpdesk
+│   ├── additional/        # Asset, expense, travel management & helpdesk
+│   └── compensation/      # Compensation & benefits, salary benchmarking, ESOP
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS
@@ -238,7 +248,8 @@ navhrm/
 │   ├── ess/               # Employee self-service templates (39 files)
 │   ├── reports/           # Reports & analytics templates (20 files)
 │   ├── administration/    # Admin & settings templates (33 files)
-│   └── additional/        # Additional modules templates (31 files)
+│   ├── additional/        # Additional modules templates (31 files)
+│   └── compensation/      # Compensation & benefits templates (31 files)
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
