@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compensation</li>
+            <li class="breadcrumb-item"><a href="{% url 'compensation:benefit_plan_list' %}">Benefit Plans</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Plan Information -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Plan Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Name -->
+                <div class="col-md-6">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.name.errors %}is-invalid{% endif %}" id="{{ form.name.id_for_label }}" name="{{ form.name.html_name }}" value="{{ form.name.value|default_if_none:'' }}" placeholder="e.g., Health Insurance Premium">
+                    {% if form.name.errors %}<div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Plan Type -->
+                <div class="col-md-6">
+                    <label for="{{ form.plan_type.id_for_label }}" class="form-label">Plan Type <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.plan_type.errors %}is-invalid{% endif %}" id="{{ form.plan_type.id_for_label }}" name="{{ form.plan_type.html_name }}">
+                        <option value="">-- Select Type --</option>
+                        {% for value, label in form.plan_type.field.choices %}
+                        <option value="{{ value }}" {% if form.plan_type.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.plan_type.errors %}<div class="invalid-feedback d-block">{{ form.plan_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Provider -->
+                <div class="col-md-6">
+                    <label for="{{ form.provider.id_for_label }}" class="form-label">Provider</label>
+                    <input type="text" class="form-control {% if form.provider.errors %}is-invalid{% endif %}" id="{{ form.provider.id_for_label }}" name="{{ form.provider.html_name }}" value="{{ form.provider.value|default_if_none:'' }}" placeholder="e.g., Blue Cross Blue Shield">
+                    {% if form.provider.errors %}<div class="invalid-feedback d-block">{{ form.provider.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="col-md-6">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="3" placeholder="Plan description...">{{ form.description.value|default_if_none:'' }}</textarea>
+                    {% if form.description.errors %}<div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coverage & Premiums -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Coverage & Premiums</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Coverage Details -->
+                <div class="col-12">
+                    <label for="{{ form.coverage_details.id_for_label }}" class="form-label">Coverage Details</label>
+                    <textarea class="form-control {% if form.coverage_details.errors %}is-invalid{% endif %}" id="{{ form.coverage_details.id_for_label }}" name="{{ form.coverage_details.html_name }}" rows="3" placeholder="Coverage details...">{{ form.coverage_details.value|default_if_none:'' }}</textarea>
+                    {% if form.coverage_details.errors %}<div class="invalid-feedback d-block">{{ form.coverage_details.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Employee Premium -->
+                <div class="col-md-4">
+                    <label for="{{ form.premium_employee.id_for_label }}" class="form-label">Employee Premium <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.premium_employee.errors %}is-invalid{% endif %}" id="{{ form.premium_employee.id_for_label }}" name="{{ form.premium_employee.html_name }}" value="{{ form.premium_employee.value|default_if_none:'' }}" step="0.01" placeholder="0.00">
+                    {% if form.premium_employee.errors %}<div class="invalid-feedback d-block">{{ form.premium_employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Employer Premium -->
+                <div class="col-md-4">
+                    <label for="{{ form.premium_employer.id_for_label }}" class="form-label">Employer Premium <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.premium_employer.errors %}is-invalid{% endif %}" id="{{ form.premium_employer.id_for_label }}" name="{{ form.premium_employer.html_name }}" value="{{ form.premium_employer.value|default_if_none:'' }}" step="0.01" placeholder="0.00">
+                    {% if form.premium_employer.errors %}<div class="invalid-feedback d-block">{{ form.premium_employer.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Eligibility Criteria -->
+                <div class="col-md-4">
+                    <label for="{{ form.eligibility_criteria.id_for_label }}" class="form-label">Eligibility Criteria</label>
+                    <textarea class="form-control {% if form.eligibility_criteria.errors %}is-invalid{% endif %}" id="{{ form.eligibility_criteria.id_for_label }}" name="{{ form.eligibility_criteria.html_name }}" rows="3" placeholder="Eligibility criteria...">{{ form.eligibility_criteria.value|default_if_none:'' }}</textarea>
+                    {% if form.eligibility_criteria.errors %}<div class="invalid-feedback d-block">{{ form.eligibility_criteria.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dates -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Dates</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Enrollment Start -->
+                <div class="col-md-3">
+                    <label for="{{ form.enrollment_start.id_for_label }}" class="form-label">Enrollment Start</label>
+                    <input type="date" class="form-control {% if form.enrollment_start.errors %}is-invalid{% endif %}" id="{{ form.enrollment_start.id_for_label }}" name="{{ form.enrollment_start.html_name }}" value="{{ form.enrollment_start.value|default_if_none:'' }}">
+                    {% if form.enrollment_start.errors %}<div class="invalid-feedback d-block">{{ form.enrollment_start.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Enrollment End -->
+                <div class="col-md-3">
+                    <label for="{{ form.enrollment_end.id_for_label }}" class="form-label">Enrollment End</label>
+                    <input type="date" class="form-control {% if form.enrollment_end.errors %}is-invalid{% endif %}" id="{{ form.enrollment_end.id_for_label }}" name="{{ form.enrollment_end.html_name }}" value="{{ form.enrollment_end.value|default_if_none:'' }}">
+                    {% if form.enrollment_end.errors %}<div class="invalid-feedback d-block">{{ form.enrollment_end.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Effective Start -->
+                <div class="col-md-3">
+                    <label for="{{ form.effective_start.id_for_label }}" class="form-label">Effective Start</label>
+                    <input type="date" class="form-control {% if form.effective_start.errors %}is-invalid{% endif %}" id="{{ form.effective_start.id_for_label }}" name="{{ form.effective_start.html_name }}" value="{{ form.effective_start.value|default_if_none:'' }}">
+                    {% if form.effective_start.errors %}<div class="invalid-feedback d-block">{{ form.effective_start.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Effective End -->
+                <div class="col-md-3">
+                    <label for="{{ form.effective_end.id_for_label }}" class="form-label">Effective End</label>
+                    <input type="date" class="form-control {% if form.effective_end.errors %}is-invalid{% endif %}" id="{{ form.effective_end.id_for_label }}" name="{{ form.effective_end.html_name }}" value="{{ form.effective_end.value|default_if_none:'' }}">
+                    {% if form.effective_end.errors %}<div class="invalid-feedback d-block">{{ form.effective_end.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Is Active -->
+                <div class="col-12">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input {% if form.is_active.errors %}is-invalid{% endif %}" id="{{ form.is_active.id_for_label }}" name="{{ form.is_active.html_name }}" {% if form.is_active.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Active</label>
+                        {% if form.is_active.errors %}<div class="invalid-feedback d-block">{{ form.is_active.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Benefit Plan
+        </button>
+        <a href="{% url 'compensation:benefit_plan_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
