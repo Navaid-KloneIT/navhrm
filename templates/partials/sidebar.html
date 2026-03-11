@@ -1285,6 +1285,114 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Compliance & Legal <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Labor Law Compliance -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'compliance' and 'labor_law' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'law_compliance' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-scales-3-line"></i>
+                    <span class="menu-text">Labor Law</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'compliance' and 'labor_law' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'law_compliance' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'compliance:labor_law_list' %}" class="menu-link {% if request.resolver_match.url_name == 'labor_law_list' %}active{% endif %}">
+                            <span class="menu-text">Labor Laws</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Contract Management -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'compliance' and 'contract' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'amendment' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-paper-2-line"></i>
+                    <span class="menu-text">Contracts</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'compliance' and 'contract' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'amendment' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'compliance:contract_list' %}" class="menu-link {% if request.resolver_match.url_name == 'contract_list' %}active{% endif %}">
+                            <span class="menu-text">Employment Contracts</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Policy Management -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'compliance' and 'policy' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-file-shield-2-line"></i>
+                    <span class="menu-text">Policies</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'compliance' and 'policy' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'compliance:policy_list' %}" class="menu-link {% if request.resolver_match.url_name == 'policy_list' %}active{% endif %}">
+                            <span class="menu-text">Compliance Policies</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Disciplinary Actions -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'compliance' and 'incident' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'warning' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'appeal' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-alarm-warning-line"></i>
+                    <span class="menu-text">Disciplinary</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'compliance' and 'incident' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'warning' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'appeal' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'compliance:incident_list' %}" class="menu-link {% if request.resolver_match.url_name == 'incident_list' %}active{% endif %}">
+                            <span class="menu-text">Incidents</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Grievance Handling -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'compliance' and 'grievance' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'investigation' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-feedback-line"></i>
+                    <span class="menu-text">Grievances</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'compliance' and 'grievance' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'investigation' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'compliance:grievance_list' %}" class="menu-link {% if request.resolver_match.url_name == 'grievance_list' %}active{% endif %}">
+                            <span class="menu-text">Grievances</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Statutory Registers -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'compliance' and 'muster_roll' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'wage_register' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'inspection' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-book-2-line"></i>
+                    <span class="menu-text">Statutory Registers</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'compliance' and 'muster_roll' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'wage_register' in request.resolver_match.url_name or request.resolver_match.app_name == 'compliance' and 'inspection' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'compliance:muster_roll_list' %}" class="menu-link {% if request.resolver_match.url_name == 'muster_roll_list' %}active{% endif %}">
+                            <span class="menu-text">Muster Rolls</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'compliance:wage_register_list' %}" class="menu-link {% if request.resolver_match.url_name == 'wage_register_list' %}active{% endif %}">
+                            <span class="menu-text">Wage Registers</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'compliance:inspection_list' %}" class="menu-link {% if request.resolver_match.url_name == 'inspection_list' %}active{% endif %}">
+                            <span class="menu-text">Inspection Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Admin & Settings <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- User Management -->
