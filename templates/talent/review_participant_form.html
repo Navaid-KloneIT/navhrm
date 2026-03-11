@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load talent_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Talent Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'talent:review_session_list' %}">Review Sessions</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'talent:review_session_detail' session.pk %}">{{ session.name }}</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if title == "Add Review Participant" %}
+    <!-- Add Participant Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Participant Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Employee -->
+                <div class="col-md-4">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.employee.errors %}is-invalid{% endif %}" id="{{ form.employee.id_for_label }}" name="{{ form.employee.html_name }}">
+                        <option value="">-- Select Employee --</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Initial Performance Rating -->
+                <div class="col-md-4">
+                    <label for="{{ form.initial_performance_rating.id_for_label }}" class="form-label">Initial Performance Rating <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.initial_performance_rating.errors %}is-invalid{% endif %}" id="{{ form.initial_performance_rating.id_for_label }}" name="{{ form.initial_performance_rating.html_name }}" value="{{ form.initial_performance_rating.value|default:'' }}" min="1" max="5" step="1">
+                    {% if form.initial_performance_rating.errors %}<div class="invalid-feedback">{{ form.initial_performance_rating.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Initial Potential Rating -->
+                <div class="col-md-4">
+                    <label for="{{ form.initial_potential_rating.id_for_label }}" class="form-label">Initial Potential Rating <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.initial_potential_rating.errors %}is-invalid{% endif %}" id="{{ form.initial_potential_rating.id_for_label }}" name="{{ form.initial_potential_rating.html_name }}" value="{{ form.initial_potential_rating.value|default:'' }}" min="1" max="5" step="1">
+                    {% if form.initial_potential_rating.errors %}<div class="invalid-feedback">{{ form.initial_potential_rating.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if title == "Calibrate Participant" %}
+    <!-- Calibrate Participant Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Calibration Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Calibrated Performance Rating -->
+                <div class="col-md-6">
+                    <label for="{{ form.calibrated_performance_rating.id_for_label }}" class="form-label">Calibrated Performance Rating <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.calibrated_performance_rating.errors %}is-invalid{% endif %}" id="{{ form.calibrated_performance_rating.id_for_label }}" name="{{ form.calibrated_performance_rating.html_name }}" value="{{ form.calibrated_performance_rating.value|default:'' }}" min="1" max="5" step="1">
+                    {% if form.calibrated_performance_rating.errors %}<div class="invalid-feedback">{{ form.calibrated_performance_rating.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Calibrated Potential Rating -->
+                <div class="col-md-6">
+                    <label for="{{ form.calibrated_potential_rating.id_for_label }}" class="form-label">Calibrated Potential Rating <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.calibrated_potential_rating.errors %}is-invalid{% endif %}" id="{{ form.calibrated_potential_rating.id_for_label }}" name="{{ form.calibrated_potential_rating.html_name }}" value="{{ form.calibrated_potential_rating.value|default:'' }}" min="1" max="5" step="1">
+                    {% if form.calibrated_potential_rating.errors %}<div class="invalid-feedback">{{ form.calibrated_potential_rating.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Calibration Notes -->
+                <div class="col-12">
+                    <label for="{{ form.calibration_notes.id_for_label }}" class="form-label">Calibration Notes</label>
+                    <textarea class="form-control {% if form.calibration_notes.errors %}is-invalid{% endif %}" id="{{ form.calibration_notes.id_for_label }}" name="{{ form.calibration_notes.html_name }}" rows="3">{{ form.calibration_notes.value|default:'' }}</textarea>
+                    {% if form.calibration_notes.errors %}<div class="invalid-feedback">{{ form.calibration_notes.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Development Recommendations -->
+                <div class="col-12">
+                    <label for="{{ form.development_recommendations.id_for_label }}" class="form-label">Development Recommendations</label>
+                    <textarea class="form-control {% if form.development_recommendations.errors %}is-invalid{% endif %}" id="{{ form.development_recommendations.id_for_label }}" name="{{ form.development_recommendations.html_name }}" rows="3">{{ form.development_recommendations.value|default:'' }}</textarea>
+                    {% if form.development_recommendations.errors %}<div class="invalid-feedback">{{ form.development_recommendations.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save
+        </button>
+        <a href="{% url 'talent:review_session_detail' session.pk %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
