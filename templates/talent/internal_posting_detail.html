@@ -19,7 +19,7 @@
     <div class="d-flex gap-2 align-items-center">
         <span class="badge bg-soft-{{ posting.status|posting_status_color }} text-{{ posting.status|posting_status_color }}">{{ posting.get_status_display }}</span>
         {% if posting.status == 'open' %}
-        <a href="{% url 'talent:transfer_application_create' posting.pk %}" class="btn btn-success">
+        <a href="{% url 'talent:transfer_apply' posting.pk %}" class="btn btn-success">
             <i class="ri-send-plane-line me-1"></i> Apply
         </a>
         {% endif %}
