@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compliance & Legal</li>
+            <li class="breadcrumb-item">Labor Law Compliance</li>
+            <li class="breadcrumb-item"><a href="{% url 'compliance:labor_law_detail' labor_law.pk %}">{{ labor_law.name }}</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Compliance Details Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Compliance Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Department -->
+                <div class="col-md-6">
+                    <label for="{{ form.department.id_for_label }}" class="form-label">Department</label>
+                    <select name="{{ form.department.html_name }}"
+                            id="{{ form.department.id_for_label }}"
+                            class="form-select {% if form.department.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for choice in form.department.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.department.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.department.errors %}<div class="invalid-feedback">{{ form.department.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Compliance Status -->
+                <div class="col-md-6">
+                    <label for="{{ form.compliance_status.id_for_label }}" class="form-label">
+                        Compliance Status <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.compliance_status.html_name }}"
+                            id="{{ form.compliance_status.id_for_label }}"
+                            class="form-select {% if form.compliance_status.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for value, label in form.compliance_status.field.choices %}
+                        <option value="{{ value }}" {% if form.compliance_status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.compliance_status.errors %}<div class="invalid-feedback">{{ form.compliance_status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Review Date -->
+                <div class="col-md-4">
+                    <label for="{{ form.review_date.id_for_label }}" class="form-label">
+                        Review Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           name="{{ form.review_date.html_name }}"
+                           id="{{ form.review_date.id_for_label }}"
+                           class="form-control {% if form.review_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.review_date.value|default_if_none:'' }}">
+                    {% if form.review_date.errors %}<div class="invalid-feedback">{{ form.review_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Next Review Date -->
+                <div class="col-md-4">
+                    <label for="{{ form.next_review_date.id_for_label }}" class="form-label">Next Review Date</label>
+                    <input type="date"
+                           name="{{ form.next_review_date.html_name }}"
+                           id="{{ form.next_review_date.id_for_label }}"
+                           class="form-control {% if form.next_review_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.next_review_date.value|default_if_none:'' }}">
+                    {% if form.next_review_date.errors %}<div class="invalid-feedback">{{ form.next_review_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Responsible Person -->
+                <div class="col-md-4">
+                    <label for="{{ form.responsible_person.id_for_label }}" class="form-label">Responsible Person</label>
+                    <select name="{{ form.responsible_person.html_name }}"
+                            id="{{ form.responsible_person.id_for_label }}"
+                            class="form-select {% if form.responsible_person.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for choice in form.responsible_person.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.responsible_person.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.responsible_person.errors %}<div class="invalid-feedback">{{ form.responsible_person.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Notes</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Compliance Notes -->
+                <div class="col-12">
+                    <label for="{{ form.compliance_notes.id_for_label }}" class="form-label">Compliance Notes</label>
+                    <textarea name="{{ form.compliance_notes.html_name }}"
+                              id="{{ form.compliance_notes.id_for_label }}"
+                              class="form-control {% if form.compliance_notes.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Enter compliance notes">{{ form.compliance_notes.value|default_if_none:'' }}</textarea>
+                    {% if form.compliance_notes.errors %}<div class="invalid-feedback">{{ form.compliance_notes.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Action Required -->
+                <div class="col-12">
+                    <label for="{{ form.action_required.id_for_label }}" class="form-label">Action Required</label>
+                    <textarea name="{{ form.action_required.html_name }}"
+                              id="{{ form.action_required.id_for_label }}"
+                              class="form-control {% if form.action_required.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Enter required actions">{{ form.action_required.value|default_if_none:'' }}</textarea>
+                    {% if form.action_required.errors %}<div class="invalid-feedback">{{ form.action_required.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Compliance Record
+        </button>
+        <a href="{% url 'compliance:labor_law_detail' labor_law.pk %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
