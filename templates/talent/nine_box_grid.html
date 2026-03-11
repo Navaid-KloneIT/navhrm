@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load talent_tags %}
+
+{% block title %}9-Box Grid{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>9-Box Grid</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Talent Management</li>
+            <li class="breadcrumb-item active">9-Box Grid</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex">
+            <!-- Y-axis label -->
+            <div class="d-flex align-items-center me-3" style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                <span class="fw-bold text-muted" style="font-size: 14px; letter-spacing: 2px;">POTENTIAL</span>
+            </div>
+
+            <div class="flex-grow-1">
+                <table class="table table-bordered mb-0" style="table-layout: fixed;">
+                    <tbody>
+                        <!-- Row 1: High Potential (5,4) -->
+                        <tr>
+                            <!-- High Potential / Low Performance -->
+                            <td class="align-top p-2" style="background-color: rgba(220, 53, 69, 0.08); height: 180px; width: 33.33%;">
+                                <div class="fw-semibold text-danger mb-2" style="font-size: 13px;">Enigma/Misplaced</div>
+                                <div class="text-muted mb-2" style="font-size: 11px;">High Potential / Low Performance</div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for a in assessments %}
+                                        {% if a.potential_rating >= 4 and a.performance_rating <= 2 %}
+                                        <a href="{% url 'talent:assessment_detail' a.pk %}" class="badge bg-soft-danger text-danger text-decoration-none">{{ a.employee }}</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <!-- High Potential / Meets Expectations -->
+                            <td class="align-top p-2" style="background-color: rgba(255, 193, 7, 0.08); height: 180px; width: 33.33%;">
+                                <div class="fw-semibold text-warning mb-2" style="font-size: 13px;">Emerging Talent</div>
+                                <div class="text-muted mb-2" style="font-size: 11px;">High Potential / Meets Expectations</div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for a in assessments %}
+                                        {% if a.potential_rating >= 4 and a.performance_rating == 3 %}
+                                        <a href="{% url 'talent:assessment_detail' a.pk %}" class="badge bg-soft-warning text-warning text-decoration-none">{{ a.employee }}</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <!-- High Potential / High Performance -->
+                            <td class="align-top p-2" style="background-color: rgba(25, 135, 84, 0.08); height: 180px; width: 33.33%;">
+                                <div class="fw-semibold text-success mb-2" style="font-size: 13px;">Star/High Potential</div>
+                                <div class="text-muted mb-2" style="font-size: 11px;">High Potential / High Performance</div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for a in assessments %}
+                                        {% if a.potential_rating >= 4 and a.performance_rating >= 4 %}
+                                        <a href="{% url 'talent:assessment_detail' a.pk %}" class="badge bg-soft-success text-success text-decoration-none">{{ a.employee }}</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 2: Average Potential (3) -->
+                        <tr>
+                            <!-- Average Potential / Low Performance -->
+                            <td class="align-top p-2" style="background-color: rgba(220, 53, 69, 0.05); height: 180px;">
+                                <div class="fw-semibold text-secondary mb-2" style="font-size: 13px;">Inconsistent</div>
+                                <div class="text-muted mb-2" style="font-size: 11px;">Average Potential / Low Performance</div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for a in assessments %}
+                                        {% if a.potential_rating == 3 and a.performance_rating <= 2 %}
+                                        <a href="{% url 'talent:assessment_detail' a.pk %}" class="badge bg-soft-secondary text-secondary text-decoration-none">{{ a.employee }}</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <!-- Average Potential / Meets Expectations -->
+                            <td class="align-top p-2" style="background-color: rgba(13, 202, 240, 0.08); height: 180px;">
+                                <div class="fw-semibold text-info mb-2" style="font-size: 13px;">Core/Solid Performer</div>
+                                <div class="text-muted mb-2" style="font-size: 11px;">Average Potential / Meets Expectations</div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for a in assessments %}
+                                        {% if a.potential_rating == 3 and a.performance_rating == 3 %}
+                                        <a href="{% url 'talent:assessment_detail' a.pk %}" class="badge bg-soft-info text-info text-decoration-none">{{ a.employee }}</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <!-- Average Potential / High Performance -->
+                            <td class="align-top p-2" style="background-color: rgba(25, 135, 84, 0.05); height: 180px;">
+                                <div class="fw-semibold text-primary mb-2" style="font-size: 13px;">Key Talent</div>
+                                <div class="text-muted mb-2" style="font-size: 11px;">Average Potential / High Performance</div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for a in assessments %}
+                                        {% if a.potential_rating == 3 and a.performance_rating >= 4 %}
+                                        <a href="{% url 'talent:assessment_detail' a.pk %}" class="badge bg-soft-primary text-primary text-decoration-none">{{ a.employee }}</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 3: Low Potential (2,1) -->
+                        <tr>
+                            <!-- Low Potential / Low Performance -->
+                            <td class="align-top p-2" style="background-color: rgba(220, 53, 69, 0.12); height: 180px;">
+                                <div class="fw-semibold text-danger mb-2" style="font-size: 13px;">Underperformer</div>
+                                <div class="text-muted mb-2" style="font-size: 11px;">Low Potential / Low Performance</div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for a in assessments %}
+                                        {% if a.potential_rating <= 2 and a.performance_rating <= 2 %}
+                                        <a href="{% url 'talent:assessment_detail' a.pk %}" class="badge bg-soft-danger text-danger text-decoration-none">{{ a.employee }}</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <!-- Low Potential / Meets Expectations -->
+                            <td class="align-top p-2" style="background-color: rgba(255, 193, 7, 0.05); height: 180px;">
+                                <div class="fw-semibold text-warning mb-2" style="font-size: 13px;">Risk of Stagnation</div>
+                                <div class="text-muted mb-2" style="font-size: 11px;">Low Potential / Meets Expectations</div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for a in assessments %}
+                                        {% if a.potential_rating <= 2 and a.performance_rating == 3 %}
+                                        <a href="{% url 'talent:assessment_detail' a.pk %}" class="badge bg-soft-warning text-warning text-decoration-none">{{ a.employee }}</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <!-- Low Potential / High Performance -->
+                            <td class="align-top p-2" style="background-color: rgba(13, 202, 240, 0.05); height: 180px;">
+                                <div class="fw-semibold text-info mb-2" style="font-size: 13px;">Solid Performer</div>
+                                <div class="text-muted mb-2" style="font-size: 11px;">Low Potential / High Performance</div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for a in assessments %}
+                                        {% if a.potential_rating <= 2 and a.performance_rating >= 4 %}
+                                        <a href="{% url 'talent:assessment_detail' a.pk %}" class="badge bg-soft-info text-info text-decoration-none">{{ a.employee }}</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- X-axis labels -->
+                <div class="d-flex mt-2">
+                    <div class="text-center" style="width: 33.33%;">
+                        <span class="text-muted fw-medium" style="font-size: 12px;">Low Performance (1-2)</span>
+                    </div>
+                    <div class="text-center" style="width: 33.33%;">
+                        <span class="text-muted fw-medium" style="font-size: 12px;">Meets Expectations (3)</span>
+                    </div>
+                    <div class="text-center" style="width: 33.33%;">
+                        <span class="text-muted fw-medium" style="font-size: 12px;">High Performance (4-5)</span>
+                    </div>
+                </div>
+                <div class="text-center mt-1">
+                    <span class="fw-bold text-muted" style="font-size: 14px; letter-spacing: 2px;">PERFORMANCE</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
