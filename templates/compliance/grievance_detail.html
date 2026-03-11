@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% load compliance_tags %}
+
+{% block title %}Grievance Detail{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>Grievance Detail</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item">Compliance & Legal</li>
+                    <li class="breadcrumb-item">Grievance Handling</li>
+                    <li class="breadcrumb-item"><a href="{% url 'compliance:grievance_list' %}">Grievances</a></li>
+                    <li class="breadcrumb-item active">Detail</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'compliance:grievance_edit' grievance.pk %}" class="btn btn-soft-warning">
+                <i class="ri-pencil-line me-1"></i> Edit
+            </a>
+            <form method="post" action="{% url 'compliance:grievance_delete' grievance.pk %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-soft-danger" onclick="return confirm('Are you sure you want to delete this grievance?')">
+                    <i class="ri-delete-bin-line me-1"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Header Card -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+            <div>
+                <h5 class="mb-1">{{ grievance.subject }}</h5>
+                <span class="badge bg-soft-{{ grievance.priority|grievance_priority_color }} text-{{ grievance.priority|grievance_priority_color }} me-1">{{ grievance.get_priority_display }}</span>
+                <span class="badge bg-soft-{{ grievance.status|grievance_status_color }} text-{{ grievance.status|grievance_status_color }}">{{ grievance.get_status_display }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info Cards -->
+<div class="row">
+    <!-- Grievance Details -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Grievance Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Employee</small>
+                    <div class="fw-medium">
+                        {% if grievance.is_anonymous %}
+                        <span class="text-muted fst-italic">Anonymous</span>
+                        {% else %}
+                        {{ grievance.employee|default:"-" }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Date</small>
+                    <div class="fw-medium">{% if grievance.date %}{{ grievance.date|date:"M d, Y" }}{% else %}-{% endif %}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Category</small>
+                    <div class="fw-medium">{{ grievance.get_category_display|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Subject</small>
+                    <div class="fw-medium">{{ grievance.subject|default:"-" }}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Priority</small>
+                    <div>
+                        <span class="badge bg-soft-{{ grievance.priority|grievance_priority_color }} text-{{ grievance.priority|grievance_priority_color }}">{{ grievance.get_priority_display }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignment & Resolution -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Assignment & Resolution</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        <span class="badge bg-soft-{{ grievance.status|grievance_status_color }} text-{{ grievance.status|grievance_status_color }}">{{ grievance.get_status_display }}</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Assigned To</small>
+                    <div class="fw-medium">{{ grievance.assigned_to|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Resolution Date</small>
+                    <div class="fw-medium">{% if grievance.resolution_date %}{{ grievance.resolution_date|date:"M d, Y" }}{% else %}-{% endif %}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Created</small>
+                    <div class="fw-medium">{{ grievance.created_at|date:"M d, Y" }}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Updated</small>
+                    <div class="fw-medium">{{ grievance.updated_at|date:"M d, Y" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Description -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Description</h5>
+    </div>
+    <div class="card-body">
+        {% if grievance.description %}
+        {{ grievance.description|linebreaks }}
+        {% else %}
+        <span class="text-muted">No description provided.</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Resolution Summary -->
+{% if grievance.resolution_summary %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Resolution Summary</h5>
+    </div>
+    <div class="card-body">
+        {{ grievance.resolution_summary|linebreaks }}
+    </div>
+</div>
+{% endif %}
+
+<!-- Investigations -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Investigations</h5>
+        <a href="{% url 'compliance:investigation_create' grievance.pk %}" class="btn btn-sm btn-primary">
+            <i class="ri-add-line me-1"></i> Add Investigation
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Investigator</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for investigation in investigations %}
+                    <tr>
+                        <td class="fw-medium">{{ investigation.investigator|default:"-" }}</td>
+                        <td>{% if investigation.start_date %}{{ investigation.start_date|date:"M d, Y" }}{% else %}-{% endif %}</td>
+                        <td>{% if investigation.end_date %}{{ investigation.end_date|date:"M d, Y" }}{% else %}-{% endif %}</td>
+                        <td>
+                            <span class="badge bg-soft-{{ investigation.status|investigation_status_color }} text-{{ investigation.status|investigation_status_color }}">{{ investigation.get_status_display }}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'compliance:investigation_edit' investigation.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                    <i class="ri-pencil-line"></i>
+                                </a>
+                                <form method="post" action="{% url 'compliance:investigation_delete' investigation.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this investigation?')">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            No investigations found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
