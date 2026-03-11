@@ -21,7 +21,7 @@
             <span class="badge bg-soft-{{ position.criticality|criticality_color }} text-{{ position.criticality|criticality_color }} fs-6 align-self-center">
                 {{ position.get_criticality_display }}
             </span>
-            <span class="badge bg-soft-{{ position.status|status_color }} text-{{ position.status|status_color }} fs-6 align-self-center">
+            <span class="badge bg-soft-{{ position.status|critical_position_status_color }} text-{{ position.status|critical_position_status_color }} fs-6 align-self-center">
                 {{ position.get_status_display }}
             </span>
             <a href="{% url 'talent:critical_position_edit' position.pk %}" class="btn btn-soft-warning">
