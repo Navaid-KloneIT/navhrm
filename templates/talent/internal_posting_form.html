@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load talent_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Talent Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'talent:internal_posting_list' %}">Internal Mobility</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Card 1: Posting Details -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Posting Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Title -->
+                <div class="col-md-6">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="{{ form.title.id_for_label }}" name="{{ form.title.html_name }}" value="{{ form.title.value|default_if_none:'' }}">
+                    {% if form.title.errors %}<div class="invalid-feedback">{{ form.title.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Department -->
+                <div class="col-md-6">
+                    <label for="{{ form.department.id_for_label }}" class="form-label">Department <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.department.errors %}is-invalid{% endif %}" id="{{ form.department.id_for_label }}" name="{{ form.department.html_name }}">
+                        <option value="">-- Select Department --</option>
+                        {% for choice in form.department.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.department.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice.name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.department.errors %}<div class="invalid-feedback">{{ form.department.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Designation -->
+                <div class="col-md-4">
+                    <label for="{{ form.designation.id_for_label }}" class="form-label">Designation <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.designation.errors %}is-invalid{% endif %}" id="{{ form.designation.id_for_label }}" name="{{ form.designation.html_name }}">
+                        <option value="">-- Select Designation --</option>
+                        {% for choice in form.designation.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.designation.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice.name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.designation.errors %}<div class="invalid-feedback">{{ form.designation.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Positions -->
+                <div class="col-md-2">
+                    <label for="{{ form.positions.id_for_label }}" class="form-label">Positions <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control {% if form.positions.errors %}is-invalid{% endif %}" id="{{ form.positions.id_for_label }}" name="{{ form.positions.html_name }}" value="{{ form.positions.value|default_if_none:'1' }}" min="1">
+                    {% if form.positions.errors %}<div class="invalid-feedback">{{ form.positions.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-3">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                    <select class="form-select {% if form.status.errors %}is-invalid{% endif %}" id="{{ form.status.id_for_label }}" name="{{ form.status.html_name }}">
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Posted By -->
+                <div class="col-md-3">
+                    <label for="{{ form.posted_by.id_for_label }}" class="form-label">Posted By</label>
+                    <select class="form-select {% if form.posted_by.errors %}is-invalid{% endif %}" id="{{ form.posted_by.id_for_label }}" name="{{ form.posted_by.html_name }}">
+                        <option value="">-- Select --</option>
+                        {% for choice in form.posted_by.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.posted_by.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.posted_by.errors %}<div class="invalid-feedback">{{ form.posted_by.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Closing Date -->
+                <div class="col-md-4">
+                    <label for="{{ form.closing_date.id_for_label }}" class="form-label">Closing Date</label>
+                    <input type="date" class="form-control {% if form.closing_date.errors %}is-invalid{% endif %}" id="{{ form.closing_date.id_for_label }}" name="{{ form.closing_date.html_name }}" value="{{ form.closing_date.value|default_if_none:'' }}">
+                    {% if form.closing_date.errors %}<div class="invalid-feedback">{{ form.closing_date.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2: Description -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Description</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Description -->
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="4">{{ form.description.value|default_if_none:'' }}</textarea>
+                    {% if form.description.errors %}<div class="invalid-feedback">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Requirements -->
+                <div class="col-12">
+                    <label for="{{ form.requirements.id_for_label }}" class="form-label">Requirements</label>
+                    <textarea class="form-control {% if form.requirements.errors %}is-invalid{% endif %}" id="{{ form.requirements.id_for_label }}" name="{{ form.requirements.html_name }}" rows="4">{{ form.requirements.value|default_if_none:'' }}</textarea>
+                    {% if form.requirements.errors %}<div class="invalid-feedback">{{ form.requirements.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Posting
+        </button>
+        <a href="{% url 'talent:internal_posting_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
