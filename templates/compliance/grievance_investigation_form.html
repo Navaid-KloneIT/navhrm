@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compliance & Legal</li>
+            <li class="breadcrumb-item">Grievance Handling</li>
+            <li class="breadcrumb-item"><a href="{% url 'compliance:grievance_detail' grievance.pk %}">{{ grievance.subject }}</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Investigation Details Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Investigation Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Investigator -->
+                <div class="col-md-6">
+                    <label for="{{ form.investigator.id_for_label }}" class="form-label">Investigator</label>
+                    <select name="{{ form.investigator.html_name }}"
+                            id="{{ form.investigator.id_for_label }}"
+                            class="form-select {% if form.investigator.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for choice in form.investigator.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.investigator.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.investigator.errors %}<div class="invalid-feedback">{{ form.investigator.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">
+                        Status <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.status.html_name }}"
+                            id="{{ form.status.id_for_label }}"
+                            class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Start Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.start_date.id_for_label }}" class="form-label">
+                        Start Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           name="{{ form.start_date.html_name }}"
+                           id="{{ form.start_date.id_for_label }}"
+                           class="form-control {% if form.start_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.start_date.value|default_if_none:'' }}">
+                    {% if form.start_date.errors %}<div class="invalid-feedback">{{ form.start_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- End Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date</label>
+                    <input type="date"
+                           name="{{ form.end_date.html_name }}"
+                           id="{{ form.end_date.id_for_label }}"
+                           class="form-control {% if form.end_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.end_date.value|default_if_none:'' }}">
+                    {% if form.end_date.errors %}<div class="invalid-feedback">{{ form.end_date.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Findings Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Findings</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Findings -->
+                <div class="col-12">
+                    <label for="{{ form.findings.id_for_label }}" class="form-label">Findings</label>
+                    <textarea name="{{ form.findings.html_name }}"
+                              id="{{ form.findings.id_for_label }}"
+                              class="form-control {% if form.findings.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Enter investigation findings">{{ form.findings.value|default_if_none:'' }}</textarea>
+                    {% if form.findings.errors %}<div class="invalid-feedback">{{ form.findings.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Evidence -->
+                <div class="col-12">
+                    <label for="{{ form.evidence.id_for_label }}" class="form-label">Evidence</label>
+                    <textarea name="{{ form.evidence.html_name }}"
+                              id="{{ form.evidence.id_for_label }}"
+                              class="form-control {% if form.evidence.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Enter evidence details">{{ form.evidence.value|default_if_none:'' }}</textarea>
+                    {% if form.evidence.errors %}<div class="invalid-feedback">{{ form.evidence.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Recommendation -->
+                <div class="col-12">
+                    <label for="{{ form.recommendation.id_for_label }}" class="form-label">Recommendation</label>
+                    <textarea name="{{ form.recommendation.html_name }}"
+                              id="{{ form.recommendation.id_for_label }}"
+                              class="form-control {% if form.recommendation.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Enter recommendation">{{ form.recommendation.value|default_if_none:'' }}</textarea>
+                    {% if form.recommendation.errors %}<div class="invalid-feedback">{{ form.recommendation.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Investigation
+        </button>
+        <a href="{% url 'compliance:grievance_detail' grievance.pk %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
