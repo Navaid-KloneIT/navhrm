@@ -153,7 +153,7 @@
                         </td>
                         <td>
                             <div class="d-flex gap-1">
-                                <a href="{% url 'talent:review_participant_calibrate' participant.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Calibrate">
+                                <a href="{% url 'talent:review_participant_edit' participant.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Calibrate">
                                     <i class="ri-pencil-line"></i>
                                 </a>
                                 <form method="post" action="{% url 'talent:review_participant_delete' participant.pk %}" class="d-inline">
