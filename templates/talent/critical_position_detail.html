@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load talent_tags %}
+
+{% block title %}Critical Position - {{ position.designation }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>{{ position.designation }}</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item">Talent Management</li>
+                    <li class="breadcrumb-item"><a href="{% url 'talent:critical_position_list' %}">Critical Positions</a></li>
+                    <li class="breadcrumb-item active">{{ position.designation }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="badge bg-soft-{{ position.criticality|criticality_color }} text-{{ position.criticality|criticality_color }} fs-6 align-self-center">
+                {{ position.get_criticality_display }}
+            </span>
+            <span class="badge bg-soft-{{ position.status|status_color }} text-{{ position.status|status_color }} fs-6 align-self-center">
+                {{ position.get_status_display }}
+            </span>
+            <a href="{% url 'talent:critical_position_edit' position.pk %}" class="btn btn-soft-warning">
+                <i class="ri-pencil-line me-1"></i> Edit
+            </a>
+            <form method="post" action="{% url 'talent:critical_position_delete' position.pk %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-soft-danger" onclick="return confirm('Are you sure you want to delete this critical position?')">
+                    <i class="ri-delete-bin-line me-1"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Position Info -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Position Info</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <small class="text-muted">Designation</small>
+                        <div class="fw-medium">{{ position.designation }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Department</small>
+                        <div class="fw-medium">{{ position.department }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Criticality</small>
+                        <div>
+                            <span class="badge bg-soft-{{ position.criticality|criticality_color }} text-{{ position.criticality|criticality_color }}">
+                                {{ position.get_criticality_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">Incumbent</small>
+                        <div class="fw-medium">{{ position.incumbent|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-8">
+                        <small class="text-muted">Reason</small>
+                        <div>{{ position.reason|linebreaksbr|default:"-" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Successors -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Successors</h5>
+                <a href="{% url 'talent:successor_create' position.pk %}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> Add Successor
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Readiness</th>
+                                <th>Status</th>
+                                <th>Development Needs</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for successor in successors %}
+                            <tr>
+                                <td class="fw-medium">{{ successor.employee }}</td>
+                                <td>
+                                    <span class="badge bg-soft-{{ successor.readiness|readiness_color }} text-{{ successor.readiness|readiness_color }}">
+                                        {{ successor.get_readiness_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-{{ successor.status|successor_status_color }} text-{{ successor.status|successor_status_color }}">
+                                        {{ successor.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ successor.development_needs|truncatewords:10|default:"-" }}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'talent:successor_edit' successor.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'talent:successor_delete' successor.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to remove this successor?')">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    No successors have been identified yet.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
