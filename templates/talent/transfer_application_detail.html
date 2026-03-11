@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load talent_tags %}
+
+{% block title %}Transfer Application - {{ application.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div>
+        <h4>{{ application.employee }} - {{ application.posting.title }}</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item">Talent Management</li>
+                <li class="breadcrumb-item"><a href="{% url 'talent:transfer_application_list' %}">Internal Mobility</a></li>
+                <li class="breadcrumb-item active">Transfer Application</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+        <span class="badge bg-soft-{{ application.status|transfer_status_color }} text-{{ application.status|transfer_status_color }}">{{ application.get_status_display }}</span>
+        <a href="{% url 'talent:transfer_application_edit' application.pk %}" class="btn btn-warning">
+            <i class="ri-pencil-line me-1"></i> Edit
+        </a>
+    </div>
+</div>
+
+<!-- Card 1: Application Info -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Application Info</h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p class="mb-1 text-muted">Employee</p>
+                <p class="fw-medium">{{ application.employee }}</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1 text-muted">Posting</p>
+                <p class="fw-medium">
+                    <a href="{% url 'talent:internal_posting_detail' application.posting.pk %}">{{ application.posting.title }}</a>
+                </p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1 text-muted">Current Department</p>
+                <p class="fw-medium">{{ application.current_department|default:"-" }}</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1 text-muted">Current Designation</p>
+                <p class="fw-medium">{{ application.current_designation|default:"-" }}</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1 text-muted">Reason</p>
+                <p class="fw-medium">{{ application.reason|default:"-"|linebreaks }}</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1 text-muted">Status</p>
+                <p class="fw-medium">
+                    <span class="badge bg-soft-{{ application.status|transfer_status_color }} text-{{ application.status|transfer_status_color }}">{{ application.get_status_display }}</span>
+                </p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1 text-muted">Applied On</p>
+                <p class="fw-medium">{{ application.created_at|date:"M d, Y" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Card 2: Review Info -->
+{% if application.reviewed_by %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Review Info</h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p class="mb-1 text-muted">Reviewed By</p>
+                <p class="fw-medium">{{ application.reviewed_by }}</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1 text-muted">Review Notes</p>
+                <p class="fw-medium">{{ application.review_notes|default:"-"|linebreaks }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
