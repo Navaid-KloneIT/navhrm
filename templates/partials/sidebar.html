@@ -1167,6 +1167,124 @@
                 </ul>
             </li>
 
+            <li class="menu-title" data-toggle="menu-section">Talent Management <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Talent Pool -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'talent' and 'assessment' in request.resolver_match.url_name or request.resolver_match.app_name == 'talent' and 'nine_box' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-user-star-line"></i>
+                    <span class="menu-text">Talent Pool</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'talent' and 'assessment' in request.resolver_match.url_name or request.resolver_match.app_name == 'talent' and 'nine_box' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'talent:assessment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'assessment_list' %}active{% endif %}">
+                            <span class="menu-text">Assessments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'talent:nine_box_grid' %}" class="menu-link {% if request.resolver_match.url_name == 'nine_box_grid' %}active{% endif %}">
+                            <span class="menu-text">9-Box Grid</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Succession Planning -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'talent' and 'critical_position' in request.resolver_match.url_name or request.resolver_match.app_name == 'talent' and 'successor' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-flow-chart"></i>
+                    <span class="menu-text">Succession</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'talent' and 'critical_position' in request.resolver_match.url_name or request.resolver_match.app_name == 'talent' and 'successor' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'talent:critical_position_list' %}" class="menu-link {% if request.resolver_match.url_name == 'critical_position_list' %}active{% endif %}">
+                            <span class="menu-text">Critical Positions</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Career Pathing -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'talent' and 'career_path' in request.resolver_match.url_name or request.resolver_match.app_name == 'talent' and 'career_plan' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-route-line"></i>
+                    <span class="menu-text">Career Pathing</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'talent' and 'career_path' in request.resolver_match.url_name or request.resolver_match.app_name == 'talent' and 'career_plan' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'talent:career_path_list' %}" class="menu-link {% if request.resolver_match.url_name == 'career_path_list' %}active{% endif %}">
+                            <span class="menu-text">Career Paths</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'talent:career_plan_list' %}" class="menu-link {% if request.resolver_match.url_name == 'career_plan_list' %}active{% endif %}">
+                            <span class="menu-text">Employee Plans</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Internal Mobility -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'talent' and 'internal_posting' in request.resolver_match.url_name or request.resolver_match.app_name == 'talent' and 'transfer' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-swap-box-line"></i>
+                    <span class="menu-text">Internal Mobility</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'talent' and 'internal_posting' in request.resolver_match.url_name or request.resolver_match.app_name == 'talent' and 'transfer' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'talent:internal_posting_list' %}" class="menu-link {% if request.resolver_match.url_name == 'internal_posting_list' %}active{% endif %}">
+                            <span class="menu-text">Job Postings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'talent:transfer_application_list' %}" class="menu-link {% if request.resolver_match.url_name == 'transfer_application_list' %}active{% endif %}">
+                            <span class="menu-text">Transfer Applications</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Talent Reviews -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'talent' and 'review_session' in request.resolver_match.url_name or request.resolver_match.app_name == 'talent' and 'review_participant' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-group-line"></i>
+                    <span class="menu-text">Talent Reviews</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'talent' and 'review_session' in request.resolver_match.url_name or request.resolver_match.app_name == 'talent' and 'review_participant' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'talent:review_session_list' %}" class="menu-link {% if request.resolver_match.url_name == 'review_session_list' %}active{% endif %}">
+                            <span class="menu-text">Review Sessions</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Retention Strategies -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'talent' and 'flight_risk' in request.resolver_match.url_name or request.resolver_match.app_name == 'talent' and 'retention' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-shield-check-line"></i>
+                    <span class="menu-text">Retention</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'talent' and 'flight_risk' in request.resolver_match.url_name or request.resolver_match.app_name == 'talent' and 'retention' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'talent:flight_risk_list' %}" class="menu-link {% if request.resolver_match.url_name == 'flight_risk_list' %}active{% endif %}">
+                            <span class="menu-text">Flight Risk</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'talent:retention_plan_list' %}" class="menu-link {% if request.resolver_match.url_name == 'retention_plan_list' %}active{% endif %}">
+                            <span class="menu-text">Retention Plans</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="menu-title" data-toggle="menu-section">Admin & Settings <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
 
             <!-- User Management -->
