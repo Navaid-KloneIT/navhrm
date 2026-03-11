@@ -53,6 +53,15 @@ def successor_status_color(status):
 
 
 @register.filter
+def critical_position_status_color(status):
+    colors = {
+        'active': 'success',
+        'inactive': 'secondary',
+    }
+    return colors.get(status, 'secondary')
+
+
+@register.filter
 def career_path_status_color(status):
     colors = {
         'active': 'success',
