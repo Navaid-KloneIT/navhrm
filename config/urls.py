@@ -23,6 +23,7 @@ urlpatterns = [
     path('additional/', include('apps.additional.urls')),
     path('compensation/', include('apps.compensation.urls')),
     path('talent/', include('apps.talent.urls')),
+    path('compliance/', include('apps.compliance.urls')),
 ]
 
 if settings.DEBUG:
