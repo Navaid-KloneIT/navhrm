@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load talent_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Talent Management</li>
+            <li class="breadcrumb-item">Retention Strategies</li>
+            <li class="breadcrumb-item"><a href="{% url 'talent:flight_risk_list' %}">Flight Risk Assessments</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Assessment Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Assessment Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.employee.errors %}is-invalid{% endif %}" id="{{ form.employee.id_for_label }}" name="{{ form.employee.html_name }}">
+                        <option value="">-- Select Employee --</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback d-block">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Risk Level -->
+                <div class="col-md-6">
+                    <label for="{{ form.risk_level.id_for_label }}" class="form-label">Risk Level <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.risk_level.errors %}is-invalid{% endif %}" id="{{ form.risk_level.id_for_label }}" name="{{ form.risk_level.html_name }}">
+                        <option value="">-- Select Risk Level --</option>
+                        {% for value, label in form.risk_level.field.choices %}
+                        {% if value %}
+                        <option value="{{ value }}" {% if form.risk_level.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.risk_level.errors %}<div class="invalid-feedback d-block">{{ form.risk_level.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Assessed Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.assessed_date.id_for_label }}" class="form-label">Assessed Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.assessed_date.errors %}is-invalid{% endif %}" id="{{ form.assessed_date.id_for_label }}" name="{{ form.assessed_date.html_name }}" value="{{ form.assessed_date.value|default_if_none:'' }}">
+                    {% if form.assessed_date.errors %}<div class="invalid-feedback d-block">{{ form.assessed_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Assessed By -->
+                <div class="col-md-6">
+                    <label for="{{ form.assessed_by.id_for_label }}" class="form-label">Assessed By</label>
+                    <select class="form-select {% if form.assessed_by.errors %}is-invalid{% endif %}" id="{{ form.assessed_by.id_for_label }}" name="{{ form.assessed_by.html_name }}">
+                        <option value="">-- Select Assessor --</option>
+                        {% for choice in form.assessed_by.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.assessed_by.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.assessed_by.errors %}<div class="invalid-feedback d-block">{{ form.assessed_by.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Is Active -->
+                <div class="col-md-6">
+                    <div class="form-check mt-4">
+                        <input type="checkbox" class="form-check-input {% if form.is_active.errors %}is-invalid{% endif %}" id="{{ form.is_active.id_for_label }}" name="{{ form.is_active.html_name }}" {% if form.is_active.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Active</label>
+                        {% if form.is_active.errors %}<div class="invalid-feedback d-block">{{ form.is_active.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Analysis -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Risk Analysis</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Risk Factors -->
+                <div class="col-12">
+                    <label for="{{ form.risk_factors.id_for_label }}" class="form-label">Risk Factors</label>
+                    <textarea class="form-control {% if form.risk_factors.errors %}is-invalid{% endif %}" id="{{ form.risk_factors.id_for_label }}" name="{{ form.risk_factors.html_name }}" rows="3" placeholder="Describe the risk factors...">{{ form.risk_factors.value|default_if_none:'' }}</textarea>
+                    {% if form.risk_factors.errors %}<div class="invalid-feedback d-block">{{ form.risk_factors.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Impact If Lost -->
+                <div class="col-12">
+                    <label for="{{ form.impact_if_lost.id_for_label }}" class="form-label">Impact If Lost</label>
+                    <textarea class="form-control {% if form.impact_if_lost.errors %}is-invalid{% endif %}" id="{{ form.impact_if_lost.id_for_label }}" name="{{ form.impact_if_lost.html_name }}" rows="3" placeholder="Describe the impact if this employee is lost...">{{ form.impact_if_lost.value|default_if_none:'' }}</textarea>
+                    {% if form.impact_if_lost.errors %}<div class="invalid-feedback d-block">{{ form.impact_if_lost.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Notes -->
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                    <textarea class="form-control {% if form.notes.errors %}is-invalid{% endif %}" id="{{ form.notes.id_for_label }}" name="{{ form.notes.html_name }}" rows="3" placeholder="Additional notes...">{{ form.notes.value|default_if_none:'' }}</textarea>
+                    {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Assessment
+        </button>
+        <a href="{% url 'talent:flight_risk_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
