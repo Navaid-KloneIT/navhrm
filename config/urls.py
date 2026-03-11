@@ -22,6 +22,7 @@ urlpatterns = [
     path('administration/', include('apps.administration.urls')),
     path('additional/', include('apps.additional.urls')),
     path('compensation/', include('apps.compensation.urls')),
+    path('talent/', include('apps.talent.urls')),
 ]
 
 if settings.DEBUG:
