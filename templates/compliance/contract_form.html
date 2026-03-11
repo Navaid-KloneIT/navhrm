@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compliance & Legal</li>
+            <li class="breadcrumb-item">Contract Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'compliance:contract_list' %}">Contracts</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Contract Info Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Contract Info</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">
+                        Employee <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.employee.html_name }}"
+                            id="{{ form.employee.id_for_label }}"
+                            class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Contract Type -->
+                <div class="col-md-6">
+                    <label for="{{ form.contract_type.id_for_label }}" class="form-label">
+                        Contract Type <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.contract_type.html_name }}"
+                            id="{{ form.contract_type.id_for_label }}"
+                            class="form-select {% if form.contract_type.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for value, label in form.contract_type.field.choices %}
+                        <option value="{{ value }}" {% if form.contract_type.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.contract_type.errors %}<div class="invalid-feedback">{{ form.contract_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Contract Number -->
+                <div class="col-md-4">
+                    <label for="{{ form.contract_number.id_for_label }}" class="form-label">Contract Number</label>
+                    <input type="text"
+                           name="{{ form.contract_number.html_name }}"
+                           id="{{ form.contract_number.id_for_label }}"
+                           class="form-control {% if form.contract_number.errors %}is-invalid{% endif %}"
+                           value="{{ form.contract_number.value|default_if_none:'' }}"
+                           placeholder="Enter contract number">
+                    {% if form.contract_number.errors %}<div class="invalid-feedback">{{ form.contract_number.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Start Date -->
+                <div class="col-md-4">
+                    <label for="{{ form.start_date.id_for_label }}" class="form-label">
+                        Start Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           name="{{ form.start_date.html_name }}"
+                           id="{{ form.start_date.id_for_label }}"
+                           class="form-control {% if form.start_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.start_date.value|default_if_none:'' }}">
+                    {% if form.start_date.errors %}<div class="invalid-feedback">{{ form.start_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- End Date -->
+                <div class="col-md-4">
+                    <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date</label>
+                    <input type="date"
+                           name="{{ form.end_date.html_name }}"
+                           id="{{ form.end_date.id_for_label }}"
+                           class="form-control {% if form.end_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.end_date.value|default_if_none:'' }}">
+                    {% if form.end_date.errors %}<div class="invalid-feedback">{{ form.end_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-4">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">
+                        Status <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.status.html_name }}"
+                            id="{{ form.status.id_for_label }}"
+                            class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms & Conditions Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Terms & Conditions</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Terms -->
+                <div class="col-12">
+                    <label for="{{ form.terms.id_for_label }}" class="form-label">Terms</label>
+                    <textarea name="{{ form.terms.html_name }}"
+                              id="{{ form.terms.id_for_label }}"
+                              class="form-control {% if form.terms.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Enter contract terms">{{ form.terms.value|default_if_none:'' }}</textarea>
+                    {% if form.terms.errors %}<div class="invalid-feedback">{{ form.terms.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Salary Details -->
+                <div class="col-12">
+                    <label for="{{ form.salary_details.id_for_label }}" class="form-label">Salary Details</label>
+                    <textarea name="{{ form.salary_details.html_name }}"
+                              id="{{ form.salary_details.id_for_label }}"
+                              class="form-control {% if form.salary_details.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Enter salary details">{{ form.salary_details.value|default_if_none:'' }}</textarea>
+                    {% if form.salary_details.errors %}<div class="invalid-feedback">{{ form.salary_details.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Probation Period Months -->
+                <div class="col-md-6">
+                    <label for="{{ form.probation_period_months.id_for_label }}" class="form-label">Probation Period (Months)</label>
+                    <input type="number"
+                           name="{{ form.probation_period_months.html_name }}"
+                           id="{{ form.probation_period_months.id_for_label }}"
+                           class="form-control {% if form.probation_period_months.errors %}is-invalid{% endif %}"
+                           value="{{ form.probation_period_months.value|default_if_none:'' }}"
+                           min="0">
+                    {% if form.probation_period_months.errors %}<div class="invalid-feedback">{{ form.probation_period_months.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Notice Period Days -->
+                <div class="col-md-6">
+                    <label for="{{ form.notice_period_days.id_for_label }}" class="form-label">Notice Period (Days)</label>
+                    <input type="number"
+                           name="{{ form.notice_period_days.html_name }}"
+                           id="{{ form.notice_period_days.id_for_label }}"
+                           class="form-control {% if form.notice_period_days.errors %}is-invalid{% endif %}"
+                           value="{{ form.notice_period_days.value|default_if_none:'' }}"
+                           min="0">
+                    {% if form.notice_period_days.errors %}<div class="invalid-feedback">{{ form.notice_period_days.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signing Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Signing</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Signed Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.signed_date.id_for_label }}" class="form-label">Signed Date</label>
+                    <input type="date"
+                           name="{{ form.signed_date.html_name }}"
+                           id="{{ form.signed_date.id_for_label }}"
+                           class="form-control {% if form.signed_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.signed_date.value|default_if_none:'' }}">
+                    {% if form.signed_date.errors %}<div class="invalid-feedback">{{ form.signed_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Signed By -->
+                <div class="col-md-6">
+                    <label for="{{ form.signed_by.id_for_label }}" class="form-label">Signed By</label>
+                    <select name="{{ form.signed_by.html_name }}"
+                            id="{{ form.signed_by.id_for_label }}"
+                            class="form-select {% if form.signed_by.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for choice in form.signed_by.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.signed_by.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.signed_by.errors %}<div class="invalid-feedback">{{ form.signed_by.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Notes -->
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                    <textarea name="{{ form.notes.html_name }}"
+                              id="{{ form.notes.id_for_label }}"
+                              class="form-control {% if form.notes.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Additional notes">{{ form.notes.value|default_if_none:'' }}</textarea>
+                    {% if form.notes.errors %}<div class="invalid-feedback">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Contract
+        </button>
+        <a href="{% url 'compliance:contract_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
