@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compliance & Legal</li>
+            <li class="breadcrumb-item">Grievance Handling</li>
+            <li class="breadcrumb-item"><a href="{% url 'compliance:grievance_list' %}">Grievances</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Grievance Details Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Grievance Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">
+                        Employee <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.employee.html_name }}"
+                            id="{{ form.employee.id_for_label }}"
+                            class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Grievance Date -->
+                <div class="col-md-3">
+                    <label for="{{ form.grievance_date.id_for_label }}" class="form-label">
+                        Grievance Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           name="{{ form.grievance_date.html_name }}"
+                           id="{{ form.grievance_date.id_for_label }}"
+                           class="form-control {% if form.grievance_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.grievance_date.value|default_if_none:'' }}">
+                    {% if form.grievance_date.errors %}<div class="invalid-feedback">{{ form.grievance_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Category -->
+                <div class="col-md-3">
+                    <label for="{{ form.category.id_for_label }}" class="form-label">
+                        Category <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.category.html_name }}"
+                            id="{{ form.category.id_for_label }}"
+                            class="form-select {% if form.category.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for value, label in form.category.field.choices %}
+                        <option value="{{ value }}" {% if form.category.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.category.errors %}<div class="invalid-feedback">{{ form.category.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Subject -->
+                <div class="col-md-6">
+                    <label for="{{ form.subject.id_for_label }}" class="form-label">
+                        Subject <span class="text-danger">*</span>
+                    </label>
+                    <input type="text"
+                           name="{{ form.subject.html_name }}"
+                           id="{{ form.subject.id_for_label }}"
+                           class="form-control {% if form.subject.errors %}is-invalid{% endif %}"
+                           value="{{ form.subject.value|default_if_none:'' }}"
+                           placeholder="Enter grievance subject">
+                    {% if form.subject.errors %}<div class="invalid-feedback">{{ form.subject.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Priority -->
+                <div class="col-md-3">
+                    <label for="{{ form.priority.id_for_label }}" class="form-label">
+                        Priority <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.priority.html_name }}"
+                            id="{{ form.priority.id_for_label }}"
+                            class="form-select {% if form.priority.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for value, label in form.priority.field.choices %}
+                        <option value="{{ value }}" {% if form.priority.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.priority.errors %}<div class="invalid-feedback">{{ form.priority.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-3">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">
+                        Status <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.status.html_name }}"
+                            id="{{ form.status.id_for_label }}"
+                            class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Assigned To -->
+                <div class="col-md-6">
+                    <label for="{{ form.assigned_to.id_for_label }}" class="form-label">Assigned To</label>
+                    <select name="{{ form.assigned_to.html_name }}"
+                            id="{{ form.assigned_to.id_for_label }}"
+                            class="form-select {% if form.assigned_to.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for choice in form.assigned_to.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.assigned_to.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.assigned_to.errors %}<div class="invalid-feedback">{{ form.assigned_to.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Is Anonymous -->
+                <div class="col-md-6">
+                    <label class="form-label d-block">&nbsp;</label>
+                    <div class="form-check">
+                        <input type="checkbox"
+                               name="{{ form.is_anonymous.html_name }}"
+                               id="{{ form.is_anonymous.id_for_label }}"
+                               class="form-check-input {% if form.is_anonymous.errors %}is-invalid{% endif %}"
+                               {% if form.is_anonymous.value %}checked{% endif %}>
+                        <label for="{{ form.is_anonymous.id_for_label }}" class="form-check-label">Anonymous Grievance</label>
+                    </div>
+                    {% if form.is_anonymous.errors %}<div class="invalid-feedback">{{ form.is_anonymous.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Description</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Description -->
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">
+                        Description <span class="text-danger">*</span>
+                    </label>
+                    <textarea name="{{ form.description.html_name }}"
+                              id="{{ form.description.id_for_label }}"
+                              class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Describe the grievance in detail">{{ form.description.value|default_if_none:'' }}</textarea>
+                    {% if form.description.errors %}<div class="invalid-feedback">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolution Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Resolution</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Resolution Date -->
+                <div class="col-md-4">
+                    <label for="{{ form.resolution_date.id_for_label }}" class="form-label">Resolution Date</label>
+                    <input type="date"
+                           name="{{ form.resolution_date.html_name }}"
+                           id="{{ form.resolution_date.id_for_label }}"
+                           class="form-control {% if form.resolution_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.resolution_date.value|default_if_none:'' }}">
+                    {% if form.resolution_date.errors %}<div class="invalid-feedback">{{ form.resolution_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Resolution Summary -->
+                <div class="col-12">
+                    <label for="{{ form.resolution_summary.id_for_label }}" class="form-label">Resolution Summary</label>
+                    <textarea name="{{ form.resolution_summary.html_name }}"
+                              id="{{ form.resolution_summary.id_for_label }}"
+                              class="form-control {% if form.resolution_summary.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Enter resolution summary">{{ form.resolution_summary.value|default_if_none:'' }}</textarea>
+                    {% if form.resolution_summary.errors %}<div class="invalid-feedback">{{ form.resolution_summary.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Grievance
+        </button>
+        <a href="{% url 'compliance:grievance_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
