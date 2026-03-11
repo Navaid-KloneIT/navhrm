@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% load compliance_tags %}
+
+{% block title %}Policy Detail{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>Policy Detail</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item">Compliance & Legal</li>
+                    <li class="breadcrumb-item">Policy Management</li>
+                    <li class="breadcrumb-item"><a href="{% url 'compliance:policy_list' %}">Policies</a></li>
+                    <li class="breadcrumb-item active">Detail</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'compliance:policy_edit' policy.pk %}" class="btn btn-soft-warning">
+                <i class="ri-pencil-line me-1"></i> Edit
+            </a>
+            <form method="post" action="{% url 'compliance:policy_delete' policy.pk %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-soft-danger" onclick="return confirm('Are you sure you want to delete this policy?')">
+                    <i class="ri-delete-bin-line me-1"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Header Card -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+            <div>
+                <h5 class="mb-1">{{ policy.title }}</h5>
+                <span class="badge bg-soft-secondary text-secondary me-1">v{{ policy.version }}</span>
+                <span class="badge bg-soft-{{ policy.status|policy_status_color }} text-{{ policy.status|policy_status_color }}">{{ policy.get_status_display }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info Cards -->
+<div class="row">
+    <!-- Policy Details -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Policy Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Title</small>
+                    <div class="fw-medium">{{ policy.title|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Category</small>
+                    <div class="fw-medium">{{ policy.get_category_display|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Version</small>
+                    <div class="fw-medium">{{ policy.version|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Department</small>
+                    <div class="fw-medium">{{ policy.department|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Effective Date</small>
+                    <div class="fw-medium">{% if policy.effective_date %}{{ policy.effective_date|date:"M d, Y" }}{% else %}-{% endif %}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Expiry Date</small>
+                    <div class="fw-medium">{% if policy.expiry_date %}{{ policy.expiry_date|date:"M d, Y" }}{% else %}-{% endif %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status & Approval -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Status & Approval</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        <span class="badge bg-soft-{{ policy.status|policy_status_color }} text-{{ policy.status|policy_status_color }}">{{ policy.get_status_display }}</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Approved By</small>
+                    <div class="fw-medium">{{ policy.approved_by|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Created</small>
+                    <div class="fw-medium">{{ policy.created_at|date:"M d, Y" }}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Updated</small>
+                    <div class="fw-medium">{{ policy.updated_at|date:"M d, Y" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Description -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Description</h5>
+    </div>
+    <div class="card-body">
+        {% if policy.description %}
+        {{ policy.description|linebreaks }}
+        {% else %}
+        <span class="text-muted">No description provided.</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Content -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Content</h5>
+    </div>
+    <div class="card-body">
+        {% if policy.content %}
+        {{ policy.content|linebreaks }}
+        {% else %}
+        <span class="text-muted">No content provided.</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Version History -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Version History</h5>
+        <a href="{% url 'compliance:policy_version_create' policy.pk %}" class="btn btn-sm btn-primary">
+            <i class="ri-add-line me-1"></i> Add Version
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Version #</th>
+                        <th>Changes Summary</th>
+                        <th>Effective Date</th>
+                        <th>Created By</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for version in versions %}
+                    <tr>
+                        <td class="fw-medium">{{ version.version_number|default:"-" }}</td>
+                        <td>{{ version.changes_summary|default:"-"|truncatewords:15 }}</td>
+                        <td>{% if version.effective_date %}{{ version.effective_date|date:"M d, Y" }}{% else %}-{% endif %}</td>
+                        <td>{{ version.created_by|default:"-" }}</td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <form method="post" action="{% url 'compliance:policy_version_delete' version.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this version?')">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            No version history found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Acknowledgments -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Acknowledgments</h5>
+        <a href="{% url 'compliance:policy_acknowledgment_create' policy.pk %}" class="btn btn-sm btn-primary">
+            <i class="ri-add-line me-1"></i> Add Acknowledgment
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Acknowledged</th>
+                        <th>Date</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ack in acknowledgments %}
+                    <tr>
+                        <td class="fw-medium">{{ ack.employee|default:"-" }}</td>
+                        <td>
+                            {% if ack.acknowledged %}
+                            <span class="badge bg-soft-success text-success">Yes</span>
+                            {% else %}
+                            <span class="badge bg-soft-danger text-danger">No</span>
+                            {% endif %}
+                        </td>
+                        <td>{% if ack.acknowledged_date %}{{ ack.acknowledged_date|date:"M d, Y" }}{% else %}-{% endif %}</td>
+                        <td>{{ ack.notes|default:"-"|truncatewords:15 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">
+                            No acknowledgments found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
