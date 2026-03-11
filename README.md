@@ -94,6 +94,14 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Compensation Planning** - Compensation plans (merit/promotion/market adjustment/annual review) with budget tracking and utilization, employee recommendations with current/recommended salary and increase percentage, approval workflow
 - **Rewards & Recognition** - Reward programs (spot award/service award/peer recognition/performance bonus/team award) with budget tracking, employee recognitions with nominee/nominator, approval workflow (nominated → approved → awarded)
 
+### Talent Management & Succession Planning Module
+- **Talent Pool** - High-potential employee identification, talent assessments with performance/potential ratings (1-5), auto-calculated 9-box grid categories, interactive 9-box grid visualization
+- **Succession Planning** - Critical role mapping with criticality levels (critical/high/medium/low), successor identification with readiness timelines (ready now/1-2 years/3-5 years), development needs tracking
+- **Career Pathing** - Role progression maps with sequenced designation steps, skill and competency requirements per step, employee career plans linking to paths with current/target step tracking
+- **Internal Mobility** - Internal job postings with status workflow (open/closed/on_hold), transfer applications with review process (applied → shortlisted → selected/rejected)
+- **Talent Reviews** - Calibration sessions with review periods, participant management with initial and calibrated performance/potential ratings, development recommendations
+- **Retention Strategies** - Flight risk analysis with risk levels (critical/high/medium/low), retention action plans with responsible person tracking, action items with assignment and status tracking
+
 ### Recruitment Module
 - **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
 - **Job Templates** - Pre-defined job description templates for quick requisition creation
@@ -181,6 +189,7 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
    python manage.py seed_administration
    python manage.py seed_additional
    python manage.py seed_compensation
+   python manage.py seed_talent
    ```
 
 8. **Run the development server**
@@ -225,7 +234,8 @@ navhrm/
 │   ├── reports/           # Reports & analytics (no models, read-only views)
 │   ├── administration/    # Admin & settings, roles, workflows, audit
 │   ├── additional/        # Asset, expense, travel management & helpdesk
-│   └── compensation/      # Compensation & benefits, salary benchmarking, ESOP
+│   ├── compensation/      # Compensation & benefits, salary benchmarking, ESOP
+│   └── talent/            # Talent management, succession planning, career pathing
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS
@@ -249,7 +259,8 @@ navhrm/
 │   ├── reports/           # Reports & analytics templates (20 files)
 │   ├── administration/    # Admin & settings templates (33 files)
 │   ├── additional/        # Additional modules templates (31 files)
-│   └── compensation/      # Compensation & benefits templates (31 files)
+│   ├── compensation/      # Compensation & benefits templates (31 files)
+│   └── talent/            # Talent management templates (32 files)
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
