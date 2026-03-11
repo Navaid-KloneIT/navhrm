@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load talent_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Talent Management</li>
+            <li class="breadcrumb-item"><a href="{% url 'talent:career_plan_list' %}">Career Plans</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Plan Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Plan Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.employee.errors %}is-invalid{% endif %}" id="{{ form.employee.id_for_label }}" name="{{ form.employee.html_name }}">
+                        <option value="">-- Select Employee --</option>
+                        {% for value, label in form.employee.field.choices %}
+                        <option value="{{ value }}" {% if form.employee.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.employee.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.career_path.id_for_label }}" class="form-label">Career Path <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.career_path.errors %}is-invalid{% endif %}" id="{{ form.career_path.id_for_label }}" name="{{ form.career_path.html_name }}">
+                        <option value="">-- Select Career Path --</option>
+                        {% for value, label in form.career_path.field.choices %}
+                        <option value="{{ value }}" {% if form.career_path.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.career_path.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.current_step.id_for_label }}" class="form-label">Current Step</label>
+                    <select class="form-select {% if form.current_step.errors %}is-invalid{% endif %}" id="{{ form.current_step.id_for_label }}" name="{{ form.current_step.html_name }}">
+                        <option value="">-- Select Current Step --</option>
+                        {% for value, label in form.current_step.field.choices %}
+                        <option value="{{ value }}" {% if form.current_step.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.current_step.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.target_step.id_for_label }}" class="form-label">Target Step</label>
+                    <select class="form-select {% if form.target_step.errors %}is-invalid{% endif %}" id="{{ form.target_step.id_for_label }}" name="{{ form.target_step.html_name }}">
+                        <option value="">-- Select Target Step --</option>
+                        {% for value, label in form.target_step.field.choices %}
+                        <option value="{{ value }}" {% if form.target_step.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.target_step.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.target_date.id_for_label }}" class="form-label">Target Date</label>
+                    <input type="date" class="form-control {% if form.target_date.errors %}is-invalid{% endif %}" id="{{ form.target_date.id_for_label }}" name="{{ form.target_date.html_name }}" value="{{ form.target_date.value|default_if_none:'' }}">
+                    {% for error in form.target_date.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.status.errors %}is-invalid{% endif %}" id="{{ form.status.id_for_label }}" name="{{ form.status.html_name }}">
+                        <option value="">-- Select Status --</option>
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.status.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Notes</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                    <textarea class="form-control {% if form.notes.errors %}is-invalid{% endif %}" id="{{ form.notes.id_for_label }}" name="{{ form.notes.html_name }}" rows="4" placeholder="Add any additional notes about this career plan...">{{ form.notes.value|default_if_none:'' }}</textarea>
+                    {% for error in form.notes.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Career Plan
+        </button>
+        <a href="{% url 'talent:career_plan_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
