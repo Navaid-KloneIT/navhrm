@@ -102,7 +102,7 @@
                                 <td>{{ pos.incumbent|default:"-" }}</td>
                                 <td>{{ pos.successors_count }}</td>
                                 <td>
-                                    <span class="badge bg-soft-{{ pos.status|status_color }} text-{{ pos.status|status_color }}">
+                                    <span class="badge bg-soft-{{ pos.status|critical_position_status_color }} text-{{ pos.status|critical_position_status_color }}">
                                         {{ pos.get_status_display }}
                                     </span>
                                 </td>
