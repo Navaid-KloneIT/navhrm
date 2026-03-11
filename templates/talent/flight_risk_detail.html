@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load talent_tags %}
+
+{% block title %}{{ assessment.employee }} - Flight Risk{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div>
+        <h4>{{ assessment.employee }}</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item">Talent Management</li>
+                <li class="breadcrumb-item">Retention Strategies</li>
+                <li class="breadcrumb-item"><a href="{% url 'talent:flight_risk_list' %}">Flight Risk Assessments</a></li>
+                <li class="breadcrumb-item active">{{ assessment.employee }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'talent:flight_risk_edit' assessment.pk %}" class="btn btn-warning">
+            <i class="ri-pencil-line me-1"></i> Edit
+        </a>
+        <form method="post" action="{% url 'talent:flight_risk_delete' assessment.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this assessment?')">
+                <i class="ri-delete-bin-line me-1"></i> Delete
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Header Card -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex align-items-center">
+            <div>
+                <h5 class="mb-1">{{ assessment.employee }}</h5>
+                <span class="badge bg-soft-{{ assessment.risk_level|flight_risk_color }} text-{{ assessment.risk_level|flight_risk_color }} me-1">{{ assessment.get_risk_level_display }}</span>
+                {% if assessment.is_active %}
+                <span class="badge bg-soft-success text-success">Active</span>
+                {% else %}
+                <span class="badge bg-soft-secondary text-secondary">Inactive</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info Cards -->
+<div class="row">
+    <!-- Assessment Info -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Assessment Info</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Employee</small>
+                    <div class="fw-medium">{{ assessment.employee }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Risk Level</small>
+                    <div>
+                        <span class="badge bg-soft-{{ assessment.risk_level|flight_risk_color }} text-{{ assessment.risk_level|flight_risk_color }}">{{ assessment.get_risk_level_display }}</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Assessed Date</small>
+                    <div class="fw-medium">{{ assessment.assessed_date|date:"M d, Y" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Assessed By</small>
+                    <div class="fw-medium">{{ assessment.assessed_by|default:"-" }}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        {% if assessment.is_active %}
+                        <span class="badge bg-soft-success text-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-soft-secondary text-secondary">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Analysis -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Risk Analysis</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Risk Factors</small>
+                    <div class="fw-medium">{{ assessment.risk_factors|default:"-"|linebreaksbr }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Impact If Lost</small>
+                    <div class="fw-medium">{{ assessment.impact_if_lost|default:"-"|linebreaksbr }}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Notes</small>
+                    <div class="fw-medium">{{ assessment.notes|default:"-"|linebreaksbr }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Linked Retention Plans -->
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Linked Retention Plans</h5>
+                <a href="{% url 'talent:retention_plan_create' %}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> New Plan
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Responsible Person</th>
+                                <th>Target Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for plan in retention_plans %}
+                            <tr>
+                                <td class="fw-medium">
+                                    <a href="{% url 'talent:retention_plan_detail' plan.pk %}">{{ plan.title }}</a>
+                                </td>
+                                <td>{{ plan.responsible_person|default:"-" }}</td>
+                                <td>{{ plan.target_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-soft-{{ plan.status|retention_plan_status_color }} text-{{ plan.status|retention_plan_status_color }}">{{ plan.get_status_display }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'talent:retention_plan_detail' plan.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="View">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                        <a href="{% url 'talent:retention_plan_edit' plan.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <p class="mb-0">No retention plans linked to this assessment.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
