@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Compliance & Legal</li>
+            <li class="breadcrumb-item">Statutory Registers</li>
+            <li class="breadcrumb-item"><a href="{% url 'compliance:inspection_list' %}">Inspections</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Inspection Info Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Inspection Info</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Inspection Date -->
+                <div class="col-md-4">
+                    <label for="{{ form.inspection_date.id_for_label }}" class="form-label">
+                        Inspection Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date"
+                           name="{{ form.inspection_date.html_name }}"
+                           id="{{ form.inspection_date.id_for_label }}"
+                           class="form-control {% if form.inspection_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.inspection_date.value|default_if_none:'' }}">
+                    {% if form.inspection_date.errors %}<div class="invalid-feedback">{{ form.inspection_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Inspector Name -->
+                <div class="col-md-4">
+                    <label for="{{ form.inspector_name.id_for_label }}" class="form-label">
+                        Inspector Name <span class="text-danger">*</span>
+                    </label>
+                    <input type="text"
+                           name="{{ form.inspector_name.html_name }}"
+                           id="{{ form.inspector_name.id_for_label }}"
+                           class="form-control {% if form.inspector_name.errors %}is-invalid{% endif %}"
+                           value="{{ form.inspector_name.value|default_if_none:'' }}"
+                           placeholder="Enter inspector name">
+                    {% if form.inspector_name.errors %}<div class="invalid-feedback">{{ form.inspector_name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Inspector Designation -->
+                <div class="col-md-4">
+                    <label for="{{ form.inspector_designation.id_for_label }}" class="form-label">Inspector Designation</label>
+                    <input type="text"
+                           name="{{ form.inspector_designation.html_name }}"
+                           id="{{ form.inspector_designation.id_for_label }}"
+                           class="form-control {% if form.inspector_designation.errors %}is-invalid{% endif %}"
+                           value="{{ form.inspector_designation.value|default_if_none:'' }}"
+                           placeholder="Enter designation">
+                    {% if form.inspector_designation.errors %}<div class="invalid-feedback">{{ form.inspector_designation.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Inspection Type -->
+                <div class="col-md-4">
+                    <label for="{{ form.inspection_type.id_for_label }}" class="form-label">
+                        Inspection Type <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.inspection_type.html_name }}"
+                            id="{{ form.inspection_type.id_for_label }}"
+                            class="form-select {% if form.inspection_type.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for value, label in form.inspection_type.field.choices %}
+                        <option value="{{ value }}" {% if form.inspection_type.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.inspection_type.errors %}<div class="invalid-feedback">{{ form.inspection_type.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Department -->
+                <div class="col-md-4">
+                    <label for="{{ form.department.id_for_label }}" class="form-label">Department</label>
+                    <select name="{{ form.department.html_name }}"
+                            id="{{ form.department.id_for_label }}"
+                            class="form-select {% if form.department.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for choice in form.department.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.department.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.department.errors %}<div class="invalid-feedback">{{ form.department.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Compliance Status -->
+                <div class="col-md-4">
+                    <label for="{{ form.compliance_status.id_for_label }}" class="form-label">
+                        Compliance Status <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.compliance_status.html_name }}"
+                            id="{{ form.compliance_status.id_for_label }}"
+                            class="form-select {% if form.compliance_status.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for value, label in form.compliance_status.field.choices %}
+                        <option value="{{ value }}" {% if form.compliance_status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.compliance_status.errors %}<div class="invalid-feedback">{{ form.compliance_status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-4">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">
+                        Status <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.status.html_name }}"
+                            id="{{ form.status.id_for_label }}"
+                            class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                        <option value="">Select...</option>
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Follow Up Date -->
+                <div class="col-md-4">
+                    <label for="{{ form.follow_up_date.id_for_label }}" class="form-label">Follow Up Date</label>
+                    <input type="date"
+                           name="{{ form.follow_up_date.html_name }}"
+                           id="{{ form.follow_up_date.id_for_label }}"
+                           class="form-control {% if form.follow_up_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.follow_up_date.value|default_if_none:'' }}">
+                    {% if form.follow_up_date.errors %}<div class="invalid-feedback">{{ form.follow_up_date.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Areas Inspected -->
+                <div class="col-12">
+                    <label for="{{ form.areas_inspected.id_for_label }}" class="form-label">Areas Inspected</label>
+                    <textarea name="{{ form.areas_inspected.html_name }}"
+                              id="{{ form.areas_inspected.id_for_label }}"
+                              class="form-control {% if form.areas_inspected.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Enter areas inspected">{{ form.areas_inspected.value|default_if_none:'' }}</textarea>
+                    {% if form.areas_inspected.errors %}<div class="invalid-feedback">{{ form.areas_inspected.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Findings -->
+                <div class="col-12">
+                    <label for="{{ form.findings.id_for_label }}" class="form-label">Findings</label>
+                    <textarea name="{{ form.findings.html_name }}"
+                              id="{{ form.findings.id_for_label }}"
+                              class="form-control {% if form.findings.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Enter inspection findings">{{ form.findings.value|default_if_none:'' }}</textarea>
+                    {% if form.findings.errors %}<div class="invalid-feedback">{{ form.findings.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Recommendations -->
+                <div class="col-12">
+                    <label for="{{ form.recommendations.id_for_label }}" class="form-label">Recommendations</label>
+                    <textarea name="{{ form.recommendations.html_name }}"
+                              id="{{ form.recommendations.id_for_label }}"
+                              class="form-control {% if form.recommendations.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Enter recommendations">{{ form.recommendations.value|default_if_none:'' }}</textarea>
+                    {% if form.recommendations.errors %}<div class="invalid-feedback">{{ form.recommendations.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Notes -->
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                    <textarea name="{{ form.notes.html_name }}"
+                              id="{{ form.notes.id_for_label }}"
+                              class="form-control {% if form.notes.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Additional notes">{{ form.notes.value|default_if_none:'' }}</textarea>
+                    {% if form.notes.errors %}<div class="invalid-feedback">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Inspection Report
+        </button>
+        <a href="{% url 'compliance:inspection_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
