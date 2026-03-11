@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'apps.administration',
     'apps.additional',
     'apps.compensation',
+    'apps.talent',
 ]
 
 MIDDLEWARE = [
