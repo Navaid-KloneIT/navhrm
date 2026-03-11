@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% load compliance_tags %}
+
+{% block title %}Labor Law Detail{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4>Labor Law Detail</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item">Compliance & Legal</li>
+                    <li class="breadcrumb-item">Labor Law Compliance</li>
+                    <li class="breadcrumb-item"><a href="{% url 'compliance:labor_law_list' %}">Labor Laws</a></li>
+                    <li class="breadcrumb-item active">Detail</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'compliance:labor_law_edit' law.pk %}" class="btn btn-soft-warning">
+                <i class="ri-pencil-line me-1"></i> Edit
+            </a>
+            <form method="post" action="{% url 'compliance:labor_law_delete' law.pk %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-soft-danger" onclick="return confirm('Are you sure you want to delete this labor law?')">
+                    <i class="ri-delete-bin-line me-1"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Header Card -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+            <div>
+                <h5 class="mb-1">{{ law.name }}</h5>
+                <span class="badge bg-soft-{{ law.status|labor_law_status_color }} text-{{ law.status|labor_law_status_color }}">{{ law.get_status_display }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info Cards -->
+<div class="row">
+    <!-- Law Details -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Law Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Name</small>
+                    <div class="fw-medium">{{ law.name|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Jurisdiction</small>
+                    <div class="fw-medium">{{ law.jurisdiction|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Category</small>
+                    <div>
+                        {% if law.category %}
+                        <span class="badge bg-soft-info text-info">{{ law.get_category_display }}</span>
+                        {% else %}-{% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Effective Date</small>
+                    <div class="fw-medium">{% if law.effective_date %}{{ law.effective_date|date:"M d, Y" }}{% else %}-{% endif %}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Expiry Date</small>
+                    <div class="fw-medium">{% if law.expiry_date %}{{ law.expiry_date|date:"M d, Y" }}{% else %}-{% endif %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metadata -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Metadata</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        <span class="badge bg-soft-{{ law.status|labor_law_status_color }} text-{{ law.status|labor_law_status_color }}">{{ law.get_status_display }}</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Reference URL</small>
+                    <div class="fw-medium">
+                        {% if law.reference_url %}
+                        <a href="{{ law.reference_url }}" target="_blank">{{ law.reference_url }}</a>
+                        {% else %}-{% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Created</small>
+                    <div class="fw-medium">{{ law.created_at|date:"M d, Y" }}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Updated</small>
+                    <div class="fw-medium">{{ law.updated_at|date:"M d, Y" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Description -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Description</h5>
+    </div>
+    <div class="card-body">
+        {% if law.description %}
+        {{ law.description|linebreaks }}
+        {% else %}
+        <span class="text-muted">No description provided.</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Compliance Requirements -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Compliance Requirements</h5>
+    </div>
+    <div class="card-body">
+        {% if law.compliance_requirements %}
+        {{ law.compliance_requirements|linebreaks }}
+        {% else %}
+        <span class="text-muted">No compliance requirements specified.</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Penalties -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Penalties</h5>
+    </div>
+    <div class="card-body">
+        {% if law.penalties %}
+        {{ law.penalties|linebreaks }}
+        {% else %}
+        <span class="text-muted">No penalties specified.</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Compliance Records -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Compliance Records</h5>
+        <a href="{% url 'compliance:law_compliance_create' law.pk %}" class="btn btn-sm btn-primary">
+            <i class="ri-add-line me-1"></i> Add Compliance Record
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Review Date</th>
+                        <th>Next Review</th>
+                        <th>Responsible Person</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in compliance_records %}
+                    <tr>
+                        <td class="fw-medium">{{ record.department|default:"-" }}</td>
+                        <td>
+                            <span class="badge bg-soft-{{ record.status|compliance_status_color }} text-{{ record.status|compliance_status_color }}">{{ record.get_status_display }}</span>
+                        </td>
+                        <td>{% if record.review_date %}{{ record.review_date|date:"M d, Y" }}{% else %}-{% endif %}</td>
+                        <td>{% if record.next_review %}{{ record.next_review|date:"M d, Y" }}{% else %}-{% endif %}</td>
+                        <td>{{ record.responsible_person|default:"-" }}</td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'compliance:law_compliance_edit' record.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                    <i class="ri-pencil-line"></i>
+                                </a>
+                                <form method="post" action="{% url 'compliance:law_compliance_delete' record.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this compliance record?')">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            No compliance records found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
