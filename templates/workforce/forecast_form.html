@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load workforce_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Workforce Planning</li>
+            <li class="breadcrumb-item"><a href="{% url 'workforce:forecast_list' %}">Demand Forecasts</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Forecast Details -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Forecast Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.department.id_for_label }}" class="form-label">
+                                Department <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.department.html_name }}"
+                                    id="{{ form.department.id_for_label }}"
+                                    class="form-select {% if form.department.errors %}is-invalid{% endif %}">
+                                <option value="">Select Department</option>
+                                {% for value, label in form.department.field.choices %}
+                                    {% if value %}
+                                    <option value="{{ value }}" {% if form.department.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            {% for error in form.department.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.designation.id_for_label }}" class="form-label">
+                                Designation <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.designation.html_name }}"
+                                    id="{{ form.designation.id_for_label }}"
+                                    class="form-select {% if form.designation.errors %}is-invalid{% endif %}">
+                                <option value="">Select Designation</option>
+                                {% for value, label in form.designation.field.choices %}
+                                    {% if value %}
+                                    <option value="{{ value }}" {% if form.designation.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            {% for error in form.designation.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.fiscal_year.id_for_label }}" class="form-label">
+                                Fiscal Year <span class="text-danger">*</span>
+                            </label>
+                            {{ form.fiscal_year }}
+                            {% for error in form.fiscal_year.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.current_headcount.id_for_label }}" class="form-label">
+                                Current Headcount <span class="text-danger">*</span>
+                            </label>
+                            {{ form.current_headcount }}
+                            {% for error in form.current_headcount.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.projected_headcount.id_for_label }}" class="form-label">
+                                Projected Headcount <span class="text-danger">*</span>
+                            </label>
+                            {{ form.projected_headcount }}
+                            {% for error in form.projected_headcount.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.growth_rate.id_for_label }}" class="form-label">
+                                Growth Rate (%)
+                            </label>
+                            {{ form.growth_rate }}
+                            {% for error in form.growth_rate.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Additional Info</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="{{ form.justification.id_for_label }}" class="form-label">
+                                Justification
+                            </label>
+                            <textarea name="{{ form.justification.html_name }}"
+                                      id="{{ form.justification.id_for_label }}"
+                                      class="form-control {% if form.justification.errors %}is-invalid{% endif %}"
+                                      rows="4"
+                                      placeholder="Provide justification for the forecast...">{{ form.justification.value|default:'' }}</textarea>
+                            {% for error in form.justification.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">
+                                Status <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.status.html_name }}"
+                                    id="{{ form.status.id_for_label }}"
+                                    class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                                <option value="">Select Status</option>
+                                {% for value, label in form.status.field.choices %}
+                                    {% if value %}
+                                    <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            {% for error in form.status.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.priority.id_for_label }}" class="form-label">
+                                Priority <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.priority.html_name }}"
+                                    id="{{ form.priority.id_for_label }}"
+                                    class="form-select {% if form.priority.errors %}is-invalid{% endif %}">
+                                <option value="">Select Priority</option>
+                                {% for value, label in form.priority.field.choices %}
+                                    {% if value %}
+                                    <option value="{{ value }}" {% if form.priority.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            {% for error in form.priority.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Save Forecast
+                </button>
+                <a href="{% url 'workforce:forecast_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
