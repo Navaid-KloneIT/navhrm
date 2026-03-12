@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load workforce_tags %}
+
+{% block title %}Salary Forecast - {{ forecast.department }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0">Salary Forecast - {{ forecast.department }}</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="#">Workforce Planning</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'workforce:salary_forecast_list' %}">Salary Forecasts</a></li>
+                        <li class="breadcrumb-item active">{{ forecast.department }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column: Forecast Details -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Forecast Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <small class="text-muted">Department</small>
+                            <div class="fw-medium">{{ forecast.department }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Designation</small>
+                            <div class="fw-medium">{{ forecast.designation }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Fiscal Year</small>
+                            <div class="fw-medium">{{ forecast.fiscal_year }}</div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <small class="text-muted">Headcount</small>
+                            <div class="fw-medium">{{ forecast.headcount }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">Current Avg Salary</small>
+                            <div class="fw-medium">{{ forecast.current_avg_salary|floatformat:2 }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">Projected Avg Salary</small>
+                            <div class="fw-medium">{{ forecast.projected_avg_salary|floatformat:2 }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">Increment %</small>
+                            <div class="fw-medium">{{ forecast.increment_percentage|floatformat:2 }}%</div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <small class="text-muted">Effective Date</small>
+                            <div class="fw-medium">{{ forecast.effective_date|date:"M d, Y" }}</div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Cost Summary -->
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="border rounded p-3 text-center">
+                                <small class="text-muted d-block mb-1">Total Current Cost</small>
+                                <h4 class="mb-0 text-primary">{{ forecast.total_current_cost|floatformat:2 }}</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border rounded p-3 text-center">
+                                <small class="text-muted d-block mb-1">Total Projected Cost</small>
+                                <h4 class="mb-0 text-warning">{{ forecast.total_projected_cost|floatformat:2 }}</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border rounded p-3 text-center">
+                                <small class="text-muted d-block mb-1">Cost Impact</small>
+                                <h4 class="mb-0 text-success">{{ forecast.cost_impact|floatformat:2 }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes Card -->
+            {% if forecast.notes %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Notes</h5>
+                </div>
+                <div class="card-body">
+                    <div>{{ forecast.notes|linebreaksbr }}</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column: Actions -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'workforce:salary_forecast_edit' forecast.pk %}" class="btn btn-soft-warning">
+                            <i class="ri-pencil-line me-1"></i> Edit Forecast
+                        </a>
+                        <a href="{% url 'workforce:salary_forecast_delete' forecast.pk %}" class="btn btn-soft-danger">
+                            <i class="ri-delete-bin-line me-1"></i> Delete Forecast
+                        </a>
+                        <a href="{% url 'workforce:salary_forecast_list' %}" class="btn btn-light">
+                            <i class="ri-arrow-left-line me-1"></i> Back to Salary Forecasts
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
