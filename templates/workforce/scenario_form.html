@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load workforce_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0">{{ title }}</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="#">Workforce Planning</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'workforce:scenario_list' %}">Scenarios</a></li>
+                        <li class="breadcrumb-item active">{{ title }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-12 mb-3">
+                <a href="{% url 'workforce:scenario_list' %}" class="btn btn-sm btn-secondary">
+                    <i class="ri-arrow-left-line me-1"></i> Back to Scenarios
+                </a>
+            </div>
+        </div>
+
+        <!-- Scenario Details -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="ri-git-branch-line me-1"></i> Scenario Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="id_name" class="form-label">Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control {% if form.name.errors %}is-invalid{% endif %}" id="id_name" name="name" value="{{ form.name.value|default_if_none:'' }}" required>
+                                {% for error in form.name.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_scenario_type" class="form-label">Scenario Type <span class="text-danger">*</span></label>
+                                <select class="form-select {% if form.scenario_type.errors %}is-invalid{% endif %}" id="id_scenario_type" name="scenario_type" required>
+                                    <option value="">Select Type</option>
+                                    {% for value, label in form.scenario_type.field.choices %}
+                                        {% if value %}
+                                            <option value="{{ value }}" {% if form.scenario_type.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                {% for error in form.scenario_type.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_base_year" class="form-label">Base Year <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control {% if form.base_year.errors %}is-invalid{% endif %}" id="id_base_year" name="base_year" value="{{ form.base_year.value|default_if_none:'' }}" required>
+                                {% for error in form.base_year.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_projection_year" class="form-label">Projection Year <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control {% if form.projection_year.errors %}is-invalid{% endif %}" id="id_projection_year" name="projection_year" value="{{ form.projection_year.value|default_if_none:'' }}" required>
+                                {% for error in form.projection_year.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_status" class="form-label">Status <span class="text-danger">*</span></label>
+                                <select class="form-select {% if form.status.errors %}is-invalid{% endif %}" id="id_status" name="status" required>
+                                    <option value="">Select Status</option>
+                                    {% for value, label in form.status.field.choices %}
+                                        {% if value %}
+                                            <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                {% for error in form.status.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_created_by" class="form-label">Created By</label>
+                                <select class="form-select {% if form.created_by.errors %}is-invalid{% endif %}" id="id_created_by" name="created_by">
+                                    <option value="">Select User</option>
+                                    {% for value, label in form.created_by.field.choices %}
+                                        {% if value %}
+                                            <option value="{{ value }}" {% if form.created_by.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                {% for error in form.created_by.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description & Assumptions -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="ri-file-text-line me-1"></i> Description & Assumptions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="id_description" class="form-label">Description</label>
+                                <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" id="id_description" name="description" rows="4">{{ form.description.value|default_if_none:'' }}</textarea>
+                                {% for error in form.description.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-12">
+                                <label for="id_assumptions" class="form-label">Assumptions</label>
+                                <textarea class="form-control {% if form.assumptions.errors %}is-invalid{% endif %}" id="id_assumptions" name="assumptions" rows="4">{{ form.assumptions.value|default_if_none:'' }}</textarea>
+                                {% for error in form.assumptions.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-12">
+                                <label for="id_impact_summary" class="form-label">Impact Summary</label>
+                                <textarea class="form-control {% if form.impact_summary.errors %}is-invalid{% endif %}" id="id_impact_summary" name="impact_summary" rows="4">{{ form.impact_summary.value|default_if_none:'' }}</textarea>
+                                {% for error in form.impact_summary.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex gap-2 justify-content-end mb-4">
+                    <a href="{% url 'workforce:scenario_list' %}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary"><i class="ri-save-line me-1"></i> Save Scenario</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
