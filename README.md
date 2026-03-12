@@ -102,6 +102,14 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Talent Reviews** - Calibration sessions with review periods, participant management with initial and calibrated performance/potential ratings, development recommendations
 - **Retention Strategies** - Flight risk analysis with risk levels (critical/high/medium/low), retention action plans with responsible person tracking, action items with assignment and status tracking
 
+### Workforce Planning Module
+- **Demand Forecasting** - Headcount planning based on business growth, department/designation-level projections, fiscal year tracking, growth rate calculation, status workflow (draft/submitted/approved/rejected), priority levels (low/medium/high/critical)
+- **Supply Analysis** - Skills inventory with employee skill tracking, proficiency levels (beginner/intermediate/advanced/expert), certification tracking with expiry dates; talent availability analysis with department-level counts (available/on-notice/retiring/transfer-ready)
+- **Gap Analysis** - Current vs. future workforce needs comparison, auto-computed gap type (surplus/deficit/balanced), skills gap descriptions, action plans, priority-based tracking
+- **Budget Planning** - Hiring budget management with allocated/utilized tracking, position budgeting, utilization percentage; salary forecasting with current vs. projected salary analysis, increment percentages, cost impact calculations
+- **Scenario Planning** - What-if analysis with scenario types (growth/restructuring/downsizing/merger/expansion), base/projection year tracking, assumptions documentation, per-department scenario details with headcount and cost impact projections
+- **Workforce Analytics** - Productivity metrics with target vs. actual tracking, achievement percentages, variance analysis; utilization rates with total/productive/billable/non-billable hours tracking
+
 ### Recruitment Module
 - **Job Requisitions** - Create job posts, status workflow (draft → approved → published → closed), priority levels, budget tracking
 - **Job Templates** - Pre-defined job description templates for quick requisition creation
@@ -190,6 +198,7 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
    python manage.py seed_additional
    python manage.py seed_compensation
    python manage.py seed_talent
+   python manage.py seed_workforce
    ```
 
 8. **Run the development server**
@@ -235,7 +244,8 @@ navhrm/
 │   ├── administration/    # Admin & settings, roles, workflows, audit
 │   ├── additional/        # Asset, expense, travel management & helpdesk
 │   ├── compensation/      # Compensation & benefits, salary benchmarking, ESOP
-│   └── talent/            # Talent management, succession planning, career pathing
+│   ├── talent/            # Talent management, succession planning, career pathing
+│   └── workforce/         # Workforce planning, demand forecasting, gap analysis
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
 │   ├── css/style.css      # Custom theme CSS
@@ -260,7 +270,8 @@ navhrm/
 │   ├── administration/    # Admin & settings templates (33 files)
 │   ├── additional/        # Additional modules templates (31 files)
 │   ├── compensation/      # Compensation & benefits templates (31 files)
-│   └── talent/            # Talent management templates (32 files)
+│   ├── talent/            # Talent management templates (32 files)
+│   └── workforce/         # Workforce planning templates (28 files)
 ├── media/                 # User uploads
 ├── manage.py
 └── requirements.txt
