@@ -1529,6 +1529,125 @@
                 </ul>
             </li>
 
+            <!-- ============================================== -->
+            <!-- WORKFORCE PLANNING MODULE -->
+            <!-- ============================================== -->
+
+            <li class="menu-title" data-toggle="menu-section">
+                Workforce Planning <i class="ri-arrow-down-s-line menu-title-arrow"></i>
+            </li>
+
+            <!-- Demand Forecasting -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'workforce' and 'forecast' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-line-chart-line"></i>
+                    <span class="menu-text">Demand Forecasting</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'workforce' and 'forecast' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'workforce:forecast_list' %}" class="menu-link {% if request.resolver_match.url_name == 'forecast_list' or request.resolver_match.url_name == 'forecast_detail' %}active{% endif %}">
+                            <span class="menu-text">Forecasts</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Supply Analysis -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'workforce' and 'skill' in request.resolver_match.url_name or request.resolver_match.app_name == 'workforce' and 'availability' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-user-search-line"></i>
+                    <span class="menu-text">Supply Analysis</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'workforce' and 'skill' in request.resolver_match.url_name or request.resolver_match.app_name == 'workforce' and 'availability' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'workforce:skill_list' %}" class="menu-link {% if 'skill' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Skills Inventory</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'workforce:availability_list' %}" class="menu-link {% if 'availability' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Talent Availability</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Gap Analysis -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'workforce' and 'gap' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-contrast-2-line"></i>
+                    <span class="menu-text">Gap Analysis</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'workforce' and 'gap' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'workforce:gap_list' %}" class="menu-link {% if 'gap' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Workforce Gaps</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Budget Planning -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'workforce' and 'hiring_budget' in request.resolver_match.url_name or request.resolver_match.app_name == 'workforce' and 'salary_forecast' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-money-dollar-circle-line"></i>
+                    <span class="menu-text">Budget Planning</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'workforce' and 'hiring_budget' in request.resolver_match.url_name or request.resolver_match.app_name == 'workforce' and 'salary_forecast' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'workforce:hiring_budget_list' %}" class="menu-link {% if 'hiring_budget' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Hiring Budgets</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'workforce:salary_forecast_list' %}" class="menu-link {% if 'salary_forecast' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Salary Forecasts</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Scenario Planning -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'workforce' and 'scenario' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-git-branch-line"></i>
+                    <span class="menu-text">Scenario Planning</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'workforce' and 'scenario' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'workforce:scenario_list' %}" class="menu-link {% if 'scenario' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Scenarios</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Workforce Analytics -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'workforce' and 'productivity' in request.resolver_match.url_name or request.resolver_match.app_name == 'workforce' and 'utilization' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-bar-chart-box-line"></i>
+                    <span class="menu-text">Workforce Analytics</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'workforce' and 'productivity' in request.resolver_match.url_name or request.resolver_match.app_name == 'workforce' and 'utilization' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'workforce:productivity_list' %}" class="menu-link {% if 'productivity' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Productivity Metrics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'workforce:utilization_list' %}" class="menu-link {% if 'utilization' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Utilization Rates</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- Settings / Profile -->
             <li class="nav-item">
                 <a href="{% url 'accounts:profile' %}" class="menu-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
