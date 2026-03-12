@@ -24,6 +24,7 @@ urlpatterns = [
     path('compensation/', include('apps.compensation.urls')),
     path('talent/', include('apps.talent.urls')),
     path('compliance/', include('apps.compliance.urls')),
+    path('workforce/', include('apps.workforce.urls')),
 ]
 
 if settings.DEBUG:
