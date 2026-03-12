@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load workforce_tags %}
+
+{% block title %}Salary Forecasts{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0">Salary Forecasts</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="#">Workforce Planning</a></li>
+                        <li class="breadcrumb-item active">Salary Forecasts</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search by department or designation...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Department</label>
+                            <select class="form-select" name="department">
+                                <option value="">All Departments</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.pk }}" {% if request.GET.department == dept.pk|stringformat:"d" %}selected{% endif %}>{{ dept }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <a href="{% url 'workforce:salary_forecast_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> New Forecast
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forecast Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">All Salary Forecasts</h5>
+                </div>
+                <div class="card-body">
+                    {% if forecasts %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Department</th>
+                                        <th>Designation</th>
+                                        <th>Current Avg Salary</th>
+                                        <th>Projected Avg Salary</th>
+                                        <th>Increment %</th>
+                                        <th>Headcount</th>
+                                        <th>Cost Impact</th>
+                                        <th>Fiscal Year</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for forecast in forecasts %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'workforce:salary_forecast_detail' forecast.pk %}" class="fw-medium">{{ forecast.department }}</a>
+                                            </td>
+                                            <td>{{ forecast.designation }}</td>
+                                            <td>{{ forecast.current_avg_salary|floatformat:2 }}</td>
+                                            <td>{{ forecast.projected_avg_salary|floatformat:2 }}</td>
+                                            <td>{{ forecast.increment_percentage|floatformat:2 }}%</td>
+                                            <td>{{ forecast.headcount }}</td>
+                                            <td>{{ forecast.cost_impact|floatformat:2 }}</td>
+                                            <td>{{ forecast.fiscal_year }}</td>
+                                            <td>
+                                                <div class="d-flex gap-1">
+                                                    <a href="{% url 'workforce:salary_forecast_detail' forecast.pk %}" class="btn btn-sm btn-soft-info" title="View">
+                                                        <i class="ri-eye-line"></i>
+                                                    </a>
+                                                    <a href="{% url 'workforce:salary_forecast_edit' forecast.pk %}" class="btn btn-sm btn-soft-warning" title="Edit">
+                                                        <i class="ri-pencil-line"></i>
+                                                    </a>
+                                                    <a href="{% url 'workforce:salary_forecast_delete' forecast.pk %}" class="btn btn-sm btn-soft-danger" title="Delete">
+                                                        <i class="ri-delete-bin-line"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="ri-money-dollar-box-line display-4 text-muted"></i>
+                            <h5 class="mt-3 text-muted">No Salary Forecasts Found</h5>
+                            <p class="text-muted">
+                                {% if request.GET.search or request.GET.department %}
+                                    Try adjusting your search or filter criteria.
+                                {% else %}
+                                    Salary forecasts will appear here once created.
+                                {% endif %}
+                            </p>
+                            <a href="{% url 'workforce:salary_forecast_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> Create Forecast
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if forecasts.has_other_pages %}
+                    <div class="card-footer">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                {% if forecasts.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ forecasts.previous_page_number }}&search={{ request.GET.search }}&department={{ request.GET.department }}">
+                                            <i class="ri-arrow-left-s-line"></i>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in forecasts.paginator.page_range %}
+                                    {% if forecasts.number == num %}
+                                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                    {% elif num > forecasts.number|add:'-3' and num < forecasts.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}&search={{ request.GET.search }}&department={{ request.GET.department }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if forecasts.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ forecasts.next_page_number }}&search={{ request.GET.search }}&department={{ request.GET.department }}">
+                                            <i class="ri-arrow-right-s-line"></i>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
