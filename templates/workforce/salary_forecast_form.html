@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% load workforce_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0">{{ title }}</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="#">Workforce Planning</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'workforce:salary_forecast_list' %}">Salary Forecasts</a></li>
+                        <li class="breadcrumb-item active">{{ title }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+            <p class="mb-0">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Forecast Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Forecast Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- Department -->
+                    <div class="col-md-4">
+                        <label for="{{ form.department.id_for_label }}" class="form-label">
+                            Department <span class="text-danger">*</span>
+                        </label>
+                        <select name="{{ form.department.html_name }}"
+                                id="{{ form.department.id_for_label }}"
+                                class="form-select {% if form.department.errors %}is-invalid{% endif %}">
+                            <option value="">Select Department</option>
+                            {% for choice in form.department.field.queryset %}
+                            <option value="{{ choice.pk }}" {% if form.department.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.department.errors %}<div class="invalid-feedback">{{ form.department.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <!-- Designation -->
+                    <div class="col-md-4">
+                        <label for="{{ form.designation.id_for_label }}" class="form-label">
+                            Designation <span class="text-danger">*</span>
+                        </label>
+                        <select name="{{ form.designation.html_name }}"
+                                id="{{ form.designation.id_for_label }}"
+                                class="form-select {% if form.designation.errors %}is-invalid{% endif %}">
+                            <option value="">Select Designation</option>
+                            {% for choice in form.designation.field.queryset %}
+                            <option value="{{ choice.pk }}" {% if form.designation.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.designation.errors %}<div class="invalid-feedback">{{ form.designation.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <!-- Fiscal Year -->
+                    <div class="col-md-4">
+                        <label for="{{ form.fiscal_year.id_for_label }}" class="form-label">
+                            Fiscal Year <span class="text-danger">*</span>
+                        </label>
+                        <input type="text"
+                               name="{{ form.fiscal_year.html_name }}"
+                               id="{{ form.fiscal_year.id_for_label }}"
+                               class="form-control {% if form.fiscal_year.errors %}is-invalid{% endif %}"
+                               value="{{ form.fiscal_year.value|default_if_none:'' }}"
+                               placeholder="e.g., 2025-2026">
+                        {% if form.fiscal_year.errors %}<div class="invalid-feedback">{{ form.fiscal_year.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <!-- Headcount -->
+                    <div class="col-md-3">
+                        <label for="{{ form.headcount.id_for_label }}" class="form-label">
+                            Headcount <span class="text-danger">*</span>
+                        </label>
+                        <input type="number"
+                               name="{{ form.headcount.html_name }}"
+                               id="{{ form.headcount.id_for_label }}"
+                               class="form-control {% if form.headcount.errors %}is-invalid{% endif %}"
+                               value="{{ form.headcount.value|default_if_none:'' }}"
+                               min="0"
+                               placeholder="0">
+                        {% if form.headcount.errors %}<div class="invalid-feedback">{{ form.headcount.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <!-- Current Avg Salary -->
+                    <div class="col-md-3">
+                        <label for="{{ form.current_avg_salary.id_for_label }}" class="form-label">
+                            Current Avg Salary <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="ri-money-dollar-circle-line"></i></span>
+                            <input type="number"
+                                   name="{{ form.current_avg_salary.html_name }}"
+                                   id="{{ form.current_avg_salary.id_for_label }}"
+                                   class="form-control {% if form.current_avg_salary.errors %}is-invalid{% endif %}"
+                                   value="{{ form.current_avg_salary.value|default_if_none:'' }}"
+                                   step="0.01"
+                                   placeholder="0.00">
+                            {% if form.current_avg_salary.errors %}<div class="invalid-feedback">{{ form.current_avg_salary.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Projected Avg Salary -->
+                    <div class="col-md-3">
+                        <label for="{{ form.projected_avg_salary.id_for_label }}" class="form-label">
+                            Projected Avg Salary <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="ri-money-dollar-circle-line"></i></span>
+                            <input type="number"
+                                   name="{{ form.projected_avg_salary.html_name }}"
+                                   id="{{ form.projected_avg_salary.id_for_label }}"
+                                   class="form-control {% if form.projected_avg_salary.errors %}is-invalid{% endif %}"
+                                   value="{{ form.projected_avg_salary.value|default_if_none:'' }}"
+                                   step="0.01"
+                                   placeholder="0.00">
+                            {% if form.projected_avg_salary.errors %}<div class="invalid-feedback">{{ form.projected_avg_salary.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Increment Percentage -->
+                    <div class="col-md-3">
+                        <label for="{{ form.increment_percentage.id_for_label }}" class="form-label">
+                            Increment %
+                        </label>
+                        <div class="input-group">
+                            <input type="number"
+                                   name="{{ form.increment_percentage.html_name }}"
+                                   id="{{ form.increment_percentage.id_for_label }}"
+                                   class="form-control {% if form.increment_percentage.errors %}is-invalid{% endif %}"
+                                   value="{{ form.increment_percentage.value|default_if_none:'' }}"
+                                   step="0.01"
+                                   placeholder="0.00">
+                            <span class="input-group-text">%</span>
+                            {% if form.increment_percentage.errors %}<div class="invalid-feedback">{{ form.increment_percentage.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Effective Date -->
+                    <div class="col-md-3">
+                        <label for="{{ form.effective_date.id_for_label }}" class="form-label">
+                            Effective Date <span class="text-danger">*</span>
+                        </label>
+                        <input type="date"
+                               name="{{ form.effective_date.html_name }}"
+                               id="{{ form.effective_date.id_for_label }}"
+                               class="form-control {% if form.effective_date.errors %}is-invalid{% endif %}"
+                               value="{{ form.effective_date.value|default_if_none:'' }}">
+                        {% if form.effective_date.errors %}<div class="invalid-feedback">{{ form.effective_date.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Notes</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                        <textarea name="{{ form.notes.html_name }}"
+                                  id="{{ form.notes.id_for_label }}"
+                                  class="form-control {% if form.notes.errors %}is-invalid{% endif %}"
+                                  rows="4"
+                                  placeholder="Additional notes...">{{ form.notes.value|default_if_none:'' }}</textarea>
+                        {% if form.notes.errors %}<div class="invalid-feedback">{{ form.notes.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mb-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="ri-save-line me-1"></i> Save Forecast
+            </button>
+            <a href="{% url 'workforce:salary_forecast_list' %}" class="btn btn-light">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
