@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load workforce_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Workforce Planning</li>
+            <li class="breadcrumb-item"><a href="{% url 'workforce:skill_list' %}">Skills Inventory</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Skill Details -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Skill Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.employee.id_for_label }}" class="form-label">
+                                Employee <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.employee.html_name }}"
+                                    id="{{ form.employee.id_for_label }}"
+                                    class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                                <option value="">Select Employee</option>
+                                {% for value, label in form.employee.field.choices %}
+                                    {% if value %}
+                                    <option value="{{ value }}" {% if form.employee.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            {% for error in form.employee.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.skill_name.id_for_label }}" class="form-label">
+                                Skill Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="{{ form.skill_name.html_name }}"
+                                   id="{{ form.skill_name.id_for_label }}"
+                                   class="form-control {% if form.skill_name.errors %}is-invalid{% endif %}"
+                                   value="{{ form.skill_name.value|default:'' }}"
+                                   placeholder="Enter skill name">
+                            {% for error in form.skill_name.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.proficiency_level.id_for_label }}" class="form-label">
+                                Proficiency Level <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.proficiency_level.html_name }}"
+                                    id="{{ form.proficiency_level.id_for_label }}"
+                                    class="form-select {% if form.proficiency_level.errors %}is-invalid{% endif %}">
+                                <option value="">Select Level</option>
+                                {% for value, label in form.proficiency_level.field.choices %}
+                                    {% if value %}
+                                    <option value="{{ value }}" {% if form.proficiency_level.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            {% for error in form.proficiency_level.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.years_of_experience.id_for_label }}" class="form-label">
+                                Years of Experience
+                            </label>
+                            {{ form.years_of_experience }}
+                            {% for error in form.years_of_experience.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certification -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Certification</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input type="checkbox"
+                                       name="{{ form.certified.html_name }}"
+                                       id="{{ form.certified.id_for_label }}"
+                                       class="form-check-input {% if form.certified.errors %}is-invalid{% endif %}"
+                                       {% if form.certified.value %}checked{% endif %}>
+                                <label for="{{ form.certified.id_for_label }}" class="form-check-label">
+                                    Certified
+                                </label>
+                                {% for error in form.certified.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.certification_expiry.id_for_label }}" class="form-label">
+                                Certification Expiry
+                            </label>
+                            <input type="date"
+                                   name="{{ form.certification_expiry.html_name }}"
+                                   id="{{ form.certification_expiry.id_for_label }}"
+                                   class="form-control {% if form.certification_expiry.errors %}is-invalid{% endif %}"
+                                   value="{{ form.certification_expiry.value|default:'' }}">
+                            {% for error in form.certification_expiry.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input type="checkbox"
+                                       name="{{ form.is_active.html_name }}"
+                                       id="{{ form.is_active.id_for_label }}"
+                                       class="form-check-input {% if form.is_active.errors %}is-invalid{% endif %}"
+                                       {% if form.is_active.value %}checked{% endif %}>
+                                <label for="{{ form.is_active.id_for_label }}" class="form-check-label">
+                                    Active
+                                </label>
+                                {% for error in form.is_active.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Save Skill
+                </button>
+                <a href="{% url 'workforce:skill_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
