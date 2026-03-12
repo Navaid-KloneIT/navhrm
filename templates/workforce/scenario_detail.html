@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% load workforce_tags %}
+
+{% block title %}Scenario - {{ scenario.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0">Scenario - {{ scenario.name }}</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="#">Workforce Planning</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'workforce:scenario_list' %}">Scenarios</a></li>
+                        <li class="breadcrumb-item active">{{ scenario.name }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row">
+        <div class="col-12 mb-3">
+            <div class="d-flex gap-2">
+                <a href="{% url 'workforce:scenario_list' %}" class="btn btn-sm btn-secondary">
+                    <i class="ri-arrow-left-line me-1"></i> Back to Scenarios
+                </a>
+                <a href="{% url 'workforce:scenario_edit' scenario.pk %}" class="btn btn-sm btn-warning">
+                    <i class="ri-pencil-line me-1"></i> Edit
+                </a>
+                <a href="{% url 'workforce:scenario_delete' scenario.pk %}" class="btn btn-sm btn-danger">
+                    <i class="ri-delete-bin-line me-1"></i> Delete
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scenario Overview -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="ri-git-branch-line me-1"></i> Scenario Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted mb-1">Name</label>
+                            <p class="fw-medium mb-0">{{ scenario.name }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted mb-1">Type</label>
+                            <p class="mb-0">
+                                <span class="badge bg-soft-{{ scenario.scenario_type|scenario_type_color }} text-{{ scenario.scenario_type|scenario_type_color }}">
+                                    {{ scenario.get_scenario_type_display }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted mb-1">Base Year</label>
+                            <p class="fw-medium mb-0">{{ scenario.base_year }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted mb-1">Projection Year</label>
+                            <p class="fw-medium mb-0">{{ scenario.projection_year }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted mb-1">Status</label>
+                            <p class="mb-0">
+                                <span class="badge bg-soft-{{ scenario.status|scenario_status_color }} text-{{ scenario.status|scenario_status_color }}">
+                                    {{ scenario.get_status_display }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted mb-1">Created By</label>
+                            <p class="fw-medium mb-0">{{ scenario.created_by|default:"N/A" }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted mb-1">Total Cost Impact</label>
+                            <p class="fw-medium mb-0">{{ scenario.total_cost_impact|floatformat:2 }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="ri-file-text-line me-1"></i> Description</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ scenario.description|default:"No description provided."|linebreaksbr }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assumptions -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="ri-lightbulb-line me-1"></i> Assumptions</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ scenario.assumptions|default:"No assumptions provided."|linebreaksbr }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Impact Summary -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="ri-bar-chart-line me-1"></i> Impact Summary</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ scenario.impact_summary|default:"No impact summary provided."|linebreaksbr }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scenario Details (Child Records) -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0"><i class="ri-list-check-2 me-1"></i> Scenario Details</h5>
+                    <a href="{% url 'workforce:scenario_detail_create' scenario.pk %}" class="btn btn-sm btn-primary">
+                        <i class="ri-add-line me-1"></i> Add Detail
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if details %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Department</th>
+                                        <th>Designation</th>
+                                        <th>Current HC</th>
+                                        <th>Projected HC</th>
+                                        <th>Change</th>
+                                        <th>Cost Impact</th>
+                                        <th>Notes</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for detail in details %}
+                                        <tr>
+                                            <td>{{ detail.department }}</td>
+                                            <td>{{ detail.designation }}</td>
+                                            <td>{{ detail.current_headcount }}</td>
+                                            <td>{{ detail.projected_headcount }}</td>
+                                            <td>
+                                                {% if detail.headcount_change > 0 %}
+                                                    <span class="text-success">+{{ detail.headcount_change }}</span>
+                                                {% elif detail.headcount_change < 0 %}
+                                                    <span class="text-danger">{{ detail.headcount_change }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">0</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ detail.cost_impact|floatformat:2 }}</td>
+                                            <td>{{ detail.notes|default:"-"|truncatewords:10 }}</td>
+                                            <td>
+                                                <div class="d-flex gap-1">
+                                                    <a href="{% url 'workforce:scenario_detail_edit' detail.pk %}" class="btn btn-sm btn-soft-warning" title="Edit">
+                                                        <i class="ri-pencil-line"></i>
+                                                    </a>
+                                                    <a href="{% url 'workforce:scenario_detail_delete' detail.pk %}" class="btn btn-sm btn-soft-danger" title="Delete">
+                                                        <i class="ri-delete-bin-line"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="ri-list-check-2 display-5 text-muted"></i>
+                            <h6 class="mt-3 text-muted">No Details Found</h6>
+                            <p class="text-muted mb-0">No scenario details have been added yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
