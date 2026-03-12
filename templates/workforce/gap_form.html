@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% load workforce_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Workforce Planning</li>
+            <li class="breadcrumb-item"><a href="{% url 'workforce:gap_list' %}">Workforce Gaps</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Gap Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Gap Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Department -->
+                <div class="col-md-4">
+                    <label for="{{ form.department.id_for_label }}" class="form-label">
+                        Department <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.department.html_name }}"
+                            id="{{ form.department.id_for_label }}"
+                            class="form-select {% if form.department.errors %}is-invalid{% endif %}">
+                        <option value="">Select Department</option>
+                        {% for choice in form.department.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.department.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.department.errors %}<div class="invalid-feedback">{{ form.department.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Designation -->
+                <div class="col-md-4">
+                    <label for="{{ form.designation.id_for_label }}" class="form-label">
+                        Designation <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.designation.html_name }}"
+                            id="{{ form.designation.id_for_label }}"
+                            class="form-select {% if form.designation.errors %}is-invalid{% endif %}">
+                        <option value="">Select Designation</option>
+                        {% for choice in form.designation.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.designation.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.designation.errors %}<div class="invalid-feedback">{{ form.designation.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Fiscal Year -->
+                <div class="col-md-4">
+                    <label for="{{ form.fiscal_year.id_for_label }}" class="form-label">
+                        Fiscal Year <span class="text-danger">*</span>
+                    </label>
+                    <input type="text"
+                           name="{{ form.fiscal_year.html_name }}"
+                           id="{{ form.fiscal_year.id_for_label }}"
+                           class="form-control {% if form.fiscal_year.errors %}is-invalid{% endif %}"
+                           value="{{ form.fiscal_year.value|default_if_none:'' }}"
+                           placeholder="e.g. 2025-26">
+                    {% if form.fiscal_year.errors %}<div class="invalid-feedback">{{ form.fiscal_year.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Required Count -->
+                <div class="col-md-6">
+                    <label for="{{ form.required_count.id_for_label }}" class="form-label">
+                        Required Count <span class="text-danger">*</span>
+                    </label>
+                    <input type="number"
+                           name="{{ form.required_count.html_name }}"
+                           id="{{ form.required_count.id_for_label }}"
+                           class="form-control {% if form.required_count.errors %}is-invalid{% endif %}"
+                           value="{{ form.required_count.value|default_if_none:'' }}"
+                           min="0">
+                    {% if form.required_count.errors %}<div class="invalid-feedback">{{ form.required_count.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Available Count -->
+                <div class="col-md-6">
+                    <label for="{{ form.available_count.id_for_label }}" class="form-label">
+                        Available Count <span class="text-danger">*</span>
+                    </label>
+                    <input type="number"
+                           name="{{ form.available_count.html_name }}"
+                           id="{{ form.available_count.id_for_label }}"
+                           class="form-control {% if form.available_count.errors %}is-invalid{% endif %}"
+                           value="{{ form.available_count.value|default_if_none:'' }}"
+                           min="0">
+                    {% if form.available_count.errors %}<div class="invalid-feedback">{{ form.available_count.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Plan -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Action Plan</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Skills Gap Description -->
+                <div class="col-12">
+                    <label for="{{ form.skills_gap_description.id_for_label }}" class="form-label">Skills Gap Description</label>
+                    <textarea name="{{ form.skills_gap_description.html_name }}"
+                              id="{{ form.skills_gap_description.id_for_label }}"
+                              class="form-control {% if form.skills_gap_description.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Describe the skills gap...">{{ form.skills_gap_description.value|default_if_none:'' }}</textarea>
+                    {% if form.skills_gap_description.errors %}<div class="invalid-feedback">{{ form.skills_gap_description.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Action Plan -->
+                <div class="col-12">
+                    <label for="{{ form.action_plan.id_for_label }}" class="form-label">Action Plan</label>
+                    <textarea name="{{ form.action_plan.html_name }}"
+                              id="{{ form.action_plan.id_for_label }}"
+                              class="form-control {% if form.action_plan.errors %}is-invalid{% endif %}"
+                              rows="3"
+                              placeholder="Describe the action plan...">{{ form.action_plan.value|default_if_none:'' }}</textarea>
+                    {% if form.action_plan.errors %}<div class="invalid-feedback">{{ form.action_plan.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Priority -->
+                <div class="col-md-6">
+                    <label for="{{ form.priority.id_for_label }}" class="form-label">Priority</label>
+                    <select name="{{ form.priority.html_name }}"
+                            id="{{ form.priority.id_for_label }}"
+                            class="form-select {% if form.priority.errors %}is-invalid{% endif %}">
+                        <option value="">Select Priority</option>
+                        {% for value, label in form.priority.field.choices %}
+                        <option value="{{ value }}" {% if form.priority.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.priority.errors %}<div class="invalid-feedback">{{ form.priority.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                    <select name="{{ form.status.html_name }}"
+                            id="{{ form.status.id_for_label }}"
+                            class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                        <option value="">Select Status</option>
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save
+        </button>
+        <a href="{% url 'workforce:gap_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
