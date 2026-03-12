@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load workforce_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Workforce Planning</li>
+            <li class="breadcrumb-item"><a href="{% url 'workforce:productivity_list' %}">Productivity Metrics</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <h5 class="mb-3">Metric Details</h5>
+            <div class="row g-3">
+                <!-- Department -->
+                <div class="col-md-6">
+                    <label for="{{ form.department.id_for_label }}" class="form-label">Department <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.department.errors %}is-invalid{% endif %}" id="{{ form.department.id_for_label }}" name="{{ form.department.html_name }}">
+                        <option value="">-- Select Department --</option>
+                        {% for choice in form.department.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.department.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.department.errors %}<div class="invalid-feedback">{{ form.department.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee</label>
+                    <select class="form-select {% if form.employee.errors %}is-invalid{% endif %}" id="{{ form.employee.id_for_label }}" name="{{ form.employee.html_name }}">
+                        <option value="">-- Select Employee (Optional) --</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Metric Name -->
+                <div class="col-md-6">
+                    <label for="{{ form.metric_name.id_for_label }}" class="form-label">Metric Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.metric_name.errors %}is-invalid{% endif %}" id="{{ form.metric_name.id_for_label }}" name="{{ form.metric_name.html_name }}" value="{{ form.metric_name.value|default_if_none:'' }}">
+                    {% if form.metric_name.errors %}<div class="invalid-feedback">{{ form.metric_name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Metric Value -->
+                <div class="col-md-3">
+                    <label for="{{ form.metric_value.id_for_label }}" class="form-label">Metric Value <span class="text-danger">*</span></label>
+                    <input type="number" step="0.01" class="form-control {% if form.metric_value.errors %}is-invalid{% endif %}" id="{{ form.metric_value.id_for_label }}" name="{{ form.metric_value.html_name }}" value="{{ form.metric_value.value|default_if_none:'' }}">
+                    {% if form.metric_value.errors %}<div class="invalid-feedback">{{ form.metric_value.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Target Value -->
+                <div class="col-md-3">
+                    <label for="{{ form.target_value.id_for_label }}" class="form-label">Target Value <span class="text-danger">*</span></label>
+                    <input type="number" step="0.01" class="form-control {% if form.target_value.errors %}is-invalid{% endif %}" id="{{ form.target_value.id_for_label }}" name="{{ form.target_value.html_name }}" value="{{ form.target_value.value|default_if_none:'' }}">
+                    {% if form.target_value.errors %}<div class="invalid-feedback">{{ form.target_value.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Measurement Period -->
+                <div class="col-md-6">
+                    <label for="{{ form.measurement_period.id_for_label }}" class="form-label">Measurement Period <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.measurement_period.errors %}is-invalid{% endif %}" id="{{ form.measurement_period.id_for_label }}" name="{{ form.measurement_period.html_name }}" value="{{ form.measurement_period.value|default_if_none:'' }}">
+                    {% if form.measurement_period.errors %}<div class="invalid-feedback">{{ form.measurement_period.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Measurement Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.measurement_date.id_for_label }}" class="form-label">Measurement Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control {% if form.measurement_date.errors %}is-invalid{% endif %}" id="{{ form.measurement_date.id_for_label }}" name="{{ form.measurement_date.html_name }}" value="{{ form.measurement_date.value|default_if_none:'' }}">
+                    {% if form.measurement_date.errors %}<div class="invalid-feedback">{{ form.measurement_date.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <h5 class="mt-4 mb-3">Notes</h5>
+            <div class="row g-3">
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                    <textarea class="form-control {% if form.notes.errors %}is-invalid{% endif %}" id="{{ form.notes.id_for_label }}" name="{{ form.notes.html_name }}" rows="4">{{ form.notes.value|default_if_none:'' }}</textarea>
+                    {% if form.notes.errors %}<div class="invalid-feedback">{{ form.notes.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Save
+                </button>
+                <a href="{% url 'workforce:productivity_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
