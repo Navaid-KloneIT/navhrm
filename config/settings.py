@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'apps.compensation',
     'apps.talent',
     'apps.compliance',
+    'apps.workforce',
 ]
 
 MIDDLEWARE = [
