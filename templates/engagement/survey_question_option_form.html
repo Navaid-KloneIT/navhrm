@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}Add Option{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Add Option</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:survey_list' %}">Surveys</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:survey_detail' question.survey.pk %}">{{ question.survey.title }}</a></li>
+            <li class="breadcrumb-item active">Add Option</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Add Option to: {{ question.question_text|truncatewords:10 }}</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <!-- Option Text -->
+                <div class="col-md-8">
+                    <label for="{{ form.option_text.id_for_label }}" class="form-label">Option Text <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control {% if form.option_text.errors %}is-invalid{% endif %}" id="{{ form.option_text.id_for_label }}" name="{{ form.option_text.html_name }}" value="{{ form.option_text.value|default:'' }}">
+                    {% if form.option_text.errors %}<div class="invalid-feedback">{{ form.option_text.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Order -->
+                <div class="col-md-4">
+                    <label for="{{ form.order.id_for_label }}" class="form-label">Order</label>
+                    <input type="number" class="form-control {% if form.order.errors %}is-invalid{% endif %}" id="{{ form.order.id_for_label }}" name="{{ form.order.html_name }}" value="{{ form.order.value|default:'' }}">
+                    {% if form.order.errors %}<div class="invalid-feedback">{{ form.order.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Add Option
+                </button>
+                <a href="{% url 'engagement:survey_detail' question.survey.pk %}" class="btn btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
