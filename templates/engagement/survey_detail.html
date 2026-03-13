@@ -157,7 +157,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Action Plans ({{ action_plans|length }})</h5>
-                <a href="{% url 'engagement:action_plan_create' %}?survey={{ engagementsurvey.pk }}" class="btn btn-sm btn-primary">
+                <a href="{% url 'engagement:action_plan_create' engagementsurvey.pk %}" class="btn btn-sm btn-primary">
                     <i class="ri-add-line me-1"></i> Add Action Plan
                 </a>
             </div>
