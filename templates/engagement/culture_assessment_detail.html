@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}Assessment - {{ cultureassessment.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Culture Assessment Detail</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item">Culture & Values</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:culture_assessment_list' %}">Culture Assessments</a></li>
+            <li class="breadcrumb-item active">{{ cultureassessment.title|truncatewords:5 }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Left Column -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ cultureassessment.title }}</h5>
+                <span class="badge bg-soft-{{ cultureassessment.status|culture_status_color }} text-{{ cultureassessment.status|culture_status_color }} fs-6">{{ cultureassessment.get_status_display }}</span>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Description</small>
+                    <div>{{ cultureassessment.description|linebreaksbr|default:"-" }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted">Assessment Date</small>
+                        <div class="fw-medium">{{ cultureassessment.assessment_date|date:"d M Y"|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted">Created By</small>
+                        <div class="fw-medium">{{ cultureassessment.created_by|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <small class="text-muted">Total Responses</small>
+                        <div class="fw-medium">{{ cultureassessment.response_count|default:"0" }}</div>
+                    </div>
+                    <div class="col-md-6 mb-0">
+                        <small class="text-muted">Avg Alignment Score</small>
+                        <div class="fw-medium">{{ cultureassessment.avg_alignment_score|default:"-" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Responses -->
+        <div class="card mb-4 table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Responses</h5>
+                <a href="{% url 'engagement:culture_assessment_respond' cultureassessment.pk %}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> Submit Response
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th class="text-center">Alignment Score</th>
+                                <th>Comments</th>
+                                <th>Submitted At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for response in responses %}
+                            <tr>
+                                <td class="fw-medium">{{ response.employee }}</td>
+                                <td class="text-center">{{ response.alignment_score|default:"-" }}</td>
+                                <td>{{ response.comments|truncatewords:10|default:"-" }}</td>
+                                <td>{{ response.submitted_at|date:"d M Y h:i A"|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No responses yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Sidebar -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'engagement:culture_assessment_edit' cultureassessment.pk %}" class="btn btn-warning">
+                        <i class="ri-pencil-line me-1"></i> Edit
+                    </a>
+                    <form method="post" action="{% url 'engagement:culture_assessment_delete' cultureassessment.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to delete this assessment?')">
+                            <i class="ri-delete-bin-line me-1"></i> Delete
+                        </button>
+                    </form>
+                    <a href="{% url 'engagement:culture_assessment_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
