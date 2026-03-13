@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}{{ title|default:"Culture Assessment Form" }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title|default:"Culture Assessment Form" }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item">Culture & Values</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:culture_assessment_list' %}">Culture Assessments</a></li>
+            <li class="breadcrumb-item active">{{ title|default:"Form" }}</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Assessment Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Title -->
+                <div class="col-md-6">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">
+                        Title <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" name="{{ form.title.html_name }}"
+                           id="{{ form.title.id_for_label }}"
+                           class="form-control {% if form.title.errors %}is-invalid{% endif %}"
+                           value="{{ form.title.value|default_if_none:'' }}"
+                           placeholder="Enter assessment title">
+                    {% if form.title.errors %}<div class="invalid-feedback">{{ form.title.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Assessment Date -->
+                <div class="col-md-6">
+                    <label for="{{ form.assessment_date.id_for_label }}" class="form-label">
+                        Assessment Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" name="{{ form.assessment_date.html_name }}"
+                           id="{{ form.assessment_date.id_for_label }}"
+                           class="form-control {% if form.assessment_date.errors %}is-invalid{% endif %}"
+                           value="{{ form.assessment_date.value|default_if_none:'' }}">
+                    {% if form.assessment_date.errors %}<div class="invalid-feedback">{{ form.assessment_date.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                    <select name="{{ form.status.html_name }}"
+                            id="{{ form.status.id_for_label }}"
+                            class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Created By -->
+                <div class="col-md-6">
+                    <label for="{{ form.created_by.id_for_label }}" class="form-label">Created By</label>
+                    <select name="{{ form.created_by.html_name }}"
+                            id="{{ form.created_by.id_for_label }}"
+                            class="form-select {% if form.created_by.errors %}is-invalid{% endif %}">
+                        <option value="">Select Creator</option>
+                        {% for choice in form.created_by.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.created_by.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.created_by.errors %}<div class="invalid-feedback">{{ form.created_by.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea name="{{ form.description.html_name }}"
+                              id="{{ form.description.id_for_label }}"
+                              class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Describe the assessment...">{{ form.description.value|default_if_none:'' }}</textarea>
+                    {% if form.description.errors %}<div class="invalid-feedback">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save Assessment
+        </button>
+        <a href="{% url 'engagement:culture_assessment_list' %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
