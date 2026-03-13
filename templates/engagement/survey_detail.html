@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}{{ engagementsurvey.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div>
+        <h4>{{ engagementsurvey.title }}</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item">Engagement & Wellbeing</li>
+                <li class="breadcrumb-item"><a href="{% url 'engagement:survey_list' %}">Surveys</a></li>
+                <li class="breadcrumb-item active">{{ engagementsurvey.title }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'engagement:survey_edit' engagementsurvey.pk %}" class="btn btn-warning">
+            <i class="ri-pencil-line me-1"></i> Edit
+        </a>
+        <a href="{% url 'engagement:survey_delete' engagementsurvey.pk %}" class="btn btn-danger">
+            <i class="ri-delete-bin-line me-1"></i> Delete
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Survey Details -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Survey Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Type</p>
+                        <p class="fw-medium">
+                            <span class="badge bg-soft-{{ engagementsurvey.survey_type|survey_type_color }} text-{{ engagementsurvey.survey_type|survey_type_color }}">{{ engagementsurvey.get_survey_type_display }}</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Status</p>
+                        <p class="fw-medium">
+                            <span class="badge bg-soft-{{ engagementsurvey.status|survey_status_color }} text-{{ engagementsurvey.status|survey_status_color }}">{{ engagementsurvey.get_status_display }}</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Start Date</p>
+                        <p class="fw-medium">{{ engagementsurvey.start_date|date:"M d, Y"|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">End Date</p>
+                        <p class="fw-medium">{{ engagementsurvey.end_date|date:"M d, Y"|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Anonymous</p>
+                        <p class="fw-medium">{% if engagementsurvey.is_anonymous %}<span class="text-success">Yes</span>{% else %}<span class="text-muted">No</span>{% endif %}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Target Audience</p>
+                        <p class="fw-medium">{{ engagementsurvey.get_target_audience_display|default:engagementsurvey.target_audience|default:"-" }}</p>
+                    </div>
+                </div>
+                {% if engagementsurvey.description %}
+                <h6 class="mt-4">Description</h6>
+                <p>{{ engagementsurvey.description|linebreaks }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Questions -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Questions ({{ questions|length }})</h5>
+                <a href="{% url 'engagement:survey_question_create' engagementsurvey.pk %}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> Add Question
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Question</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for question in questions %}
+                            <tr>
+                                <td>{{ question.order }}</td>
+                                <td class="fw-medium">{{ question.question_text }}</td>
+                                <td><span class="badge bg-soft-info text-info">{{ question.get_question_type_display }}</span></td>
+                                <td>{% if question.is_required %}<span class="text-success">Yes</span>{% else %}<span class="text-muted">No</span>{% endif %}</td>
+                                <td>
+                                    <a href="{% url 'engagement:survey_question_edit' question.pk %}" class="btn btn-sm btn-soft-warning me-1" title="Edit">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                    <a href="{% url 'engagement:survey_question_delete' question.pk %}" class="btn btn-sm btn-soft-danger" title="Delete">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="ri-question-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No questions added yet</p>
+                                        <a href="{% url 'engagement:survey_question_create' engagementsurvey.pk %}" class="btn btn-sm btn-primary mt-2">
+                                            <i class="ri-add-line me-1"></i> Add First Question
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Responses -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Responses ({{ responses|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% for response in responses %}
+                <div class="d-flex justify-content-between align-items-center {% if not forloop.last %}mb-3 pb-3 border-bottom{% endif %}">
+                    <div>
+                        <h6 class="mb-1">{% if engagementsurvey.is_anonymous %}Anonymous{% else %}{{ response.employee|default:"Anonymous" }}{% endif %}</h6>
+                        <small class="text-muted">Submitted: {{ response.submitted_at|date:"M d, Y H:i"|default:response.created_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                    <a href="{% url 'engagement:survey_response_detail' response.pk %}" class="btn btn-sm btn-soft-info" title="View">
+                        <i class="ri-eye-line"></i>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="text-center py-4">
+                    <div class="text-muted">
+                        <i class="ri-chat-poll-line" style="font-size: 48px; opacity: 0.3;"></i>
+                        <p class="mt-2 mb-1">No responses yet</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Action Plans -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Action Plans ({{ action_plans|length }})</h5>
+                <a href="{% url 'engagement:action_plan_create' %}?survey={{ engagementsurvey.pk }}" class="btn btn-sm btn-primary">
+                    <i class="ri-add-line me-1"></i> Add Action Plan
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Assigned To</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Due Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for plan in action_plans %}
+                            <tr>
+                                <td class="fw-medium">{{ plan.title }}</td>
+                                <td>{{ plan.assigned_to|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-soft-{{ plan.priority|action_plan_priority_color }} text-{{ plan.priority|action_plan_priority_color }}">{{ plan.get_priority_display }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-{{ plan.status|action_plan_status_color }} text-{{ plan.status|action_plan_status_color }}">{{ plan.get_status_display }}</span>
+                                </td>
+                                <td>{{ plan.due_date|date:"M d, Y"|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="ri-task-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No action plans yet</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Actions Sidebar -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'engagement:survey_edit' engagementsurvey.pk %}" class="btn btn-warning">
+                        <i class="ri-pencil-line me-1"></i> Edit Survey
+                    </a>
+                    <a href="{% url 'engagement:survey_delete' engagementsurvey.pk %}" class="btn btn-danger">
+                        <i class="ri-delete-bin-line me-1"></i> Delete Survey
+                    </a>
+                    <a href="{% url 'engagement:survey_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
