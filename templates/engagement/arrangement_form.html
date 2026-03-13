@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Arrangement{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Flexible Work Arrangement</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:arrangement_list' %}">Arrangements</a></li>
+            <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}Create{% endif %}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Arrangement Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.employee.id_for_label }}" class="form-label">
+                                Employee <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.employee.html_name }}"
+                                    id="{{ form.employee.id_for_label }}"
+                                    class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                                <option value="">Select Employee</option>
+                                {% for choice in form.employee.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.employee.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.arrangement_type.id_for_label }}" class="form-label">
+                                Arrangement Type <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.arrangement_type.html_name }}"
+                                    id="{{ form.arrangement_type.id_for_label }}"
+                                    class="form-select {% if form.arrangement_type.errors %}is-invalid{% endif %}">
+                                <option value="">Select Type</option>
+                                {% for choice in form.arrangement_type.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.arrangement_type.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.arrangement_type.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">
+                                Status <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.status.html_name }}"
+                                    id="{{ form.status.id_for_label }}"
+                                    class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                                <option value="">Select Status</option>
+                                {% for choice in form.status.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.status.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.status.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.days_per_week.id_for_label }}" class="form-label">
+                                Days Per Week
+                            </label>
+                            <input type="number"
+                                   name="{{ form.days_per_week.html_name }}"
+                                   id="{{ form.days_per_week.id_for_label }}"
+                                   class="form-control {% if form.days_per_week.errors %}is-invalid{% endif %}"
+                                   value="{{ form.days_per_week.value|default:'' }}"
+                                   min="1" max="7">
+                            {% for error in form.days_per_week.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.start_date.id_for_label }}" class="form-label">
+                                Start Date <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   name="{{ form.start_date.html_name }}"
+                                   id="{{ form.start_date.id_for_label }}"
+                                   class="form-control {% if form.start_date.errors %}is-invalid{% endif %}"
+                                   value="{{ form.start_date.value|default:'' }}">
+                            {% for error in form.start_date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.end_date.id_for_label }}" class="form-label">
+                                End Date
+                            </label>
+                            <input type="date"
+                                   name="{{ form.end_date.html_name }}"
+                                   id="{{ form.end_date.id_for_label }}"
+                                   class="form-control {% if form.end_date.errors %}is-invalid{% endif %}"
+                                   value="{{ form.end_date.value|default:'' }}">
+                            {% for error in form.end_date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.approved_by.id_for_label }}" class="form-label">
+                                Approved By
+                            </label>
+                            <select name="{{ form.approved_by.html_name }}"
+                                    id="{{ form.approved_by.id_for_label }}"
+                                    class="form-select {% if form.approved_by.errors %}is-invalid{% endif %}">
+                                <option value="">Select Approver</option>
+                                {% for choice in form.approved_by.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if form.approved_by.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.approved_by.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                            <textarea name="{{ form.notes.html_name }}"
+                                      id="{{ form.notes.id_for_label }}"
+                                      class="form-control {% if form.notes.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Additional notes...">{{ form.notes.value|default:'' }}</textarea>
+                            {% for error in form.notes.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Arrangement
+                        </button>
+                        <a href="{% url 'engagement:arrangement_list' %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
