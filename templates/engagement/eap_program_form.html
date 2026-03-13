@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} EAP Program{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{% if form.instance.pk %}Edit{% else %}Create{% endif %} EAP Program</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:eap_program_list' %}">EAP Programs</a></li>
+            <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}Create{% endif %}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Program Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                Program Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="{{ form.name.html_name }}"
+                                   id="{{ form.name.id_for_label }}"
+                                   class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                                   value="{{ form.name.value|default:'' }}"
+                                   placeholder="Enter program name">
+                            {% for error in form.name.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.service_type.id_for_label }}" class="form-label">
+                                Service Type <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.service_type.html_name }}"
+                                    id="{{ form.service_type.id_for_label }}"
+                                    class="form-select {% if form.service_type.errors %}is-invalid{% endif %}">
+                                <option value="">Select Type</option>
+                                {% for choice in form.service_type.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.service_type.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.service_type.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.provider.id_for_label }}" class="form-label">
+                                Provider
+                            </label>
+                            <input type="text"
+                                   name="{{ form.provider.html_name }}"
+                                   id="{{ form.provider.id_for_label }}"
+                                   class="form-control {% if form.provider.errors %}is-invalid{% endif %}"
+                                   value="{{ form.provider.value|default:'' }}"
+                                   placeholder="Service provider name">
+                            {% for error in form.provider.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.contact_info.id_for_label }}" class="form-label">
+                                Contact Information
+                            </label>
+                            <input type="text"
+                                   name="{{ form.contact_info.html_name }}"
+                                   id="{{ form.contact_info.id_for_label }}"
+                                   class="form-control {% if form.contact_info.errors %}is-invalid{% endif %}"
+                                   value="{{ form.contact_info.value|default:'' }}"
+                                   placeholder="Phone, email, or website">
+                            {% for error in form.contact_info.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.is_active.id_for_label }}" class="form-label">
+                                Active Status
+                            </label>
+                            <div class="form-check form-switch mt-2">
+                                <input type="checkbox"
+                                       name="{{ form.is_active.html_name }}"
+                                       id="{{ form.is_active.id_for_label }}"
+                                       class="form-check-input {% if form.is_active.errors %}is-invalid{% endif %}"
+                                       {% if form.is_active.value %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Active</label>
+                            </div>
+                            {% for error in form.is_active.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                Description
+                            </label>
+                            <textarea name="{{ form.description.html_name }}"
+                                      id="{{ form.description.id_for_label }}"
+                                      class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                                      rows="4"
+                                      placeholder="Program description...">{{ form.description.value|default:'' }}</textarea>
+                            {% for error in form.description.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Program
+                        </button>
+                        <a href="{% url 'engagement:eap_program_list' %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
