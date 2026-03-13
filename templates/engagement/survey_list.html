@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}Surveys{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Surveys</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item active">Surveys</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Search surveys...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Survey Type</label>
+                            <select class="form-select" name="survey_type">
+                                <option value="">All Types</option>
+                                {% for value, label in survey_type_choices %}
+                                <option value="{{ value }}" {% if request.GET.survey_type == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'engagement:survey_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> New Survey
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Surveys</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Anonymous</th>
+                                <th class="text-center">Responses</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for survey in surveys %}
+                            <tr>
+                                <td class="fw-medium">
+                                    <a href="{% url 'engagement:survey_detail' survey.pk %}">{{ survey.title }}</a>
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-{{ survey.survey_type|survey_type_color }} text-{{ survey.survey_type|survey_type_color }}">{{ survey.get_survey_type_display }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-{{ survey.status|survey_status_color }} text-{{ survey.status|survey_status_color }}">{{ survey.get_status_display }}</span>
+                                </td>
+                                <td>{{ survey.start_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>{{ survey.end_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>{% if survey.is_anonymous %}<span class="text-success">Yes</span>{% else %}<span class="text-muted">No</span>{% endif %}</td>
+                                <td class="text-center">{{ survey.responses.count }}</td>
+                                <td>
+                                    <a href="{% url 'engagement:survey_detail' survey.pk %}" class="btn btn-sm btn-soft-info me-1" title="View">
+                                        <i class="ri-eye-line"></i>
+                                    </a>
+                                    <a href="{% url 'engagement:survey_edit' survey.pk %}" class="btn btn-sm btn-soft-warning me-1" title="Edit">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                    <a href="{% url 'engagement:survey_delete' survey.pk %}" class="btn btn-sm btn-soft-danger" title="Delete">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-questionnaire-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No surveys found</p>
+                                        <a href="{% url 'engagement:survey_create' %}" class="btn btn-sm btn-primary mt-2">
+                                            <i class="ri-add-line me-1"></i> Create First Survey
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Survey list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.survey_type %}&survey_type={{ request.GET.survey_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.survey_type %}&survey_type={{ request.GET.survey_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.survey_type %}&survey_type={{ request.GET.survey_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
