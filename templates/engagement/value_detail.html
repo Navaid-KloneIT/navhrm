@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}Value - {{ companyvalue.name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Value Detail</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item">Culture & Values</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:value_list' %}">Company Values</a></li>
+            <li class="breadcrumb-item active">{{ companyvalue.name }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Left Column -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ companyvalue.name }}</h5>
+                {% if companyvalue.is_active %}
+                <span class="badge bg-soft-success text-success fs-6">Active</span>
+                {% else %}
+                <span class="badge bg-soft-danger text-danger fs-6">Inactive</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if companyvalue.icon %}
+                <div class="mb-4 text-center">
+                    <i class="{{ companyvalue.icon }}" style="font-size:48px"></i>
+                </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <small class="text-muted">Name</small>
+                    <div class="fw-medium">{{ companyvalue.name }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Description</small>
+                    <div>{{ companyvalue.description|linebreaksbr|default:"-" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Order</small>
+                    <div class="fw-medium">{{ companyvalue.order|default:"-" }}</div>
+                </div>
+                <div class="mb-0">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        {% if companyvalue.is_active %}
+                        <span class="badge bg-soft-success text-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-soft-danger text-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Nominations -->
+        <div class="card mb-4 table-card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Nominations</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nominee</th>
+                                <th>Nominated By</th>
+                                <th>Status</th>
+                                <th>Featured</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for nom in nominations %}
+                            <tr>
+                                <td class="fw-medium">{{ nom.nominee }}</td>
+                                <td>{{ nom.nominated_by|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-soft-{{ nom.status|nomination_status_color }} text-{{ nom.status|nomination_status_color }}">{{ nom.get_status_display }}</span>
+                                </td>
+                                <td>
+                                    {% if nom.is_featured %}
+                                    <span class="badge bg-soft-warning text-warning">Yes</span>
+                                    {% else %}
+                                    <span class="text-muted">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ nom.created_at|date:"d M Y"|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">No nominations yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Sidebar -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'engagement:value_edit' companyvalue.pk %}" class="btn btn-warning">
+                        <i class="ri-pencil-line me-1"></i> Edit
+                    </a>
+                    <form method="post" action="{% url 'engagement:value_delete' companyvalue.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to delete this value?')">
+                            <i class="ri-delete-bin-line me-1"></i> Delete
+                        </button>
+                    </form>
+                    <a href="{% url 'engagement:value_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
