@@ -50,8 +50,8 @@
                             </button>
                         </div>
                         <div class="col-auto ms-auto">
-                            <a href="{% url 'engagement:action_plan_create' %}" class="btn btn-primary">
-                                <i class="ri-add-line me-1"></i> New Action Plan
+                            <a href="{% url 'engagement:survey_list' %}" class="btn btn-light">
+                                <i class="ri-survey-line me-1"></i> View Surveys
                             </a>
                         </div>
                     </div>
@@ -114,9 +114,13 @@
                                     <div class="text-muted">
                                         <i class="ri-task-line" style="font-size: 48px; opacity: 0.3;"></i>
                                         <p class="mt-2 mb-1">No action plans found</p>
-                                        <a href="{% url 'engagement:action_plan_create' %}" class="btn btn-sm btn-primary mt-2">
-                                            <i class="ri-add-line me-1"></i> Create First Action Plan
-                                        </a>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search or request.GET.priority or request.GET.status %}
+                                                Try adjusting your search or filter criteria.
+                                            {% else %}
+                                                Action plans are created from a survey's detail page.
+                                            {% endif %}
+                                        </p>
                                     </div>
                                 </td>
                             </tr>
