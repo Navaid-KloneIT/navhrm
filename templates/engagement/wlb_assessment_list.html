@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}Work-Life Balance Assessments{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Work-Life Balance Assessments</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item">Work-Life Balance</li>
+            <li class="breadcrumb-item active">Assessments</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" action="{% url 'engagement:wlb_assessment_list' %}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Search by employee name...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'engagement:wlb_assessment_create' %}" class="btn btn-success w-100">
+                                <i class="ri-add-line me-1"></i> New Assessment
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assessments Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5>All Assessments</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Date</th>
+                                <th>Work Satisfaction</th>
+                                <th>Life Satisfaction</th>
+                                <th>Stress Level</th>
+                                <th>Overall Score</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assessment in assessments %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'engagement:wlb_assessment_detail' assessment.pk %}" class="fw-medium text-decoration-none">
+                                        {{ assessment.employee }}
+                                    </a>
+                                </td>
+                                <td>{{ assessment.assessment_date|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge bg-soft-{% if assessment.work_satisfaction >= 4 %}success{% elif assessment.work_satisfaction >= 3 %}warning{% else %}danger{% endif %} text-{% if assessment.work_satisfaction >= 4 %}success{% elif assessment.work_satisfaction >= 3 %}warning{% else %}danger{% endif %}">
+                                        {{ assessment.work_satisfaction }}/5
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-{% if assessment.life_satisfaction >= 4 %}success{% elif assessment.life_satisfaction >= 3 %}warning{% else %}danger{% endif %} text-{% if assessment.life_satisfaction >= 4 %}success{% elif assessment.life_satisfaction >= 3 %}warning{% else %}danger{% endif %}">
+                                        {{ assessment.life_satisfaction }}/5
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-{% if assessment.stress_level <= 2 %}success{% elif assessment.stress_level <= 3 %}warning{% else %}danger{% endif %} text-{% if assessment.stress_level <= 2 %}success{% elif assessment.stress_level <= 3 %}warning{% else %}danger{% endif %}">
+                                        {{ assessment.stress_level }}/5
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-medium">{{ assessment.overall_score|default:"-" }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{% url 'engagement:wlb_assessment_detail' assessment.pk %}" class="btn btn-sm btn-soft-info" data-bs-toggle="tooltip" title="View">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                        <a href="{% url 'engagement:wlb_assessment_edit' assessment.pk %}" class="btn btn-sm btn-soft-warning" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ri-pencil-line"></i>
+                                        </a>
+                                        <a href="{% url 'engagement:wlb_assessment_delete' assessment.pk %}" class="btn btn-sm btn-soft-danger" data-bs-toggle="tooltip" title="Delete">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-scales-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No assessments found</p>
+                                        <p class="mb-0" style="font-size: 13px;">
+                                            {% if request.GET.search %}
+                                                Try adjusting your search criteria.
+                                            {% else %}
+                                                Work-life balance assessments will appear here once created.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Assessment list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-left-s-line"></i></span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="ri-arrow-right-s-line"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
