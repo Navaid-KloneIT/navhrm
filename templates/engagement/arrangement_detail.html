@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}Arrangement - {{ flexibleworkarrangement.employee }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Arrangement Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:arrangement_list' %}">Arrangements</a></li>
+            <li class="breadcrumb-item active">{{ flexibleworkarrangement.employee }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Arrangement Information</h5>
+                <span class="badge bg-soft-{{ flexibleworkarrangement.status|arrangement_status_color }} text-{{ flexibleworkarrangement.status|arrangement_status_color }} fs-6">
+                    {{ flexibleworkarrangement.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Employee</small>
+                        <div class="fw-medium">{{ flexibleworkarrangement.employee }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Arrangement Type</small>
+                        <div>
+                            <span class="badge bg-soft-{{ flexibleworkarrangement.arrangement_type|arrangement_type_color }} text-{{ flexibleworkarrangement.arrangement_type|arrangement_type_color }}">
+                                {{ flexibleworkarrangement.get_arrangement_type_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Start Date</small>
+                        <div class="fw-medium">{{ flexibleworkarrangement.start_date|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">End Date</small>
+                        <div class="fw-medium">{{ flexibleworkarrangement.end_date|date:"M d, Y"|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Days Per Week</small>
+                        <div class="fw-medium">{{ flexibleworkarrangement.days_per_week|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Approved By</small>
+                        <div class="fw-medium">{{ flexibleworkarrangement.approved_by|default:"-" }}</div>
+                    </div>
+                </div>
+
+                {% if flexibleworkarrangement.notes %}
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Notes</small>
+                    <p class="mt-1 mb-0">{{ flexibleworkarrangement.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'engagement:arrangement_edit' flexibleworkarrangement.pk %}" class="btn btn-warning">
+                        <i class="ri-pencil-line me-1"></i> Edit Arrangement
+                    </a>
+                    <a href="{% url 'engagement:arrangement_delete' flexibleworkarrangement.pk %}" class="btn btn-danger">
+                        <i class="ri-delete-bin-line me-1"></i> Delete Arrangement
+                    </a>
+                    <a href="{% url 'engagement:arrangement_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
