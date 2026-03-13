@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}Action Plans{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Action Plans</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item active">Action Plans</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Search action plans...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" name="priority">
+                                <option value="">All Priorities</option>
+                                {% for value, label in priority_choices %}
+                                <option value="{{ value }}" {% if request.GET.priority == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="ri-filter-3-line me-1"></i> Filter
+                            </button>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <a href="{% url 'engagement:action_plan_create' %}" class="btn btn-primary">
+                                <i class="ri-add-line me-1"></i> New Action Plan
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card table-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Action Plans</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Survey</th>
+                                <th>Assigned To</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Due Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for plan in action_plans %}
+                            <tr>
+                                <td class="fw-medium">{{ plan.title }}</td>
+                                <td>
+                                    {% if plan.survey %}
+                                    <a href="{% url 'engagement:survey_detail' plan.survey.pk %}">{{ plan.survey.title }}</a>
+                                    {% else %}-{% endif %}
+                                </td>
+                                <td>{{ plan.assigned_to|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-soft-{{ plan.priority|action_plan_priority_color }} text-{{ plan.priority|action_plan_priority_color }}">{{ plan.get_priority_display }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-{{ plan.status|action_plan_status_color }} text-{{ plan.status|action_plan_status_color }}">{{ plan.get_status_display }}</span>
+                                </td>
+                                <td>{{ plan.due_date|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    <a href="{% url 'engagement:action_plan_edit' plan.pk %}" class="btn btn-sm btn-soft-warning me-1" title="Edit">
+                                        <i class="ri-pencil-line"></i>
+                                    </a>
+                                    <a href="{% url 'engagement:action_plan_delete' plan.pk %}" class="btn btn-sm btn-soft-danger" title="Delete">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="ri-task-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                        <p class="mt-2 mb-1">No action plans found</p>
+                                        <a href="{% url 'engagement:action_plan_create' %}" class="btn btn-sm btn-primary mt-2">
+                                            <i class="ri-add-line me-1"></i> Create First Action Plan
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Action plan list pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.priority %}&priority={{ request.GET.priority }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.priority %}&priority={{ request.GET.priority }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.priority %}&priority={{ request.GET.priority }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
