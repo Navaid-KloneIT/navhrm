@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}Add EAP Utilization{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Add EAP Utilization Record</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item">Employee Assistance</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:eap_program_list' %}">EAP Programs</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:eap_program_detail' program.pk %}">{{ program.name }}</a></li>
+            <li class="breadcrumb-item active">Add Utilization</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Utilization Details for {{ program.name }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.period_start.id_for_label }}" class="form-label">
+                                Period Start <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   name="{{ form.period_start.html_name }}"
+                                   id="{{ form.period_start.id_for_label }}"
+                                   class="form-control {% if form.period_start.errors %}is-invalid{% endif %}"
+                                   value="{{ form.period_start.value|default:'' }}">
+                            {% for error in form.period_start.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.period_end.id_for_label }}" class="form-label">
+                                Period End <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   name="{{ form.period_end.html_name }}"
+                                   id="{{ form.period_end.id_for_label }}"
+                                   class="form-control {% if form.period_end.errors %}is-invalid{% endif %}"
+                                   value="{{ form.period_end.value|default:'' }}">
+                            {% for error in form.period_end.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.total_sessions.id_for_label }}" class="form-label">
+                                Total Sessions <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.total_sessions.html_name }}"
+                                   id="{{ form.total_sessions.id_for_label }}"
+                                   class="form-control {% if form.total_sessions.errors %}is-invalid{% endif %}"
+                                   value="{{ form.total_sessions.value|default:'' }}"
+                                   min="0">
+                            {% for error in form.total_sessions.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.total_participants.id_for_label }}" class="form-label">
+                                Total Participants <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.total_participants.html_name }}"
+                                   id="{{ form.total_participants.id_for_label }}"
+                                   class="form-control {% if form.total_participants.errors %}is-invalid{% endif %}"
+                                   value="{{ form.total_participants.value|default:'' }}"
+                                   min="0">
+                            {% for error in form.total_participants.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.satisfaction_score.id_for_label }}" class="form-label">
+                                Satisfaction Score (1-5)
+                            </label>
+                            <input type="number"
+                                   name="{{ form.satisfaction_score.html_name }}"
+                                   id="{{ form.satisfaction_score.id_for_label }}"
+                                   class="form-control {% if form.satisfaction_score.errors %}is-invalid{% endif %}"
+                                   value="{{ form.satisfaction_score.value|default:'' }}"
+                                   min="1" max="5" step="0.1">
+                            {% for error in form.satisfaction_score.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Utilization
+                        </button>
+                        <a href="{% url 'engagement:eap_program_detail' program.pk %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
