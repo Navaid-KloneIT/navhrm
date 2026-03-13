@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Remote Work Policy{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Remote Work Policy</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:remote_policy_list' %}">Remote Policies</a></li>
+            <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}Create{% endif %}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Policy Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                Policy Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="{{ form.name.html_name }}"
+                                   id="{{ form.name.id_for_label }}"
+                                   class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                                   value="{{ form.name.value|default:'' }}"
+                                   placeholder="Enter policy name">
+                            {% for error in form.name.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.is_active.id_for_label }}" class="form-label">
+                                Active Status
+                            </label>
+                            <div class="form-check form-switch mt-2">
+                                <input type="checkbox"
+                                       name="{{ form.is_active.html_name }}"
+                                       id="{{ form.is_active.id_for_label }}"
+                                       class="form-check-input {% if form.is_active.errors %}is-invalid{% endif %}"
+                                       {% if form.is_active.value %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Active</label>
+                            </div>
+                            {% for error in form.is_active.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                Description
+                            </label>
+                            <textarea name="{{ form.description.html_name }}"
+                                      id="{{ form.description.id_for_label }}"
+                                      class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Policy description...">{{ form.description.value|default:'' }}</textarea>
+                            {% for error in form.description.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.eligibility_criteria.id_for_label }}" class="form-label">
+                                Eligibility Criteria
+                            </label>
+                            <textarea name="{{ form.eligibility_criteria.html_name }}"
+                                      id="{{ form.eligibility_criteria.id_for_label }}"
+                                      class="form-control {% if form.eligibility_criteria.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Who is eligible for this policy...">{{ form.eligibility_criteria.value|default:'' }}</textarea>
+                            {% for error in form.eligibility_criteria.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.equipment_provided.id_for_label }}" class="form-label">
+                                Equipment Provided
+                            </label>
+                            <textarea name="{{ form.equipment_provided.html_name }}"
+                                      id="{{ form.equipment_provided.id_for_label }}"
+                                      class="form-control {% if form.equipment_provided.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Equipment provided for remote work...">{{ form.equipment_provided.value|default:'' }}</textarea>
+                            {% for error in form.equipment_provided.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.communication_expectations.id_for_label }}" class="form-label">
+                                Communication Expectations
+                            </label>
+                            <textarea name="{{ form.communication_expectations.html_name }}"
+                                      id="{{ form.communication_expectations.id_for_label }}"
+                                      class="form-control {% if form.communication_expectations.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Communication expectations and guidelines...">{{ form.communication_expectations.value|default:'' }}</textarea>
+                            {% for error in form.communication_expectations.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Policy
+                        </button>
+                        <a href="{% url 'engagement:remote_policy_list' %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
