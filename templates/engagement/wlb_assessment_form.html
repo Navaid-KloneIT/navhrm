@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} WLB Assessment{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Work-Life Balance Assessment</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:wlb_assessment_list' %}">Assessments</a></li>
+            <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}Create{% endif %}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Assessment Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.employee.id_for_label }}" class="form-label">
+                                Employee <span class="text-danger">*</span>
+                            </label>
+                            <select name="{{ form.employee.html_name }}"
+                                    id="{{ form.employee.id_for_label }}"
+                                    class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                                <option value="">Select Employee</option>
+                                {% for choice in form.employee.field.queryset %}
+                                <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                                {% endfor %}
+                            </select>
+                            {% for error in form.employee.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.assessment_date.id_for_label }}" class="form-label">
+                                Assessment Date <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   name="{{ form.assessment_date.html_name }}"
+                                   id="{{ form.assessment_date.id_for_label }}"
+                                   class="form-control {% if form.assessment_date.errors %}is-invalid{% endif %}"
+                                   value="{{ form.assessment_date.value|default:'' }}">
+                            {% for error in form.assessment_date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.work_satisfaction.id_for_label }}" class="form-label">
+                                Work Satisfaction (1-5) <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.work_satisfaction.html_name }}"
+                                   id="{{ form.work_satisfaction.id_for_label }}"
+                                   class="form-control {% if form.work_satisfaction.errors %}is-invalid{% endif %}"
+                                   value="{{ form.work_satisfaction.value|default:'' }}"
+                                   min="1" max="5">
+                            {% for error in form.work_satisfaction.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.life_satisfaction.id_for_label }}" class="form-label">
+                                Life Satisfaction (1-5) <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.life_satisfaction.html_name }}"
+                                   id="{{ form.life_satisfaction.id_for_label }}"
+                                   class="form-control {% if form.life_satisfaction.errors %}is-invalid{% endif %}"
+                                   value="{{ form.life_satisfaction.value|default:'' }}"
+                                   min="1" max="5">
+                            {% for error in form.life_satisfaction.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.stress_level.id_for_label }}" class="form-label">
+                                Stress Level (1-5) <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
+                                   name="{{ form.stress_level.html_name }}"
+                                   id="{{ form.stress_level.id_for_label }}"
+                                   class="form-control {% if form.stress_level.errors %}is-invalid{% endif %}"
+                                   value="{{ form.stress_level.value|default:'' }}"
+                                   min="1" max="5">
+                            {% for error in form.stress_level.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                            <textarea name="{{ form.notes.html_name }}"
+                                      id="{{ form.notes.id_for_label }}"
+                                      class="form-control {% if form.notes.errors %}is-invalid{% endif %}"
+                                      rows="3"
+                                      placeholder="Additional notes...">{{ form.notes.value|default:'' }}</textarea>
+                            {% for error in form.notes.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-save-line me-1"></i> Save Assessment
+                        </button>
+                        <a href="{% url 'engagement:wlb_assessment_list' %}" class="btn btn-light">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
