@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}{{ title|default:"Volunteer Participant" }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>{{ title|default:"Volunteer Participant" }}</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item">Social Connect</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:volunteer_list' %}">Volunteering</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:volunteer_detail' activity.pk %}">{{ activity.title|truncatewords:5 }}</a></li>
+            <li class="breadcrumb-item active">Participant</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Participant for: {{ activity.title }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Employee -->
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">
+                        Employee <span class="text-danger">*</span>
+                    </label>
+                    <select name="{{ form.employee.html_name }}"
+                            id="{{ form.employee.id_for_label }}"
+                            class="form-select {% if form.employee.errors %}is-invalid{% endif %}">
+                        <option value="">Select Employee</option>
+                        {% for choice in form.employee.field.queryset %}
+                        <option value="{{ choice.pk }}" {% if form.employee.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.employee.errors %}<div class="invalid-feedback">{{ form.employee.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Hours Contributed -->
+                <div class="col-md-6">
+                    <label for="{{ form.hours_contributed.id_for_label }}" class="form-label">Hours Contributed</label>
+                    <input type="number" name="{{ form.hours_contributed.html_name }}"
+                           id="{{ form.hours_contributed.id_for_label }}"
+                           class="form-control {% if form.hours_contributed.errors %}is-invalid{% endif %}"
+                           value="{{ form.hours_contributed.value|default_if_none:'' }}"
+                           placeholder="Hours contributed"
+                           step="0.5">
+                    {% if form.hours_contributed.errors %}<div class="invalid-feedback">{{ form.hours_contributed.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Feedback -->
+                <div class="col-12">
+                    <label for="{{ form.feedback.id_for_label }}" class="form-label">Feedback</label>
+                    <textarea name="{{ form.feedback.html_name }}"
+                              id="{{ form.feedback.id_for_label }}"
+                              class="form-control {% if form.feedback.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Participant feedback...">{{ form.feedback.value|default_if_none:'' }}</textarea>
+                    {% if form.feedback.errors %}<div class="invalid-feedback">{{ form.feedback.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save
+        </button>
+        <a href="{% url 'engagement:volunteer_detail' activity.pk %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
