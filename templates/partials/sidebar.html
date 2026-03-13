@@ -1648,6 +1648,157 @@
                 </ul>
             </li>
 
+            <!-- ============================================================ -->
+            <!-- Engagement & Wellbeing -->
+            <!-- ============================================================ -->
+            <li class="menu-title" data-toggle="menu-section">Engagement & Wellbeing <i class="ri-arrow-down-s-line menu-title-arrow"></i></li>
+
+            <!-- Engagement Surveys -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'engagement' and 'survey' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'action_plan' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-questionnaire-line"></i>
+                    <span class="menu-text">Engagement Surveys</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'engagement' and 'survey' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'action_plan' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:survey_list' %}" class="menu-link {% if request.resolver_match.url_name == 'survey_list' %}active{% endif %}">
+                            <span class="menu-text">Surveys</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:action_plan_list' %}" class="menu-link {% if request.resolver_match.url_name == 'action_plan_list' %}active{% endif %}">
+                            <span class="menu-text">Action Plans</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Wellbeing Programs -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'engagement' and 'program' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'resource' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'challenge' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-heart-pulse-line"></i>
+                    <span class="menu-text">Wellbeing Programs</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'engagement' and 'program' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'resource' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'challenge' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:program_list' %}" class="menu-link {% if 'program' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Programs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:resource_list' %}" class="menu-link {% if 'resource' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Resources</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:challenge_list' %}" class="menu-link {% if 'challenge' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Wellness Challenges</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Work-Life Balance -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'engagement' and 'arrangement' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'remote_policy' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'wlb_assessment' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-scales-3-line"></i>
+                    <span class="menu-text">Work-Life Balance</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'engagement' and 'arrangement' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'remote_policy' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'wlb_assessment' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:arrangement_list' %}" class="menu-link {% if 'arrangement' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Work Arrangements</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:remote_policy_list' %}" class="menu-link {% if 'remote_policy' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Remote Policies</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:wlb_assessment_list' %}" class="menu-link {% if 'wlb_assessment' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">WLB Assessments</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Employee Assistance -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'engagement' and 'eap_program' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'counseling' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'eap_utilization' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-hand-heart-line"></i>
+                    <span class="menu-text">Employee Assistance</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'engagement' and 'eap_program' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'counseling' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'eap_utilization' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:eap_program_list' %}" class="menu-link {% if 'eap_program' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">EAP Programs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:counseling_list' %}" class="menu-link {% if 'counseling' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Counseling Sessions</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Culture & Values -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'engagement' and 'value' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'culture_assessment' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'nomination' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-award-line"></i>
+                    <span class="menu-text">Culture & Values</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'engagement' and 'value' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'culture_assessment' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'nomination' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:value_list' %}" class="menu-link {% if request.resolver_match.url_name == 'value_list' or request.resolver_match.url_name == 'value_detail' or request.resolver_match.url_name == 'value_create' or request.resolver_match.url_name == 'value_edit' %}active{% endif %}">
+                            <span class="menu-text">Company Values</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:culture_assessment_list' %}" class="menu-link {% if 'culture_assessment' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Culture Assessments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:nomination_list' %}" class="menu-link {% if 'nomination' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Value Nominations</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Social Connect -->
+            <li class="nav-item has-submenu {% if request.resolver_match.app_name == 'engagement' and 'event' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'interest_group' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'volunteer' in request.resolver_match.url_name %}open{% endif %}">
+                <a href="javascript:void(0);" class="menu-link" data-toggle="submenu">
+                    <i class="ri-group-line"></i>
+                    <span class="menu-text">Social Connect</span>
+                    <i class="ri-arrow-right-s-line menu-arrow"></i>
+                </a>
+                <ul class="sub-menu" {% if request.resolver_match.app_name == 'engagement' and 'event' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'interest_group' in request.resolver_match.url_name or request.resolver_match.app_name == 'engagement' and 'volunteer' in request.resolver_match.url_name %}style="display:block"{% endif %}>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:event_list' %}" class="menu-link {% if 'event' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Team Events</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:interest_group_list' %}" class="menu-link {% if 'interest_group' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Interest Groups</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'engagement:volunteer_list' %}" class="menu-link {% if 'volunteer' in request.resolver_match.url_name %}active{% endif %}">
+                            <span class="menu-text">Volunteering</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- Settings / Profile -->
             <li class="nav-item">
                 <a href="{% url 'accounts:profile' %}" class="menu-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
