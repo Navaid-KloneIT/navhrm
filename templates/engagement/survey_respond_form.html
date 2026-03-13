@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}Respond to Survey: {{ engagementsurvey.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Respond to Survey</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:survey_list' %}">Surveys</a></li>
+            <li class="breadcrumb-item active">{{ engagementsurvey.title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">{{ engagementsurvey.title }}</h5>
+        {% if engagementsurvey.description %}
+        <p class="text-muted mt-2 mb-0">{{ engagementsurvey.description }}</p>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% for question in questions %}
+            <div class="mb-4 {% if not forloop.last %}pb-4 border-bottom{% endif %}">
+                <label class="form-label fw-medium">
+                    {{ forloop.counter }}. {{ question.question_text }}
+                    {% if question.is_required %}<span class="text-danger">*</span>{% endif %}
+                </label>
+
+                {% if question.question_type == 'text' %}
+                <textarea class="form-control" name="question_{{ question.pk }}" rows="3" placeholder="Type your answer..."></textarea>
+
+                {% elif question.question_type == 'single_choice' %}
+                {% for option in question.options.all %}
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="question_{{ question.pk }}" id="question_{{ question.pk }}_{{ option.pk }}" value="{{ option.pk }}">
+                    <label class="form-check-label" for="question_{{ question.pk }}_{{ option.pk }}">{{ option.option_text }}</label>
+                </div>
+                {% endfor %}
+
+                {% elif question.question_type == 'multiple_choice' %}
+                {% for option in question.options.all %}
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="question_{{ question.pk }}" id="question_{{ question.pk }}_{{ option.pk }}" value="{{ option.pk }}">
+                    <label class="form-check-label" for="question_{{ question.pk }}_{{ option.pk }}">{{ option.option_text }}</label>
+                </div>
+                {% endfor %}
+
+                {% elif question.question_type == 'rating' %}
+                <div class="d-flex align-items-center gap-3">
+                    <input type="number" class="form-control" name="question_{{ question.pk }}" min="1" max="5" style="width: 100px;" placeholder="1-5">
+                    <small class="text-muted">Rate from 1 (lowest) to 5 (highest)</small>
+                </div>
+
+                {% elif question.question_type == 'yes_no' %}
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="question_{{ question.pk }}" id="question_{{ question.pk }}_yes" value="yes">
+                    <label class="form-check-label" for="question_{{ question.pk }}_yes">Yes</label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="question_{{ question.pk }}" id="question_{{ question.pk }}_no" value="no">
+                    <label class="form-check-label" for="question_{{ question.pk }}_no">No</label>
+                </div>
+
+                {% elif question.question_type == 'scale' %}
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted">1</span>
+                    <input type="range" class="form-range flex-grow-1" name="question_{{ question.pk }}" min="1" max="10" value="5" id="scale_{{ question.pk }}" oninput="document.getElementById('scale_val_{{ question.pk }}').textContent = this.value">
+                    <span class="text-muted">10</span>
+                    <span class="badge bg-primary" id="scale_val_{{ question.pk }}">5</span>
+                </div>
+
+                {% else %}
+                <input type="text" class="form-control" name="question_{{ question.pk }}" placeholder="Type your answer...">
+                {% endif %}
+            </div>
+            {% empty %}
+            <div class="text-center py-4">
+                <div class="text-muted">
+                    <i class="ri-question-line" style="font-size: 48px; opacity: 0.3;"></i>
+                    <p class="mt-2 mb-1">No questions in this survey</p>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% if questions %}
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-send-plane-line me-1"></i> Submit Response
+                </button>
+                <a href="{% url 'engagement:survey_list' %}" class="btn btn-light">Cancel</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}
