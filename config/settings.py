@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'apps.talent',
     'apps.compliance',
     'apps.workforce',
+    'apps.engagement',
 ]
 
 MIDDLEWARE = [
