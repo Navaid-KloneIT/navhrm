@@ -25,6 +25,7 @@ urlpatterns = [
     path('talent/', include('apps.talent.urls')),
     path('compliance/', include('apps.compliance.urls')),
     path('workforce/', include('apps.workforce.urls')),
+    path('engagement/', include('apps.engagement.urls')),
 ]
 
 if settings.DEBUG:
