@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}Add Participant - {{ challenge.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Add Participant</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item">Wellbeing</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:challenge_list' %}">Challenges</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:challenge_detail' challenge.pk %}">{{ challenge.title }}</a></li>
+            <li class="breadcrumb-item active">Add Participant</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="POST" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Participant Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="{{ form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger">*</span></label>
+                    <select class="form-select {% if form.employee.errors %}is-invalid{% endif %}" id="{{ form.employee.id_for_label }}" name="{{ form.employee.html_name }}">
+                        <option value="">-- Select Employee --</option>
+                        {% for value, label in form.employee.field.choices %}
+                        <option value="{{ value }}" {% if form.employee.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.employee.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.progress.id_for_label }}" class="form-label">Progress</label>
+                    <input type="number" class="form-control {% if form.progress.errors %}is-invalid{% endif %}" id="{{ form.progress.id_for_label }}" name="{{ form.progress.html_name }}" value="{{ form.progress.value|default_if_none:'0' }}" min="0" placeholder="e.g., 0">
+                    {% for error in form.progress.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i> Save
+        </button>
+        <a href="{% url 'engagement:challenge_detail' challenge.pk %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
