@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}EAP Program - {{ eapprogram.name }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>EAP Program Details</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:eap_program_list' %}">EAP Programs</a></li>
+            <li class="breadcrumb-item active">{{ eapprogram.name }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Program Info -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Program Information</h5>
+                {% if eapprogram.is_active %}
+                <span class="badge bg-soft-success text-success fs-6">Active</span>
+                {% else %}
+                <span class="badge bg-soft-secondary text-secondary fs-6">Inactive</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Program Name</small>
+                        <div class="fw-medium">{{ eapprogram.name }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Service Type</small>
+                        <div>
+                            <span class="badge bg-soft-{{ eapprogram.service_type|service_type_color }} text-{{ eapprogram.service_type|service_type_color }}">
+                                {{ eapprogram.get_service_type_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Provider</small>
+                        <div class="fw-medium">{{ eapprogram.provider|default:"-" }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Contact Information</small>
+                        <div class="fw-medium">{{ eapprogram.contact_info|default:"-" }}</div>
+                    </div>
+                </div>
+
+                {% if eapprogram.description %}
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Description</small>
+                    <p class="mt-1 mb-0">{{ eapprogram.description|linebreaks }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Sessions -->
+        <div class="card table-card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Sessions</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Counselor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for session in sessions %}
+                            <tr>
+                                <td class="fw-medium">{{ session.employee }}</td>
+                                <td>
+                                    <span class="badge bg-soft-{{ session.session_type|session_type_color }} text-{{ session.session_type|session_type_color }}">
+                                        {{ session.get_session_type_display }}
+                                    </span>
+                                </td>
+                                <td>{{ session.session_date|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge bg-soft-{{ session.status|session_status_color }} text-{{ session.status|session_status_color }}">
+                                        {{ session.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ session.counselor_name|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <p class="mb-0">No sessions recorded for this program.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Utilization Records -->
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Utilization Records</h5>
+                <a href="{% url 'engagement:eap_utilization_create' eapprogram.pk %}" class="btn btn-sm btn-success">
+                    <i class="ri-add-line me-1"></i> Add Utilization
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Sessions</th>
+                                <th>Participants</th>
+                                <th>Satisfaction</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for util in utilizations %}
+                            <tr>
+                                <td class="fw-medium">{{ util.period_start|date:"M d, Y" }} - {{ util.period_end|date:"M d, Y" }}</td>
+                                <td>{{ util.total_sessions }}</td>
+                                <td>{{ util.total_participants }}</td>
+                                <td>
+                                    {% if util.satisfaction_score %}
+                                    <span class="badge bg-soft-{% if util.satisfaction_score >= 4 %}success{% elif util.satisfaction_score >= 3 %}warning{% else %}danger{% endif %} text-{% if util.satisfaction_score >= 4 %}success{% elif util.satisfaction_score >= 3 %}warning{% else %}danger{% endif %}">
+                                        {{ util.satisfaction_score }}/5
+                                    </span>
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <p class="mb-0">No utilization records found.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'engagement:eap_program_edit' eapprogram.pk %}" class="btn btn-warning">
+                        <i class="ri-pencil-line me-1"></i> Edit Program
+                    </a>
+                    <a href="{% url 'engagement:eap_program_delete' eapprogram.pk %}" class="btn btn-danger">
+                        <i class="ri-delete-bin-line me-1"></i> Delete Program
+                    </a>
+                    <a href="{% url 'engagement:eap_program_list' %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
