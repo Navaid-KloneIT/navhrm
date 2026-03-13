@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}Respond - {{ assessment.title }}{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <h4>Submit Response</h4>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">Engagement & Wellbeing</li>
+            <li class="breadcrumb-item">Culture & Values</li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:culture_assessment_list' %}">Culture Assessments</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'engagement:culture_assessment_detail' assessment.pk %}">{{ assessment.title|truncatewords:5 }}</a></li>
+            <li class="breadcrumb-item active">Submit Response</li>
+        </ol>
+    </nav>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Response for: {{ assessment.title }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Alignment Score -->
+                <div class="col-md-6">
+                    <label for="{{ form.alignment_score.id_for_label }}" class="form-label">
+                        Alignment Score (1-5) <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" name="{{ form.alignment_score.html_name }}"
+                           id="{{ form.alignment_score.id_for_label }}"
+                           class="form-control {% if form.alignment_score.errors %}is-invalid{% endif %}"
+                           value="{{ form.alignment_score.value|default_if_none:'' }}"
+                           min="1" max="5"
+                           placeholder="1-5">
+                    {% if form.alignment_score.errors %}<div class="invalid-feedback">{{ form.alignment_score.errors.0 }}</div>{% endif %}
+                </div>
+
+                <!-- Comments -->
+                <div class="col-12">
+                    <label for="{{ form.comments.id_for_label }}" class="form-label">Comments</label>
+                    <textarea name="{{ form.comments.html_name }}"
+                              id="{{ form.comments.id_for_label }}"
+                              class="form-control {% if form.comments.errors %}is-invalid{% endif %}"
+                              rows="4"
+                              placeholder="Share your thoughts...">{{ form.comments.value|default_if_none:'' }}</textarea>
+                    {% if form.comments.errors %}<div class="invalid-feedback">{{ form.comments.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="ri-send-plane-line me-1"></i> Submit Response
+        </button>
+        <a href="{% url 'engagement:culture_assessment_detail' assessment.pk %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}
