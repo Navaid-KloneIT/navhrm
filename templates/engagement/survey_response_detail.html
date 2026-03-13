@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load engagement_tags %}
+
+{% block title %}Survey Response{% endblock %}
+
+{% block content %}
+<div class="page-title-box">
+    <div>
+        <h4>Survey Response</h4>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item">Engagement & Wellbeing</li>
+                <li class="breadcrumb-item"><a href="{% url 'engagement:survey_list' %}">Surveys</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'engagement:survey_detail' engagementsurveyresponse.survey.pk %}">{{ engagementsurveyresponse.survey.title }}</a></li>
+                <li class="breadcrumb-item active">Response</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'engagement:survey_detail' engagementsurveyresponse.survey.pk %}" class="btn btn-light">
+            <i class="ri-arrow-left-line me-1"></i> Back to Survey
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Response Info -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Response Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Survey</p>
+                        <p class="fw-medium">
+                            <a href="{% url 'engagement:survey_detail' engagementsurveyresponse.survey.pk %}">{{ engagementsurveyresponse.survey.title }}</a>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Respondent</p>
+                        <p class="fw-medium">
+                            {% if engagementsurveyresponse.survey.is_anonymous %}
+                            <span class="text-muted">Anonymous</span>
+                            {% else %}
+                            {{ engagementsurveyresponse.employee|default:"Anonymous" }}
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1 text-muted">Submitted</p>
+                        <p class="fw-medium">{{ engagementsurveyresponse.submitted_at|date:"M d, Y H:i"|default:engagementsurveyresponse.created_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Answers -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Answers ({{ answers|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% for answer in answers %}
+                <div class="{% if not forloop.last %}mb-4 pb-4 border-bottom{% endif %}">
+                    <h6 class="text-muted mb-2">{{ forloop.counter }}. {{ answer.question.question_text }}</h6>
+                    <p class="mb-0 fw-medium">{{ answer.answer_text|default:answer.selected_option|default:"-" }}</p>
+                </div>
+                {% empty %}
+                <div class="text-center py-4">
+                    <div class="text-muted">
+                        <i class="ri-file-text-line" style="font-size: 48px; opacity: 0.3;"></i>
+                        <p class="mt-2 mb-1">No answers recorded</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Actions Sidebar -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'engagement:survey_detail' engagementsurveyresponse.survey.pk %}" class="btn btn-light">
+                        <i class="ri-arrow-left-line me-1"></i> Back to Survey
+                    </a>
+                    <a href="{% url 'engagement:survey_list' %}" class="btn btn-light">
+                        <i class="ri-list-check me-1"></i> All Surveys
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
