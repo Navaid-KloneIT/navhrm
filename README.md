@@ -94,6 +94,14 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
 - **Compensation Planning** - Compensation plans (merit/promotion/market adjustment/annual review) with budget tracking and utilization, employee recommendations with current/recommended salary and increase percentage, approval workflow
 - **Rewards & Recognition** - Reward programs (spot award/service award/peer recognition/performance bonus/team award) with budget tracking, employee recognitions with nominee/nominator, approval workflow (nominated → approved → awarded)
 
+### Employee Engagement & Wellbeing Module
+- **Engagement Surveys** - Pulse surveys, eNPS, engagement & custom surveys with multiple question types (text/single choice/multiple choice/rating/yes-no/scale), anonymous responses, action planning with priority and status tracking
+- **Wellbeing Programs** - Program management by category (mental health/physical/nutrition/financial/social/mindfulness), wellbeing resource library (articles/videos/podcasts/webinars/tools/guides), wellness challenges with participant progress tracking
+- **Work-Life Balance** - Flexible work arrangements (remote/hybrid/flexible hours/compressed week/job sharing) with approval workflow, remote work policies with eligibility and equipment details, work-life balance assessments with satisfaction and stress scoring
+- **Employee Assistance** - EAP program management by service type (counseling/legal/financial/career/family/substance abuse), counseling session scheduling and tracking, program utilization reporting with satisfaction scores
+- **Culture & Values** - Company values definition with icons and ordering, culture assessments with employee alignment scoring, value nominations with peer recognition and featured highlights
+- **Social Connect** - Team events (team building/celebration/sports/cultural/learning/social) with RSVP and attendance tracking, interest groups by category with member roles, volunteer activities with hours tracking and participant feedback
+
 ### Talent Management & Succession Planning Module
 - **Talent Pool** - High-potential employee identification, talent assessments with performance/potential ratings (1-5), auto-calculated 9-box grid categories, interactive 9-box grid visualization
 - **Succession Planning** - Critical role mapping with criticality levels (critical/high/medium/low), successor identification with readiness timelines (ready now/1-2 years/3-5 years), development needs tracking
@@ -199,6 +207,7 @@ A multi-tenant HRM application built with Django and Bootstrap 5.
    python manage.py seed_compensation
    python manage.py seed_talent
    python manage.py seed_workforce
+   python manage.py seed_engagement
    ```
 
 8. **Run the development server**
@@ -245,6 +254,7 @@ navhrm/
 │   ├── additional/        # Asset, expense, travel management & helpdesk
 │   ├── compensation/      # Compensation & benefits, salary benchmarking, ESOP
 │   ├── talent/            # Talent management, succession planning, career pathing
+│   ├── engagement/        # Employee engagement, wellbeing, culture & social connect
 │   └── workforce/         # Workforce planning, demand forecasting, gap analysis
 ├── config/                # Django settings, URLs, WSGI
 ├── static/
@@ -271,6 +281,7 @@ navhrm/
 │   ├── additional/        # Additional modules templates (31 files)
 │   ├── compensation/      # Compensation & benefits templates (31 files)
 │   ├── talent/            # Talent management templates (32 files)
+│   ├── engagement/        # Engagement & wellbeing templates (56 files)
 │   └── workforce/         # Workforce planning templates (28 files)
 ├── media/                 # User uploads
 ├── manage.py
